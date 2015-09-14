@@ -47,7 +47,7 @@ public class Cam implements CameraCallback, Runnable
 	private boolean wantToChangeRes = false;
 	private int iheight;
 	private int iwidth;
-	public int camId;
+	private int camId;
 	private int ipreviewFormat;
 	private boolean onPreviewFrameInProgress;
 	
@@ -77,7 +77,7 @@ public class Cam implements CameraCallback, Runnable
 		camera.startPreview();
 		Log.e("cam", "preview gestartet");
 		setupPictureMode();
-		new Thread(this).start();
+		new Thread(this, "CAM").start();
 		Thread t = new Thread(new Runnable(){
 			public void run() {
 				ss = null;
@@ -107,6 +107,7 @@ public class Cam implements CameraCallback, Runnable
 					Log.e("thread camera","javaprog gefunden" + client.getInetAddress().toString());
 			}
 		});
+		t.setName("CAM Network");
 		t.start();
 	}
 	/**
@@ -144,7 +145,7 @@ public class Cam implements CameraCallback, Runnable
         try {
             camera.setPreviewDisplay(camerasurface.holder);
             camera.setPreviewCallback(previewcallback);
-    } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) { e.printStackTrace(); }
 	    camerasurface.setCamera(camera);
 		camerasurface.setCallback(this);
 	    parameters = camera.getParameters();
@@ -163,21 +164,52 @@ public class Cam implements CameraCallback, Runnable
 	{
 		while(onPreviewFrameInProgress)
 		{
-			Log.e("bla", "bla");
+			//Log.e("bla", "bla");
 		}
 		Log.e("cam", "preview stop changeres");
 		parameters = camera.getParameters();
 		List<Size> temp = parameters.getSupportedPreviewSizes();
+		//camera.stopPreview();
 		if(index < temp.size() && index >= 0){
-		int newwidth = temp.get(temp.size()-1-index).width;
-		int newheight = temp.get(temp.size()-1-index).height;
-		width = newwidth;
-		height = newheight;
-		parameters = camera.getParameters();
-		parameters.setPreviewSize(newwidth, newheight);
-		camera.setParameters(parameters);
-		camera.startPreview();
-		Log.e("cam", "preview restarted changeres");
+			if (camera != null) {
+		        stopCamera();
+		    }
+			camera = Camera.open(camId);
+			parameters = camera.getParameters();
+	        try {
+	            camera.setPreviewDisplay(camerasurface.holder);
+	            camera.setPreviewCallback(previewcallback);
+	        } catch (IOException e) { e.printStackTrace(); }
+		    camerasurface.setCamera(camera);
+			camerasurface.setCallback(this);
+		    parameters = camera.getParameters();
+		    width = temp.get(temp.size()-1-index).width;
+		    height = temp.get(temp.size()-1-index).height;
+		    previewFormat = parameters.getPreviewFormat();
+		    //controller.network.socket_package.newPreviewSizes();
+		    parameters.setPreviewSize(width, height);
+			camera.setParameters(parameters);
+		    camera.startPreview();
+			
+			/*
+			//camera.stopPreview();
+			controller.log.write(Log.INFO, "2.Teil");
+			int newwidth = temp.get(temp.size()-1-index).width;
+			int newheight = temp.get(temp.size()-1-index).height;
+			width = newwidth;
+			height = newheight;
+			controller.log.write(Log.INFO, "3.Teil - Breite: "+width+" Hoehe: "+height);
+			parameters = camera.getParameters();
+			controller.log.write(Log.INFO, "4.Teil");
+			//parameters.set
+			//parameters.setPictureSize(newwidth, newheight);
+			parameters.setPreviewSize(newwidth, newheight);
+			controller.log.write(Log.INFO, "5.Teil");
+			camera.setParameters(parameters);
+			controller.log.write(Log.INFO, "6.Teil");
+			//camera.startPreview();
+			Log.e("cam", "preview restarted changeres");
+			controller.log.write(Log.INFO, "7.Teil");*/
 		}
 	}
 	/**
