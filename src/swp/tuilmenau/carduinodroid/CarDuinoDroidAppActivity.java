@@ -17,7 +17,7 @@ import android.widget.*;
  * @see Activity
  */
 public class CarDuinoDroidAppActivity extends Activity 
-{	
+{
 	private Controller_Android controller_Android;
 
 	private NotificationManager notificationManager;
@@ -26,9 +26,11 @@ public class CarDuinoDroidAppActivity extends Activity
 	private PendingIntent contentIntent;
 	private PowerManager powerManager;
 	private PowerManager.WakeLock wakelock;
+	private int level=100;
 
 	private RadioGroup logLevelSwitch;
 	private RadioGroup.OnCheckedChangeListener logLevelSwitcherListener;
+	
 	
 	/**
 	 * Called when the activity is first created.
@@ -44,7 +46,9 @@ public class CarDuinoDroidAppActivity extends Activity
 		// prevent the application from switching to landscape-mode
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		// initialize controller field hosting all other sub classes
+	
 		controller_Android = new Controller_Android(this);
+		
 		// initialize fields for wake_lock
 		powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakelock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "CarduinoDroid_Full_Wake_Lock");
@@ -65,8 +69,17 @@ public class CarDuinoDroidAppActivity extends Activity
 			}
 		};
 		logLevelSwitch.setOnCheckedChangeListener(logLevelSwitcherListener); 
-	}   
+		
+		this.registerReceiver(this.batteryInfoReceiver,	new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+	}  
 
+	private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			controller_Android.gps.SetBatteryLevel(intent.getIntExtra(BatteryManager.EXTRA_LEVEL,0));
+		}
+	};
+	
 	/**
 	 * Called when the close button is pressed.
 	 * 
@@ -104,7 +117,8 @@ public class CarDuinoDroidAppActivity extends Activity
 	 * 
 	 * @see Activity#onPause()
 	 */
-	public void onPause()
+	@Override
+	public void onStop()
 	{
 		cleanUp();
 		finish();
@@ -116,14 +130,13 @@ public class CarDuinoDroidAppActivity extends Activity
 	 */
 	private void cleanUp()
 	{
+		controller_Android.stop();
 		notificationManager.cancel(1337);
 		controller_Android.log.save();
 		wakelock.release();
 		controller_Android.cam.disableCamera();
 		unregisterReceiver(controller_Android.connection.connectionLogger);
-		unregisterReceiver(controller_Android.arduino.mUsbReceiver);
-		controller_Android.arduino.closeAccessory();
 		controller_Android.sound.resetVolume();
 		//controller_Android.network.close();
-	}
+	}		
 }
