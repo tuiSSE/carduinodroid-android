@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="serial">
+        <item>@string/bluetooth</item>
+        <item>@string/usb</item>
+    </string-array>
+    <string-array name="serial_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="remote">
+        <item>@string/isSlave</item>
+        <item>@string/isRemote</item>
+    </string-array>
+    <integer-array name="remote_values">
+        <item>0</item>
+        <item>1</item>
+    </integer-array>
+</resources>

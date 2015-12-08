@@ -1,4 +1,4 @@
-package com.swp.tuilmenau.carduinodroid2;
+package com.swp.tuilmenau.myapplication;
 
 import org.junit.Test;
 

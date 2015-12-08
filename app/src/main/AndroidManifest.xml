@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.swp.tuilmenau.carduinodroid2">
+    package="com.swp.tuilmenau.carduinodroid_android">
 
     <uses-sdk android:minSdkVersion="16" />
 
+
     <application
+        android:name=".CarduinodroidApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name="com.swp.tuilmenau.carduinodroid_android.CarduinodroidApplication">
-
+        android:theme="@style/AppTheme">
         <activity
-            android:name="com.swp.tuilmenau.carduinodroid_android.StatusActivity"
+            android:name=".StatusActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -23,10 +22,13 @@
         </activity>
 
         <service
-            android:name="com.swp.tuilmenau.carduinodroid_android.SerialService"
+            android:name=".SerialService"
             android:enabled="true"
-            android:exported="true">
-        </service>
+            android:exported="true"></service>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
     </application>
 
 </manifest>

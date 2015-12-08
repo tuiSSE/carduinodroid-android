@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+        android:title="Remote Control" >
+        <CheckBoxPreference
+            android:key="remote"
+            android:defaultValue="true"
+            android:title=""
+            android:summaryOff="@string/isRemote"
+            android:summaryOn="@string/isSlave"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Connection"
+        android:dependency="remote" >
+        <ListPreference
+            android:key="serialBluetooth1USB0"
+            android:dependency="remote"
+            android:defaultValue="0"
+            android:entries="@array/serial"
+            android:entryValues="@array/serial_values"
+            android:summary="@string/serial"
+            android:title="@string/bluetooth" />
+        <CheckBoxPreference
+            android:key="rcNetwork1Activity0"
+            android:dependency="remote"
+            android:defaultValue="true"
+            android:summaryOn="Network"
+            android:summaryOff="Application"
+            android:title="Remote Control" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Connection" >
+        <EditTextPreference
+            android:key="targetIP"
+            android:defaultValue="@string/default_ip"
+            android:summary="@string/default_ip"
+            android:title="Remote IP" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

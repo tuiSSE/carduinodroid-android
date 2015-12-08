@@ -2,16 +2,18 @@ package com.swp.tuilmenau.carduinodroid_android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import com.swp.tuilmenau.carduinodroid2.R;
+import com.swp.tuilmenau.carduinodroid_android.R;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
 public class StatusActivity extends Activity {
 
     private static final String TAG = "CarduinoMainActivity";
+    private CarduinodroidApplication carduino;
     Button closeButton;
     Button settingsButton;
     Button startSerialButton;
@@ -20,7 +22,10 @@ public class StatusActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.carduino = (CarduinodroidApplication) getApplication();
         setContentView(R.layout.activity_status);
+        // prevent the application from switching to landscape-mode
+        setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
 
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);
@@ -38,6 +43,7 @@ public class StatusActivity extends Activity {
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
                 Log.d(TAG, "onClickSettings");
             }
         });
@@ -45,8 +51,10 @@ public class StatusActivity extends Activity {
         startSerialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startService(new Intent(StatusActivity.this, SerialService.class));
-                Log.d(TAG, "onClickSerialStart");
+                if(!carduino.isSerialServiceRunning()) {
+                    startService(new Intent(StatusActivity.this, SerialService.class));
+                    Log.d(TAG, "onClickSerialStart");
+                }
             }
         });
         stopSerialButton.setOnClickListener(new View.OnClickListener() {

@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
-    private final int DELAY = 100; //100ms
+    private final int DELAY = 100*10; //100*100ms
 
     private boolean runFlag = false;
     private RunThread runThread;
@@ -33,7 +33,6 @@ public class SerialService extends Service {
         this.runFlag = true;
         this.runThread.start();
         this.carduino.setSerialServiceRunning(true);
-
         Log.d(TAG, "onStarted");
         return START_STICKY;
     }

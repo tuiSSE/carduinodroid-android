@@ -5,4 +5,12 @@
     <string name="close_app">Close</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="serial">select Serial Connection</string>
+    <string name="bluetooth">serial: Bluetooth</string>
+    <string name="usb">serial: USB</string>
+    <string name="isSlave">ServiceApplication</string>
+    <string name="isRemote">RemoteApplication</string>
+    <string name="default_ip">141.24.11.1</string>
 </resources>
