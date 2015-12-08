@@ -3,7 +3,7 @@ package com.swp.tuilmenau.carduinodroid_android;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+import android.content.pm.ActivityInfo;
 
 public class SettingsActivity extends PreferenceActivity
 {
@@ -12,7 +12,7 @@ public class SettingsActivity extends PreferenceActivity
     {
         super.onCreate(savedInstanceState);
         // prevent the application from switching to landscape-mode
-        setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }
 

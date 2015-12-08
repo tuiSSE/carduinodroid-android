@@ -11,7 +11,7 @@ import android.util.Log;
 public class CarduinodroidApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CarduinoApplication";
     private SharedPreferences sharedPrefs;
-    private boolean serialServiceRunning = false;
+    private volatile boolean serialServiceRunning = false;
     public Prefs prefs;
     public SerialDataTx serialDataTx;
     public SerialDataRx serialDataRx;

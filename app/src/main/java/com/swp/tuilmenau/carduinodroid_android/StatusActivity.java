@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+import android.content.pm.ActivityInfo;
 
 public class StatusActivity extends Activity {
 
@@ -23,7 +23,7 @@ public class StatusActivity extends Activity {
         this.carduino = (CarduinodroidApplication) getApplication();
         setContentView(R.layout.activity_status);
         // prevent the application from switching to landscape-mode
-        setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);

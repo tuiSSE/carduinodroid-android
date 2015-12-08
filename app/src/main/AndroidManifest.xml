@@ -5,6 +5,9 @@
     <uses-sdk android:minSdkVersion="16" />
 
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <application
         android:name=".CarduinodroidApplication"
         android:allowBackup="true"
