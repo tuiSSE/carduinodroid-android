@@ -3,7 +3,6 @@ package com.swp.tuilmenau.carduinodroid_android;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import com.swp.tuilmenau.carduinodroid_android.R;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
 public class SettingsActivity extends PreferenceActivity

@@ -31,8 +31,9 @@ public class SerialService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         this.runFlag = true;
-        this.runThread.start();
         this.carduino.setSerialServiceRunning(true);
+
+        this.runThread.start();
         Log.d(TAG, "onStarted");
         return START_STICKY;
     }
@@ -61,7 +62,7 @@ public class SerialService extends Service {
             while (serialService.runFlag) {
                 Log.d(TAG, "runThread runs");
                 try {
-
+                    
                     Log.d(TAG, "runThread done");
                     Thread.sleep(DELAY);
                 } catch (InterruptedException e) {

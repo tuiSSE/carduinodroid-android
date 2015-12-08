@@ -10,8 +10,7 @@
             android:summaryOn="@string/isSlave"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Connection"
-        android:dependency="remote" >
+        android:title="Connection" >
         <ListPreference
             android:key="serialBluetooth1USB0"
             android:dependency="remote"

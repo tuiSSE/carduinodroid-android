@@ -32,11 +32,11 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         Log.i(TAG, "onTerminated");
     }
 
-    public boolean isSerialServiceRunning() {
+    public synchronized boolean isSerialServiceRunning() {
         return this.serialServiceRunning;
     }
 
-    public void setSerialServiceRunning(boolean serialServiceRunning) {
+    public synchronized void setSerialServiceRunning(boolean serialServiceRunning) {
         this.serialServiceRunning = serialServiceRunning;
     }
 
