@@ -17,17 +17,17 @@ import java.util.UUID;
  */
 public class SerialBluetooth {
     private final String TAG = "CarduinoSerialBluetooth";
+    private boolean connected;
     final static int BUFFERSIZE = 100;
     BluetoothAdapter mBluetoothAdapter = null;
-    BluetoothSocket mmSocket = null;
     BluetoothDevice mmDevice = null;
+    BluetoothSocket mmSocket = null;
     OutputStream mmOutputStream = null;
     InputStream mmInputStream = null;
     byte[] readBuffer = null;
     byte[] writeBuffer = null;
 
     public void find(){
-
         // Verbindung mit Bluetooth-Adapter herstellen
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -40,72 +40,73 @@ public class SerialBluetooth {
         }
     }
 
-    public boolean connect(){
+    public boolean connect() {
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
         boolean isConnected = true;
 
-
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if(pairedDevices.size() > 0)
-        {
-            for(BluetoothDevice device : pairedDevices) {
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
                 if (device.getName().contains("HC-06")) {
                     mmDevice = device;
                     break;
                 }
+
             }
         }
-        mBluetoothAdapter.cancelDiscovery();
-        if(mmDevice == null){
-            Log.e(TAG,"No paired Ardunio found!");
+
+        if (mmDevice == null) {
+            Log.e(TAG, "No paired Ardunio found!");
             isConnected = false;
         }
 
-        // Socket erstellen
-        try{
-            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-        } catch (Exception e) {
-            isConnected = false;
-            Log.e(TAG, "Socket Erstellung fehlgeschlagen: " + e.toString());
-        }
-        // Socket verbinden
-        try {
-            mmSocket.connect();
-            Log.d(TAG, "Socket verbunden");
-        } catch (IOException e) {
-            isConnected = false;
-            Log.e(TAG, "Socket kann nicht verbinden: " + e.toString());
+        if(isConnected) {
+            // Socket erstellen
+            try {
+                mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+            } catch (Exception e) {
+                isConnected = false;
+                Log.e(TAG, "Socket Erstellung fehlgeschlagen: " + e.toString());
+            }
+            mBluetoothAdapter.cancelDiscovery();
+            // Socket verbinden
+            try {
+                mmSocket.connect();
+            } catch (IOException e) {
+                isConnected = false;
+                Log.e(TAG, "Socket kann nicht verbinden: " + e.toString());
+            }
         }
 
         // Socket beenden, falls nicht verbunden werden konnte
         if (!isConnected) {
             try {
                 mmSocket.close();
+                Log.d(TAG,"Socket closed");
             } catch (Exception e) {
                 Log.e(TAG,"Socket kann nicht beendet werden: " + e.toString());
             }
         }
+        else {
+            // Outputstream erstellen:
+            try {
+                mmOutputStream = mmSocket.getOutputStream();
+            } catch (IOException e) {
+                Log.e(TAG, "OutputStream Fehler: " + e.toString());
+                isConnected = false;
+            }
 
-        // Outputstream erstellen:
-        try {
-            mmOutputStream = mmSocket.getOutputStream();
-            Log.d(TAG, "OutputStream erstellt");
-        } catch (IOException e) {
-            Log.e(TAG, "OutputStream Fehler: " + e.toString());
-            isConnected = false;
-        }
-
-        // Inputstream erstellen
-        try {
-            mmInputStream = mmSocket.getInputStream();
-            Log.d(TAG, "InputStream erstellt");
-        } catch (IOException e) {
-            Log.e(TAG, "InputStream Fehler: " + e.toString());
-            isConnected = false;
+            // Inputstream erstellen
+            try {
+                mmInputStream = mmSocket.getInputStream();
+            } catch (IOException e) {
+                Log.e(TAG, "InputStream Fehler: " + e.toString());
+                isConnected = false;
+            }
         }
 
         if (isConnected) {
-            Log.e(TAG, "Verbunden mit " + mmDevice.getName());
+            Log.i(TAG, "Verbunden mit " + mmDevice.getName());
         } else {
             Log.e(TAG,"Verbindungsfehler mit " + uuid.toString());
         }
@@ -136,7 +137,7 @@ public class SerialBluetooth {
         return true;
     }
 
-    public boolean rec(){
+    public boolean recv(){
 
         return true;
     }

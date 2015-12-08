@@ -26,6 +26,7 @@ public class SerialService extends Service {
         this.carduino = (CarduinodroidApplication) getApplication();
         this.runRxThread = new RunRxThread();
         this.runTxThread = new RunTxThread();
+        bluetooth = new SerialBluetooth();
         Log.d(TAG,"onCreated");
     }
 
@@ -33,28 +34,30 @@ public class SerialService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         if(runFlag == true){
-            return Service.START_REDELIVER_INTENT;
+            return Service.START_STICKY;
         }
-
         this.runFlag = true;
         this.carduino.setSerialServiceRunning(true);
 
         bluetooth.find();
+
         new Thread(new Runnable(){
+            boolean connected = false;
             public void run(){
-                while(!bluetooth.connect())
+                while(!connected && runFlag)
                 try {
                     Thread.sleep(DELAY);
+                    connected = bluetooth.connect();
                 } catch (InterruptedException e) {
                 }
             }
         }, "connectBluetoothThread").start();
-
+/*
         this.runRxThread.start();
         this.runTxThread.start();
-
+*/
         Log.d(TAG, "onStarted");
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
     @Override
@@ -69,9 +72,7 @@ public class SerialService extends Service {
         this.runTxThread = null;
 
         //disconnect
-
-
-        Log.d(TAG,"onDestroyed");
+        Log.i(TAG,"onDestroyed");
     }
 
     private class RunRxThread extends Thread {
