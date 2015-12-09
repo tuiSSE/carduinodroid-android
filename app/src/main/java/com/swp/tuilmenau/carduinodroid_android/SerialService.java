@@ -13,7 +13,7 @@ public class SerialService extends Service {
     private RunRxThread runRxThread;
     private RunTxThread runTxThread;
     private CarduinodroidApplication carduino;
-    private SerialBluetooth bluetooth;
+    private SerialConnection serial;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -26,36 +26,30 @@ public class SerialService extends Service {
         this.carduino = (CarduinodroidApplication) getApplication();
         this.runRxThread = new RunRxThread();
         this.runTxThread = new RunTxThread();
-        bluetooth = new SerialBluetooth();
+        serial = new SerialBluetooth();
         Log.d(TAG,"onCreated");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        if(runFlag == true){
+        if (runFlag == true) {
             return Service.START_STICKY;
         }
         this.runFlag = true;
         this.carduino.setSerialServiceRunning(true);
 
-        bluetooth.find();
-
-        new Thread(new Runnable(){
-            boolean connected = false;
-            public void run(){
-                while(!connected && runFlag)
-                try {
-                    Thread.sleep(DELAY);
-                    connected = bluetooth.connect();
-                } catch (InterruptedException e) {
-                }
+        new Thread(new Runnable() {
+            public void run() {
+                serial.find();
+                serial.connect();
             }
         }, "connectBluetoothThread").start();
-/*
-        this.runRxThread.start();
-        this.runTxThread.start();
-*/
+        if (serial.isConnected()){
+            Log.d(TAG, "Start Serial Threads");
+            this.runRxThread.start();
+            this.runTxThread.start();
+        }
         Log.d(TAG, "onStarted");
         return START_STICKY;
     }
@@ -66,6 +60,7 @@ public class SerialService extends Service {
 
         this.runFlag = false;
         this.carduino.setSerialServiceRunning(false);
+        this.serial.close();
         this.runRxThread.interrupt();
         this.runTxThread.interrupt();
         this.runRxThread = null;
@@ -98,7 +93,6 @@ public class SerialService extends Service {
     }//runRxThread
 
     private class RunTxThread extends Thread {
-
         public RunTxThread() {
             super("SerialService-RunTxThread");
         }

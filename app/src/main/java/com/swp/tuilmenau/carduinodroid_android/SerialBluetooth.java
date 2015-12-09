@@ -15,35 +15,38 @@ import java.util.UUID;
 /**
  * Created by keX on 08.12.2015.
  */
-public class SerialBluetooth {
+public class SerialBluetooth extends SerialConnection {
     private final String TAG = "CarduinoSerialBluetooth";
-    private boolean connected;
     final static int BUFFERSIZE = 100;
     BluetoothAdapter mBluetoothAdapter = null;
     BluetoothDevice mmDevice = null;
     BluetoothSocket mmSocket = null;
     OutputStream mmOutputStream = null;
     InputStream mmInputStream = null;
-    byte[] readBuffer = null;
-    byte[] writeBuffer = null;
 
-    public void find(){
+    @Override
+    public boolean find(){
+        if(isIdle())
+            state = State.TRYCONNECT;
         // Verbindung mit Bluetooth-Adapter herstellen
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "No bluetooth adapter available");
+            state = State.ERROR;
         }else{
             Log.d(TAG, "Bluetooth-Adapter ist bereit");
         }
         if (!mBluetoothAdapter.isEnabled()){
             mBluetoothAdapter.enable();
         }
+        return isTryConnect();
     }
 
+    @Override
     public boolean connect() {
+        if(!isError())
+            state = State.TRYCONNECT;
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
-        boolean isConnected = true;
-
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
@@ -51,21 +54,20 @@ public class SerialBluetooth {
                     mmDevice = device;
                     break;
                 }
-
             }
         }
 
         if (mmDevice == null) {
             Log.e(TAG, "No paired Ardunio found!");
-            isConnected = false;
+            state = State.ERROR;
         }
 
-        if(isConnected) {
+        if(isTryConnect()) {
             // Socket erstellen
             try {
                 mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
             } catch (Exception e) {
-                isConnected = false;
+                state = State.ERROR;
                 Log.e(TAG, "Socket Erstellung fehlgeschlagen: " + e.toString());
             }
             mBluetoothAdapter.cancelDiscovery();
@@ -73,13 +75,13 @@ public class SerialBluetooth {
             try {
                 mmSocket.connect();
             } catch (IOException e) {
-                isConnected = false;
+                state = State.ERROR;
                 Log.e(TAG, "Socket kann nicht verbinden: " + e.toString());
             }
         }
 
         // Socket beenden, falls nicht verbunden werden konnte
-        if (!isConnected) {
+        if (isError()) {
             try {
                 mmSocket.close();
                 Log.d(TAG,"Socket closed");
@@ -93,52 +95,54 @@ public class SerialBluetooth {
                 mmOutputStream = mmSocket.getOutputStream();
             } catch (IOException e) {
                 Log.e(TAG, "OutputStream Fehler: " + e.toString());
-                isConnected = false;
+                state = State.STREAMERROR;
             }
 
             // Inputstream erstellen
             try {
                 mmInputStream = mmSocket.getInputStream();
+                state = State.CONNECTED;
             } catch (IOException e) {
                 Log.e(TAG, "InputStream Fehler: " + e.toString());
-                isConnected = false;
+                state = State.STREAMERROR;
             }
         }
 
-        if (isConnected) {
+        if (isConnected()) {
             Log.i(TAG, "Verbunden mit " + mmDevice.getName());
         } else {
             Log.e(TAG,"Verbindungsfehler mit " + uuid.toString());
         }
-        return isConnected;
+        return isConnected();
     }
 
+    @Override
     public boolean close(){
-        boolean isClosed = true;
         try {
             mmOutputStream.flush();
             mmOutputStream.close();
             mmInputStream.close();
             mmSocket.close();
+            state = State.IDLE;
         } catch (IOException e) {
             Log.e(TAG,"Fehler beim Beenden des Streams und Schliessen des Sockets: "+ e.toString());
-            isClosed = false;
+            state = State.ERROR;
         }
         mBluetoothAdapter = null;
         mmSocket = null;
         mmDevice = null;
         mmOutputStream = null;
         mmInputStream = null;
-        return isClosed;
+        return isIdle();
     }
 
-    public boolean send(){
+    @Override
+    public void send(byte[] buffer) {
 
-        return true;
     }
 
-    public boolean recv(){
-
-        return true;
+    @Override
+    public byte[] receive() {
+        return new byte[0];
     }
 }
