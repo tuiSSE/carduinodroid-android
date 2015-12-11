@@ -1,4 +1,4 @@
-package com.swp.tuilmenau.myapplication;
+package tuisse.myapplication;
 
 import org.junit.Test;
 

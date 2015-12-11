@@ -31,4 +31,19 @@
         android:text="@string/stopSerialService"
         android:id="@+id/buttonSerialStop"
         android:layout_gravity="center_horizontal" />
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/motor"
+        android:id="@+id/buttonMotor"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/led"
+        android:id="@+id/buttonLed"
+        android:layout_gravity="center_horizontal" />
 </LinearLayout>

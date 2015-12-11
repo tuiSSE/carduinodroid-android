@@ -7,6 +7,9 @@
     <string name="stopSerialService">Stop Serial</string>
     <string name="title_activity_settings">Settings</string>
 
+    <string name="motor">Motor</string>
+    <string name="led">FrontLed</string>
+
     <string name="serial">select Serial Connection</string>
     <string name="bluetooth">serial: Bluetooth</string>
     <string name="usb">serial: USB</string>

@@ -1,4 +1,4 @@
-package com.swp.tuilmenau.carduinodroid_android;
+package tuisse.carduinodroid_android;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

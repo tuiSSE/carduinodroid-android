@@ -1,21 +1,21 @@
-package com.swp.tuilmenau.carduinodroid_android;
+package tuisse.carduinodroid_android;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.content.pm.ActivityInfo;
 
 public class StatusActivity extends Activity {
 
     private static final String TAG = "CarduinoMainActivity";
+    private Button closeButton;
+    private Button settingsButton;
+    private Button startSerialButton;
+    private Button stopSerialButton;
     private CarduinodroidApplication carduino;
-    Button closeButton;
-    Button settingsButton;
-    Button startSerialButton;
-    Button stopSerialButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,14 +27,14 @@ public class StatusActivity extends Activity {
 
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);
-        settingsButton  = (Button) findViewById(R.id.buttonSettings);
-        startSerialButton  = (Button) findViewById(R.id.buttonSerialStart);
-        stopSerialButton  = (Button) findViewById(R.id.buttonSerialStop);
+        settingsButton = (Button) findViewById(R.id.buttonSettings);
+        startSerialButton = (Button) findViewById(R.id.buttonSerialStart);
+        stopSerialButton = (Button) findViewById(R.id.buttonSerialStop);
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG,"onClickClose");
+                Log.d(TAG, "onClickClose");
                 moveTaskToBack(true);
             }
         });
@@ -49,7 +49,7 @@ public class StatusActivity extends Activity {
         startSerialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!carduino.isSerialServiceRunning()) {
+                if (!carduino.isSerialServiceRunning()) {
                     startService(new Intent(StatusActivity.this, SerialService.class));
                     Log.d(TAG, "onClickSerialStart");
                 }
@@ -66,37 +66,37 @@ public class StatusActivity extends Activity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         Log.d(TAG, "onStatusActivityResume");
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         Log.d(TAG, "onStatusActivityPause");
     }
 
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStatusActivityStop");
     }
 
     @Override
-    protected void onRestart(){
+    protected void onRestart() {
         super.onRestart();
         Log.d(TAG, "onStatusActivityRestart");
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStatusActivityStart");
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(StatusActivity.this, SerialService.class));
         Log.d(TAG, "onStatusActivityDestroy");
