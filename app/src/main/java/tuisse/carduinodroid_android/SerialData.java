@@ -11,7 +11,7 @@ public class SerialData {
     protected final byte startByte = (byte) 0x80;
     protected final int  bufferLengthOffset = 3;
     protected final int  checkMask = 0x01;
-    protected final int  checkBit = 7;
+    protected final int  parityBit = 7;
     protected final int  parityMask = 0x80;
 
     public synchronized static String byteArrayToHexString(byte[] array) {
@@ -39,7 +39,7 @@ public class SerialData {
         }
         //calculate parity
         int parity = 0; //even parity
-        for (int i = 0; i < checkBit; i++){
+        for (int i = 0; i < parityBit; i++){
             if(((check >> i) & checkMask) == checkMask){
                 parity ^= parityMask;
             }

@@ -3,12 +3,30 @@
 
     <string name="action_settings">Settings</string>
     <string name="close_app">Close</string>
+    <string name="drive">Drive</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
     <string name="title_activity_settings">Settings</string>
 
-    <string name="motor">Motor</string>
-    <string name="led">FrontLed</string>
+    <string name="speed">Speed %1$d</string>
+    <string name="steer">Steering %1$d</string>
+    <string name="status">Status LED</string>
+    <string name="frontLight">Front Light</string>
+    <string name="failsafeStop">Failsafe Stop</string>
+    <string name="resetAccCurrent">Reset Accumulated Current</string>
+    <string name="back">Back</string>
+    <string name="reset">Reset</string>
+
+    <string name="notAvailable">"N/A"</string>
+
+    <string name="distanceFront">%1$s\u0009 Distance Front [cm]</string>
+    <string name="distanceBack">%1$s\u0009 Distance Back [cm]</string>
+    <string name="current">%1$s\u0009 Current [mA]</string>
+    <string name="voltage">%1$s\u0009 Voltage [V]</string>
+    <string name="relativeBattery">%1$s\u0009 Relative Battery [%%]</string>
+    <string name="absoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
+    <string name="temperature">%1$s\u0009 Temperature [°C]</string>
+
 
     <string name="serial">select Serial Connection</string>
     <string name="bluetooth">serial: Bluetooth</string>

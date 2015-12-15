@@ -1,21 +1,23 @@
 package tuisse.carduinodroid_android;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-public class StatusActivity extends Activity {
+public class StatusActivity extends AppCompatActivity {
 
-    private static final String TAG = "CarduinoMainActivity";
+    private static final String TAG = "CarduinoStatusActivity";
     private Button closeButton;
     private Button settingsButton;
+    private Button driveButton;
     private Button startSerialButton;
     private Button stopSerialButton;
     private CarduinodroidApplication carduino;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,7 @@ public class StatusActivity extends Activity {
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);
         settingsButton = (Button) findViewById(R.id.buttonSettings);
+        driveButton = (Button) findViewById(R.id.buttonDrive);
         startSerialButton = (Button) findViewById(R.id.buttonSerialStart);
         stopSerialButton = (Button) findViewById(R.id.buttonSerialStop);
 
@@ -43,6 +46,14 @@ public class StatusActivity extends Activity {
             public void onClick(View v) {
                 startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
                 Log.d(TAG, "onClickSettings");
+            }
+        });
+
+        driveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(StatusActivity.this, driveActivity.class));
+                Log.d(TAG, "onClickDrive");
             }
         });
 

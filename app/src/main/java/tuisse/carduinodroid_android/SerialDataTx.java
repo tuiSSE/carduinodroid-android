@@ -40,10 +40,14 @@ public class SerialDataTx extends SerialData {
     private int resetAccCur;
 
     public SerialDataTx(){
-        speed = 15;
-        steer = -10;
+        reset();
+    }
+
+    public synchronized void reset(){
+        speed = 0;
+        steer = 0;
         statusLed = 0;
-        frontLight = 1;
+        frontLight = 0;
         resetAccCur = 0;
         failSafeStop = 1;
     }

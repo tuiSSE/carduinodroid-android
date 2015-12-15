@@ -25,41 +25,41 @@ public class SerialDataRx {
     //byte 4
     private int voltage = 0;
     //byte 5
-    private int DS2745temperature = 0;
+    private int ds2745temperature = 0;
     //byte 6
     private int ultrasoundFront = 0;
     //byte 7
     private int ultrasoundBack = 0;
 
-    public int getCurrent() {
+    public synchronized int getCurrent() {
         return current;
     }
 
-    public int getAbsoluteBatteryCapacity() {
+    public synchronized int getAbsoluteBatteryCapacity() {
         return absoluteBatteryCapacity;
     }
 
-    public int getPercentBatteryCapacity() {
+    public synchronized int getPercentBatteryCapacity() {
         return percentBatteryCapacity;
     }
 
-    public int getVoltage() {
+    public synchronized int getVoltage() {
         return voltage;
     }
 
-    public int getDS2745Temperature() {
-        return DS2745temperature;
+    public synchronized int getDs2745Temperature() {
+        return ds2745temperature;
     }
 
-    public int getUltrasoundFront() {
+    public synchronized int getUltrasoundFront() {
         return ultrasoundFront;
     }
 
-    public int getUltrasoundBack() {
+    public synchronized int getUltrasoundBack() {
         return ultrasoundBack;
     }
 
-    public void set(byte[] command) {
+    public synchronized void set(byte[] command) {
         if (command.length != bufferLength) {
             Log.e(TAG, "bufferLength out of bounds" + command.length);
         } else {
@@ -72,7 +72,7 @@ public class SerialDataRx {
                 absoluteBatteryCapacity = command[2];
                 percentBatteryCapacity = (command[2] & percentBatteryCapacityMask) >> percentBatteryCapacityShift;
                 voltage = command[4];
-                DS2745temperature = command[5];
+                ds2745temperature = command[5];
                 ultrasoundFront = command[6];
                 ultrasoundBack = command[7];
             }
