@@ -17,12 +17,15 @@ public class SerialDataRx extends SerialData{
     private final int numUltrasoundBack = 8;
     private final int numCheck = 9;
 
+
+    private final int percentBatteryCapacityMask = 0xfe;
+    private final int percentBatteryCapacityShift = 1;
+    private final int byteFilter = 0xff;
+
     //byte 0 Start
     //byte 1 Version+Length
     private final int length = 7;
     private final int bufferLength = length + bufferLengthOffset;
-    private final int percentBatteryCapacityMask = 0xfe;
-    private final int percentBatteryCapacityShift = 1;
     //byte 1
     private int current = 0;//in 0.1mA
     //byte 2
@@ -124,13 +127,15 @@ public class SerialDataRx extends SerialData{
             return;
         }
         //update values
-        current = command[numCurrent];
-        absoluteBatteryCapacity = command[numAbsBattCap];
-        percentBatteryCapacity = (command[numRelBattCap] & percentBatteryCapacityMask) >> percentBatteryCapacityShift;
-        voltage = command[numVoltage];
-        ds2745temperature = command[numTemperature];
-        ultrasoundFront = command[numUltrasoundFront];
-        ultrasoundBack = command[numUltrasoundBack];
+        current = command[numCurrent] & byteFilter;
+        absoluteBatteryCapacity = command[numAbsBattCap] & byteFilter;
+        percentBatteryCapacity = ((command[numRelBattCap] & percentBatteryCapacityMask) >> percentBatteryCapacityShift) & byteFilter;
+        voltage = command[numVoltage] & byteFilter;
+        ds2745temperature = command[numTemperature] & byteFilter;
+        ultrasoundFront = command[numUltrasoundFront] & byteFilter;
+        ultrasoundBack = command[numUltrasoundBack] & byteFilter;
+        if (ultrasoundBack == byteFilter) ultrasoundBack = -1;
+        if (ultrasoundFront == byteFilter) ultrasoundFront = -1;
         Log.d(TAG, print());
     }
 }
