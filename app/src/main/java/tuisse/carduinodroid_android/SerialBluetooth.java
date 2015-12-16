@@ -152,14 +152,19 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     protected void send() throws IOException {
-        Log.d(TAG,carduino.dataContainer.serialDataTx.byteArrayToHexString(carduino.dataContainer.serialDataTx.get()));
+        //Log.d(TAG,carduino.dataContainer.serialDataTx.byteArrayToHexString(carduino.dataContainer.serialDataTx.get()));
         mmOutputStream.write(carduino.dataContainer.serialDataTx.get());
     }
 
     @Override
     protected void receive() throws IOException {
-        byte[] buffer = new byte[20];
-       mmInputStream.read(buffer);
-        Log.d(TAG, carduino.dataContainer.serialDataTx.byteArrayToHexString(buffer));
+        while(mmInputStream.available()>0){
+            byte[] buffer = new byte[20];
+            int len = mmInputStream.read(buffer,0,20);
+            for(int i = 0; i < len; i++){
+                carduino.dataContainer.serialDataRx.append(buffer[i]);
+            }
+            //Log.d(TAG, carduino.dataContainer.serialDataTx.byteArrayToHexString(buffer));
+        }
     }
 }

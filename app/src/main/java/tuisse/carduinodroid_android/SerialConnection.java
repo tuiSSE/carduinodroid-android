@@ -12,7 +12,7 @@ import java.io.IOException;
 abstract public class SerialConnection {
     private final String            TAG = "CarduinoSerial";
     protected final int             DELAY = 100;//100ms
-    protected final int             HEARTBEAT = 10;
+    protected final int             HEARTBEAT = 100;
 
     protected CarduinodroidApplication carduino;
     protected SerialState           serialState;

@@ -8,13 +8,14 @@ import android.util.Log;
 public class SerialDataTx extends SerialData {
     private final String TAG = "CarduinoSerialDataTx";
 
+    private final int numSpeed = 2;
+    private final int numSteer = 3;
+    private final int numStatus = 4;
+    private final int numCheck = 5;
+
     //byte 0 Start
     //byte 1 Version+Length
-    private final int version = 2;
     private final int length = 3;
-    private final int versionShift = 4;
-    private final int versionMask = 0x70;
-    private final int lengthMask = 0x0f;
     private final int bufferLength = length + bufferLengthOffset;
     //byte 2 Speed
     private final int speedMax = 127;//forwards
@@ -53,36 +54,25 @@ public class SerialDataTx extends SerialData {
     }
 
     public synchronized String print(){
-        return  "version      "+ version+
-                "length       "+ length+
-                "speedVal     "+ speed+
-                "steerVal     "+ steer+
-                "statusLed    "+ statusLed+
-                "frontLight   "+ frontLight+
-                "failSafeStop "+ failSafeStop+
-                "resetAccCur  "+ resetAccCur;
-
+        return  " version      "+ version+
+                " length       "+ length+
+                " speedVal     "+ speed+
+                " steerVal     "+ steer+
+                " statusLed    "+ statusLed+
+                " frontLight   "+ frontLight+
+                " failSafeStop "+ failSafeStop+
+                " resetAccCur  "+ resetAccCur;
     }
 
     public synchronized byte[] get() {
         byte[] command = new byte[bufferLength];
         command[0] = startByte;
-        command[1] = getVersionLength();
-        command[2] = getSpeed();
-        command[3] = getSteer();
-        command[4] = getStatus();
-        command[5] = getCheck(command);
-        //Log.d(TAG,print());
-        //Log.d(TAG,byteArrayToHexString(command));
+        command[1] = getVersionLength(length);
+        command[numSpeed] = getSpeed();
+        command[numSteer] = getSteer();
+        command[numStatus] = getStatus();
+        command[numCheck] = getCheck(command, numCheck);
         return command;
-    }
-
-    public synchronized byte getVersionLength(){
-        if(version == 15) {
-            Log.e(TAG, "version must not be 15");
-            return (byte) 0x00;
-        }
-        return  (byte) (0x00 | ((length) & lengthMask) | ((version << versionShift) & versionMask));
     }
 
     public synchronized byte getSpeed(){
@@ -127,29 +117,29 @@ public class SerialDataTx extends SerialData {
         }
     }
 
-    public synchronized void setStatusLed(int statusLed) {
-        if (statusLed != 0)
+    public synchronized void setStatusLed(int _statusLed) {
+        if (_statusLed != 0)
             this.statusLed = 1;//on
         else
             this.statusLed = 0;//off = default
     }
 
-    public synchronized void setFrontLight(int frontLight) {
-        if (frontLight != 0)
+    public synchronized void setFrontLight(int _frontLight) {
+        if (_frontLight != 0)
             this.frontLight = 1;//on
         else
             this.frontLight = 0;//off = default
     }
 
-    public synchronized void setResetAccCur(int resetAccCur) {
-        if (resetAccCur != 0)
+    public synchronized void setResetAccCur(int _resetAccCur) {
+        if (_resetAccCur != 0)
             this.resetAccCur = 1;//on
         else
             this.resetAccCur = 0;//off = default
     }
 
-    public synchronized void setFailSafeStop(int failSafeStop) {
-        if (failSafeStop != 0)
+    public synchronized void setFailSafeStop(int _failSafeStop) {
+        if (_failSafeStop != 0)
             this.failSafeStop = 1;//on = default
         else
             this.failSafeStop = 0;//off

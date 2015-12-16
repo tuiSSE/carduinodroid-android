@@ -52,7 +52,7 @@ public class StatusActivity extends AppCompatActivity {
         driveButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(StatusActivity.this, driveActivity.class));
+                startActivity(new Intent(StatusActivity.this, DriveActivity.class));
                 Log.d(TAG, "onClickDrive");
             }
         });

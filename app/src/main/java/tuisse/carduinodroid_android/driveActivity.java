@@ -9,7 +9,7 @@ import android.widget.CheckBox;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class driveActivity extends AppCompatActivity {
+public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
     private CarduinodroidApplication carduino;
 
@@ -109,7 +109,7 @@ public class driveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int val = 0;
-                if(checkBoxStatus.isChecked()){
+                if(checkBoxFrontLight.isChecked()){
                     val = 1;
                 }
                 carduino.dataContainer.serialDataTx.setFrontLight(val);
@@ -120,7 +120,7 @@ public class driveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int val = 0;
-                if(checkBoxStatus.isChecked()){
+                if(checkBoxResetAccCurrent.isChecked()){
                     val = 1;
                 }
                 carduino.dataContainer.serialDataTx.setResetAccCur(val);
@@ -131,7 +131,7 @@ public class driveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int val = 0;
-                if(checkBoxStatus.isChecked()){
+                if(checkBoxFailsafeStop.isChecked()){
                     val = 1;
                 }
                 carduino.dataContainer.serialDataTx.setFailSafeStop(val);

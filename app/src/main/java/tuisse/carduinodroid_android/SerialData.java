@@ -7,14 +7,25 @@ import android.util.Log;
  */
 public class SerialData {
     private final String TAG = "CarduinoSerialData";
+
+
     //start byte
     protected final byte startByte = (byte) 0x80;
+    protected final int  version = 2;
+    protected final int  versionShift = 4;
+    protected final int  versionMask = 0x70;
+    protected final int  lengthMask = 0x0f;
     protected final int  bufferLengthOffset = 3;
     protected final int  checkMask = 0x01;
     protected final int  parityBit = 7;
     protected final int  parityMask = 0x80;
 
-    public synchronized static String byteArrayToHexString(byte[] array) {
+    protected final int numStart = 0;
+    protected final int numVersionLength = 1;
+
+
+
+    public String byteArrayToHexString(byte[] array) {
         StringBuffer hexString = new StringBuffer();
         for (byte b : array) {
             int intVal = b & 0xff;
@@ -26,15 +37,22 @@ public class SerialData {
         return hexString.toString();
     }
 
-    public synchronized byte getCheck(byte[] cmd){
-        int length = cmd.length;
-        if(length < bufferLengthOffset){
-            Log.e(TAG, "get Check buffer length to small" + length);
+    protected synchronized byte getVersionLength(int dataLength){
+        if(version == 15) {
+            Log.e(TAG, "version must not be 15");
+            return (byte) 0x00;
+        }
+        return  (byte) (0x00 | ((dataLength) & lengthMask) | ((version << versionShift) & versionMask));
+    }
+
+    protected synchronized byte getCheck(byte[] cmd, int numCheck){
+        if(numCheck+1 > cmd.length){
+            Log.e(TAG, "get Check buffer length to small " + cmd.length + " it should at least be " + (numCheck+1));
             return (byte) 0x00;
         }
         byte check = 0x00;
         //calculate xor over all byte in frame
-        for (int i = 0; i < length -1; i++){
+        for (int i = 0; i < numCheck; i++){
             check ^= cmd[i];
         }
         //calculate parity
