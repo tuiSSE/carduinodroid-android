@@ -1,12 +1,13 @@
 <resources>
-    <string name="app_name">Cardudroid</string>
+    <string name="appName">Cardudroid</string>
 
-    <string name="action_settings">Settings</string>
-    <string name="close_app">Close</string>
+    <string name="actionSettings">Settings</string>
+    <string name="titleDriveActivity">Drive</string>
+    <string name="closeApp">Close</string>
     <string name="drive">Drive</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="titleActivitySettings">Settings</string>
 
     <string name="speed">Speed %1$d</string>
     <string name="steer">Steering %1$d</string>
@@ -34,4 +35,14 @@
     <string name="isSlave">ServiceApplication</string>
     <string name="isRemote">RemoteApplication</string>
     <string name="default_ip">141.24.11.1</string>
+
+    <string name="serialConnectionStatus">Serial Connection: %1$s %2$s</string>
+
+    <!-- permissions -->
+    <string name="serialConnectionStatusLabel">Serial Connection Status Label</string>
+    <string name="serialConnectionStatusDescription">Serial Connection Status Description</string>
+    <string name="serialDataRxReceivedLabel">Serial Data Rx Received Label</string>
+    <string name="serialDataRxReceivedDescription">Serial Data Rx Received Description</string>
+
+
 </resources>

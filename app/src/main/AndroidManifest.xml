@@ -4,26 +4,38 @@
 
     <uses-sdk android:minSdkVersion="16" />
 
+    <permission android:name="tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION"
+        android:label="@string/serialConnectionStatusLabel"
+        android:description="@string/serialConnectionStatusDescription"
+        android:permissionGroup="android.perissionGroup.PERSONAL_INFO"
+        android:protectionLevel="normal"/>
+
+    <permission android:name="tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION"
+        android:label="@string/serialDataRxReceivedLabel"
+        android:description="@string/serialDataRxReceivedDescription"
+        android:permissionGroup="android.perissionGroup.PERSONAL_INFO"
+        android:protectionLevel="normal"/>
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <android:uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <android:uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION" />
+    <uses-permission android:name="tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION" />
 
     <application
         android:name=".CarduinodroidApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/appName"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".StatusActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -35,9 +47,11 @@
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity android:name=".DriveActivity" >
-        </activity>
+            android:label="@string/titleActivitySettings" />
+
+        <activity
+            android:name=".DriveActivity"
+            android:label="@string/titleDriveActivity" />
     </application>
 
 </manifest>

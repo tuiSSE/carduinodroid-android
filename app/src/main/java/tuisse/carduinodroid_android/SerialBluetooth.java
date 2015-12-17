@@ -27,19 +27,19 @@ public class SerialBluetooth extends SerialConnection {
     private OutputStream mmOutputStream = null;
     private InputStream mmInputStream = null;
 
-    public SerialBluetooth(Application a) {
-        super(a);
+    public SerialBluetooth(Application a, SerialService s) {
+        super(a,s);
     }
 
     @Override
     public boolean find() {
         if (isIdle())
-            serialState = SerialState.TRYCONNECT;
+            setSerialState(SerialState.TRYCONNECT);
         // Verbindung mit Bluetooth-Adapter herstellen
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "No bluetooth adapter available");
-            serialState = SerialState.ERROR;
+            setSerialState(SerialState.ERROR);
         } else {
             Log.d(TAG, "Bluetooth-Adapter ist bereit");
         }
@@ -52,7 +52,7 @@ public class SerialBluetooth extends SerialConnection {
     @Override
     public boolean connect() {
         if (!isError()) {
-            serialState = SerialState.TRYCONNECT;
+            setSerialState(SerialState.TRYCONNECT);
         }
         UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -60,6 +60,7 @@ public class SerialBluetooth extends SerialConnection {
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getName().contains("HC-06")) {
                     mmDevice = device;
+                    serialName = mmDevice.getName();
                     break;
                 }
             }
@@ -67,7 +68,7 @@ public class SerialBluetooth extends SerialConnection {
 
         if (mmDevice == null) {
             Log.e(TAG, "No paired Ardunio found!");
-            serialState = SerialState.ERROR;
+            setSerialState(SerialState.ERROR);
         }
 
         if (isTryConnect()) {
@@ -75,7 +76,7 @@ public class SerialBluetooth extends SerialConnection {
             try {
                 mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
             } catch (Exception e) {
-                serialState = SerialState.ERROR;
+                setSerialState(SerialState.ERROR);
                 Log.e(TAG, "Socket Erstellung fehlgeschlagen: " + e.toString());
             }
             mBluetoothAdapter.cancelDiscovery();
@@ -83,7 +84,7 @@ public class SerialBluetooth extends SerialConnection {
             try {
                 mmSocket.connect();
             } catch (IOException e) {
-                serialState = SerialState.ERROR;
+                setSerialState(SerialState.ERROR);
                 Log.e(TAG, "Socket kann nicht verbinden: " + e.toString());
             }
         }
@@ -102,21 +103,21 @@ public class SerialBluetooth extends SerialConnection {
                 mmOutputStream = mmSocket.getOutputStream();
             } catch (IOException e) {
                 Log.e(TAG, "OutputStream Fehler: " + e.toString());
-                serialState = SerialState.STREAMERROR;
+                setSerialState(SerialState.STREAMERROR);
             }
 
             // Inputstream erstellen
             try {
                 mmInputStream = mmSocket.getInputStream();
-                serialState = SerialState.CONNECTED;
+                setSerialState(SerialState.CONNECTED);
             } catch (IOException e) {
                 Log.e(TAG, "InputStream Fehler: " + e.toString());
-                serialState = SerialState.STREAMERROR;
+                setSerialState(SerialState.STREAMERROR);
             }
         }
 
         if (isConnected()) {
-            Log.i(TAG, "Verbunden mit " + mmDevice.getName());
+            Log.i(TAG, "Verbunden mit " + serialName);
         } else {
             Log.e(TAG, "Verbindungsfehler mit " + uuid.toString());
         }
@@ -126,7 +127,12 @@ public class SerialBluetooth extends SerialConnection {
     @Override
     public boolean close() {
         try {
-            serialState = SerialState.IDLE;
+            if(!isError()){
+                serialName = "";
+            }
+            if(isRunning()){
+                setSerialState(SerialState.IDLE);
+            }
             if (mmOutputStream != null) {
                 mmOutputStream.flush();
                 mmOutputStream.close();
@@ -140,7 +146,8 @@ public class SerialBluetooth extends SerialConnection {
 
         } catch (IOException e) {
             Log.e(TAG, "Fehler beim Beenden des Streams und Schliessen des Sockets: " + e.toString());
-            serialState = SerialState.ERROR;
+            serialName = e.toString();
+            setSerialState(SerialState.ERROR);
         }
         mBluetoothAdapter = null;
         mmSocket = null;

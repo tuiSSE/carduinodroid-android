@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android;
 
+import android.app.Application;
+import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -7,6 +9,7 @@ import android.util.Log;
  */
 public class SerialDataRx extends SerialData{
     private final String TAG = "CarduinoSerialDataRx";
+    private Intent onSerialDataRxIntent;
 
     private final int numCurrent = 2;
     private final int numAbsBattCap = 3;
@@ -27,22 +30,37 @@ public class SerialDataRx extends SerialData{
     private final int length = 7;
     private final int bufferLength = length + bufferLengthOffset;
     //byte 1
-    private int current = 0;//in 0.1mA
+    private int current;//in 0.1mA
     //byte 2
-    private int absoluteBatteryCapacity = 0;//in 1mAh
+    private int absoluteBatteryCapacity;//in 1mAh
     //byte 3
-    private int percentBatteryCapacity = 0;//in %
+    private int percentBatteryCapacity;//in %
     //byte 4
-    private int voltage = 0;//in 0.1V
+    private int voltage;//in 0.1V
     //byte 5
-    private int ds2745temperature = 0;//in 0.5°C
+    private int ds2745temperature;//in 0.5°C
     //byte 6
-    private int ultrasoundFront = 0;//in 1cm
+    private int ultrasoundFront;//in 1cm
     //byte 7
-    private int ultrasoundBack = 0;//in 1cm
+    private int ultrasoundBack;//in 1cm
 
     private byte[] rxBuffer = new byte[bufferLength+1];
     private int    rxBufferLength = 0;
+
+    public SerialDataRx(Application a) {
+        super(a);
+        reset();
+    }
+
+    public void reset(){
+        current = 0;
+        absoluteBatteryCapacity = 0;
+        percentBatteryCapacity = 0;
+        voltage = 0;
+        ds2745temperature = 0;
+        ultrasoundFront = 0;
+        ultrasoundBack = 0;
+    }
 
     public synchronized int getCurrent() {
         return current;
@@ -136,6 +154,8 @@ public class SerialDataRx extends SerialData{
         ultrasoundBack = command[numUltrasoundBack] & byteFilter;
         if (ultrasoundBack == byteFilter) ultrasoundBack = -1;
         if (ultrasoundFront == byteFilter) ultrasoundFront = -1;
-        Log.d(TAG, print());
+        onSerialDataRxIntent = new Intent(carduino.dataContainer.intentStrings.SERIAL_DATA_RX_RECEIVED);
+        carduino.sendBroadcast(onSerialDataRxIntent);
+        //Log.d(TAG, print());
     }
 }

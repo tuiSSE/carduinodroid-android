@@ -1,5 +1,6 @@
 package tuisse.carduinodroid_android;
 
+import android.app.Application;
 import android.util.Log;
 
 /**
@@ -40,7 +41,8 @@ public class SerialDataTx extends SerialData {
     private int failSafeStop;
     private int resetAccCur;
 
-    public SerialDataTx(){
+    public SerialDataTx(Application a){
+        super(a);
         reset();
     }
 

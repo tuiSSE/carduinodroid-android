@@ -1,5 +1,9 @@
 package tuisse.carduinodroid_android;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +17,10 @@ public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
     private CarduinodroidApplication carduino;
 
-    private Button   buttonReset;
+    private DriveActivityReceiver receiver;
+    private IntentFilter filter;
+
+    Button buttonReset;
     private CheckBox checkBoxStatus;
     private CheckBox checkBoxFrontLight;
     private CheckBox checkBoxFailsafeStop;
@@ -50,14 +57,29 @@ public class DriveActivity extends AppCompatActivity {
         textViewSteer.setText(String.format(getString(R.string.steer), 0));
 
         textViewDistanceFront.setText(String.format(getString(R.string.distanceFront), getString(R.string.notAvailable)));
-
         textViewDistanceBack.setText(String.format(getString(R.string.distanceBack),  getString(R.string.notAvailable)));
         textViewAbsBattery.setText(String.format(getString(R.string.absoluteBattery), getString(R.string.notAvailable)));
         textViewRelBattery.setText(String.format(getString(R.string.relativeBattery),  getString(R.string.notAvailable)));
         textViewCurrent.setText(String.format(getString(R.string.current),  getString(R.string.notAvailable)));
         textViewVoltage.setText(String.format(getString(R.string.voltage),  getString(R.string.notAvailable)));
         textViewTemperature.setText(String.format(getString(R.string.temperature),  getString(R.string.notAvailable)));
+    }
 
+    private void refresh(){
+        textViewDistanceFront.setText(String.format(getString(R.string.distanceFront),
+                String.valueOf(carduino.dataContainer.serialDataRx.getUltrasoundFront() )));
+        textViewDistanceBack.setText(String.format(getString(R.string.distanceBack),
+                String.valueOf(carduino.dataContainer.serialDataRx.getUltrasoundBack() )));
+        textViewAbsBattery.setText(String.format(getString(R.string.absoluteBattery),
+                String.valueOf(carduino.dataContainer.serialDataRx.getAbsoluteBatteryCapacity() )));
+        textViewRelBattery.setText(String.format(getString(R.string.relativeBattery),
+                String.valueOf(carduino.dataContainer.serialDataRx.getPercentBatteryCapacity() )));
+        textViewCurrent.setText(String.format(getString(R.string.current),
+                String.valueOf(carduino.dataContainer.serialDataRx.getCurrent() )));
+        textViewVoltage.setText(String.format(getString(R.string.voltage),
+                String.valueOf(carduino.dataContainer.serialDataRx.getVoltage() )));
+        textViewTemperature.setText(String.format(getString(R.string.temperature),
+                String.valueOf(carduino.dataContainer.serialDataRx.getDs2745Temperature() )));
     }
 
     @Override
@@ -65,8 +87,12 @@ public class DriveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drive);
 
+        receiver = new DriveActivityReceiver();
+       // filter = new IntentFilter(carduino.dataContainer.intentStrings.SERIAL_DATA_RX_RECEIVED);
+        filter = new IntentFilter("tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED");
+
         this.carduino = (CarduinodroidApplication) getApplication();
-        buttonReset             = (Button)   findViewById(R.id.buttonReset);
+        buttonReset             = (Button) findViewById(R.id.buttonReset);
         checkBoxFrontLight      = (CheckBox) findViewById(R.id.checkBoxFrontLight);
         checkBoxStatus          = (CheckBox) findViewById(R.id.checkBoxStatus);
         checkBoxFailsafeStop    = (CheckBox) findViewById(R.id.checkBoxFailsafeStop);
@@ -173,5 +199,26 @@ public class DriveActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    class DriveActivityReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //Log.d(TAG,"onDriveActivityReceiverReceive");
+            refresh();
+        }
     }
 }

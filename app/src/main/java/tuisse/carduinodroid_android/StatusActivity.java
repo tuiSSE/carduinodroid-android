@@ -1,22 +1,31 @@
 package tuisse.carduinodroid_android;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
+
     private Button closeButton;
     private Button settingsButton;
     private Button driveButton;
     private Button startSerialButton;
     private Button stopSerialButton;
+    private TextView textViewSerialConnectionStatus;
     private CarduinodroidApplication carduino;
+
+    private IntentFilter serialConnectionStatusChangeFilter;
+    private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
 
 
     @Override
@@ -26,6 +35,10 @@ public class StatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_status);
         // prevent the application from switching to landscape-mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        serialConnectionStatusChangeReceiver = new SerialConnectionStatusChangeReceiver();
+        serialConnectionStatusChangeFilter = new IntentFilter(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_CHANGED);
+        //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_PERMISSION,null);
+        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
 
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);
@@ -33,6 +46,8 @@ public class StatusActivity extends AppCompatActivity {
         driveButton = (Button) findViewById(R.id.buttonDrive);
         startSerialButton = (Button) findViewById(R.id.buttonSerialStart);
         stopSerialButton = (Button) findViewById(R.id.buttonSerialStop);
+        textViewSerialConnectionStatus = (TextView) findViewById(R.id.textViewSerialConnectionStatus);
+        textViewSerialConnectionStatus.setText("");
 
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +100,7 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         Log.d(TAG, "onStatusActivityPause");
     }
 
@@ -110,7 +126,19 @@ public class StatusActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(StatusActivity.this, SerialService.class));
+        unregisterReceiver(serialConnectionStatusChangeReceiver);
         Log.d(TAG, "onStatusActivityDestroy");
+    }
+
+    private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG,"onReceive status change event");
+            String status = intent.getStringExtra(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_EXTRA_STATE);
+            String name = intent.getStringExtra(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_EXTRA_NAME);
+            textViewSerialConnectionStatus.setText(String.format(getString(R.string.serialConnectionStatus),status,name));
+
+        }
     }
 
 }

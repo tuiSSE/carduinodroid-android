@@ -19,7 +19,7 @@ public class SerialService extends Service {
     public void onCreate() {
         super.onCreate();
         carduino = (CarduinodroidApplication) getApplication();
-        serial = new SerialBluetooth(getApplication());
+        serial = new SerialBluetooth(getApplication(),this);
         Log.d(TAG, "onCreated");
     }
 
@@ -43,10 +43,10 @@ public class SerialService extends Service {
                     serial.start();
                 }
                 else{
-                    onDestroy();
+                    stopSelf();
                 }
             }
-        }, "connectBluetoothThread").start();
+        }, "connectSerialThread").start();
         return START_STICKY;
     }
 

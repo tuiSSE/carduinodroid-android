@@ -2,6 +2,9 @@ package tuisse.carduinodroid_android;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,15 +17,17 @@ abstract public class SerialConnection {
     protected final int             DELAY = 100;//100ms
     protected final int             HEARTBEAT = 100;
 
-    protected CarduinodroidApplication carduino;
-    protected SerialState           serialState;
-    protected String                serialName;
-    protected SerialSendThread      serialSendThread;
-    protected SerialReceiveThread   serialReceiveThread;
+    protected CarduinodroidApplication  carduino;
+    protected SerialService             serialService;
+    protected SerialState               serialState;
+    protected String                    serialName;
+    protected SerialSendThread          serialSendThread;
+    protected SerialReceiveThread       serialReceiveThread;
 
-    public SerialConnection(Application a) {
+    public SerialConnection(Application a,SerialService s) {
         carduino = (CarduinodroidApplication) a;
-        serialState = SerialState.IDLE;
+        serialService = s;
+        setSerialState(SerialState.IDLE);
         serialName = "";
         serialSendThread      = new SerialSendThread();
         serialReceiveThread   = new SerialReceiveThread();
@@ -35,16 +40,28 @@ abstract public class SerialConnection {
     abstract protected void receive() throws IOException;
 
     protected boolean reset() {
-        serialState = SerialState.IDLE;
+        setSerialState(SerialState.IDLE);
         serialSendThread.interrupt();
         serialReceiveThread.interrupt();
         return true;
     }
 
     protected void start() {
-            serialState = SerialState.RUNNING;
+            setSerialState(SerialState.RUNNING);
             serialSendThread.start();
             serialReceiveThread.start();
+    }
+
+    public void setSerialState(SerialState state){
+        if(state != serialState) {
+            serialState = state;
+            Log.d(TAG, "serial State changed: " + serialState.getStateName());
+            Intent onSerialConnectionStatusChangeIntent = new Intent(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_CHANGED);
+            onSerialConnectionStatusChangeIntent.putExtra(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_EXTRA_STATE, serialState.getStateName());
+            onSerialConnectionStatusChangeIntent.putExtra(carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_EXTRA_NAME, serialName);
+            //carduino.sendBroadcast(onSerialConnectionStatusChangeIntent, carduino.dataContainer.intentStrings.SERIAL_CONNECTION_STATUS_PERMISSION);
+            carduino.sendBroadcast(onSerialConnectionStatusChangeIntent);
+        }
     }
 
     public boolean isIdle() {
@@ -75,6 +92,19 @@ abstract public class SerialConnection {
         public int getState() {
             return state;
         }
+
+        public String getStateName(){
+            String s = "";
+            switch (state){
+                case  0: s = "Idle";break;
+                case  1: s = "Connected";break;
+                case  2: s = "Try to connect ...";break;
+                case  3: s = "Running";break;
+                case -2: s = "Streamerror";break;
+                default: s = "Error";break;
+            }
+            return s;
+        }
     }
 
     protected class SerialReceiveThread extends Thread {
@@ -93,17 +123,19 @@ abstract public class SerialConnection {
                         receive();
                     } catch (java.io.IOException e){
                         Log.e(TAG, "Receive failed: " + e.toString());
-                        serialState = SerialState.STREAMERROR;
+                        serialName = "Connection timed out";
+                        setSerialState(SerialState.STREAMERROR);
+                        serialService.stopSelf();
                     }
-                    heartbeat--;
                     Thread.sleep(DELAY);
-                    if(heartbeat == 0){
+                    if(heartbeat-- == 0){
                         heartbeat = HEARTBEAT;
                         Log.d(TAG,"pulse SerialReceive");
                     }
                 } catch (InterruptedException e) {
-                    serialState = SerialState.IDLE;
-                    Log.d(TAG,"SerialReceiveThread stopped" +e.toString());
+                    setSerialState(SerialState.IDLE);
+                    Log.d(TAG, "SerialReceiveThread stopped" + e.toString());
+                    serialService.stopSelf();
                 }
             }
         }
@@ -124,17 +156,19 @@ abstract public class SerialConnection {
                         send();
                     } catch (java.io.IOException e){
                         Log.e(TAG, "Send failed: " + e.toString());
-                        serialState = SerialState.STREAMERROR;
+                        serialName = "Connection timed out";
+                        setSerialState(SerialState.STREAMERROR);
+                        serialService.stopSelf();
                     }
-                    heartbeat--;
                     Thread.sleep(DELAY);
-                    if (heartbeat == 0) {
+                    if (heartbeat-- == 0) {
                         heartbeat = HEARTBEAT;
                         Log.d(TAG, "pulse SerialSend");
                     }
                 } catch (InterruptedException e) {
-                    serialState = SerialState.IDLE;
-                    Log.d(TAG,"SerialSendThread stopped" + e.toString());
+                    setSerialState(SerialState.IDLE);
+                    Log.d(TAG, "SerialSendThread stopped" + e.toString());
+                    serialService.stopSelf();
                 }
             }
         }

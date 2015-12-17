@@ -17,7 +17,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     @Override
     public void onCreate() {
         super.onCreate();
-        dataContainer = new DataContainer();
+        dataContainer = new DataContainer(this);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         //deleting shared prefs needs to be cleared in a more stable version:
         sharedPrefs.edit().clear().apply();

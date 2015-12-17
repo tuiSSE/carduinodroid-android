@@ -1,15 +1,17 @@
 package tuisse.carduinodroid_android;
 
+import android.app.Application;
 import android.util.Log;
 
 /**
  * Created by keX on 11.12.2015.
  */
-public class SerialData {
+abstract public class SerialData {
     private final String TAG = "CarduinoSerialData";
-
+    protected CarduinodroidApplication carduino;
 
     //start byte
+    //protected final int length;
     protected final byte startByte = (byte) 0x80;
     protected final int  version = 2;
     protected final int  versionShift = 4;
@@ -23,6 +25,9 @@ public class SerialData {
     protected final int numStart = 0;
     protected final int numVersionLength = 1;
 
+    public SerialData(Application a) {
+        carduino = (CarduinodroidApplication) a;
+    }
 
 
     public String byteArrayToHexString(byte[] array) {
