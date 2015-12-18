@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,8 +18,10 @@ public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
     private CarduinodroidApplication carduino;
 
-    private DriveActivityReceiver receiver;
-    private IntentFilter filter;
+    private serialDataRxReceiver serialDataRxReceiver;
+    private IntentFilter serialDataRxFilter;
+    private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
+    private IntentFilter serialConnectionStatusChangeFilter;
 
     Button buttonReset;
     private CheckBox checkBoxStatus;
@@ -39,7 +42,6 @@ public class DriveActivity extends AppCompatActivity {
     private TextView textViewCurrent;
     private TextView textViewVoltage;
     private TextView textViewTemperature;
-
 
     private void reset(){
         carduino.dataContainer.serialDataTx.reset();
@@ -87,9 +89,14 @@ public class DriveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drive);
 
-        receiver = new DriveActivityReceiver();
-       // filter = new IntentFilter(carduino.dataContainer.intentStrings.SERIAL_DATA_RX_RECEIVED);
-        filter = new IntentFilter("tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED");
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        serialConnectionStatusChangeReceiver = new SerialConnectionStatusChangeReceiver();
+        serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+        //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+
+        serialDataRxReceiver = new serialDataRxReceiver();
+        serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
 
         this.carduino = (CarduinodroidApplication) getApplication();
         buttonReset             = (Button) findViewById(R.id.buttonReset);
@@ -204,21 +211,32 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        registerReceiver(receiver, filter);
+        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
+        registerReceiver(serialDataRxReceiver, serialDataRxFilter);
     }
 
     @Override
     protected void onPause(){
         super.onPause();
-        unregisterReceiver(receiver);
+        unregisterReceiver(serialConnectionStatusChangeReceiver);
+        unregisterReceiver(serialDataRxReceiver);
     }
 
-    class DriveActivityReceiver extends BroadcastReceiver {
-
+    class serialDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Log.d(TAG,"onDriveActivityReceiverReceive");
             refresh();
         }
     }
+
+    private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG,"onReceive status change event");
+            String status = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE));
+            String name = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME));
+        }
+    }
+
 }

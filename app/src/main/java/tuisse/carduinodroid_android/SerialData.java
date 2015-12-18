@@ -29,8 +29,7 @@ abstract public class SerialData {
         carduino = (CarduinodroidApplication) a;
     }
 
-
-    public String byteArrayToHexString(byte[] array) {
+    public synchronized String byteArrayToHexString(byte[] array) {
         StringBuffer hexString = new StringBuffer();
         for (byte b : array) {
             int intVal = b & 0xff;

@@ -8,14 +8,12 @@ import android.app.Application;
 public class DataContainer {
     protected CarduinodroidApplication carduino;
 
-    public IntentStrings intentStrings;
     public Preferences preferences;
     public SerialDataRx serialDataRx;
     public SerialDataTx serialDataTx;
 
     public DataContainer(Application a){
         carduino = (CarduinodroidApplication) a;
-        intentStrings = new IntentStrings();
         serialDataRx = new SerialDataRx(a);
         serialDataTx = new SerialDataTx(a);
     }

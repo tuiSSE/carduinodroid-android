@@ -52,7 +52,7 @@ public class SerialDataRx extends SerialData{
         reset();
     }
 
-    public void reset(){
+    public synchronized void reset(){
         current = 0;
         absoluteBatteryCapacity = 0;
         percentBatteryCapacity = 0;
@@ -100,7 +100,7 @@ public class SerialDataRx extends SerialData{
                 " ultrasoundBack  " + ultrasoundBack;
     }
 
-    public synchronized void append(byte inChar){
+    public synchronized boolean append(byte inChar){
         if(inChar == startByte){
             rxBufferLength = 0;
         }
@@ -111,38 +111,39 @@ public class SerialDataRx extends SerialData{
 
         if(rxBuffer[numStart] != startByte){
             rxBufferLength = 0;
-            return;
+            return false;
         }
         if(rxBufferLength >= bufferLength) {
             if (rxBuffer[numVersionLength] != getVersionLength(length)) {
                 rxBufferLength = 0;
-                return;
+                return false;
             }
             if (rxBuffer[numCheck] != getCheck(rxBuffer, numCheck)) {
                 rxBufferLength = 0;
                 Log.e(TAG, "wrong Check byte on receive: " + rxBuffer[numCheck]+ " should be: " + getCheck(rxBuffer, numCheck));
-                return;
+                return false;
             }
             //update values
-            set(rxBuffer);
             rxBufferLength = 0;
+            return set(rxBuffer);
         }
+        return false;
     }
 
-    private synchronized void set(byte[] command) {
+    private synchronized boolean set(byte[] command) {
         if (command.length < bufferLength) {
             Log.e(TAG, "bufferLength out of bounds" + command.length);
-            return;
+            return false;
         }
         if(command[numStart] != startByte){
             Log.e(TAG, "wrong Startbyte " + command[numStart]);
-            return;
+            return false;
         }
         int recVersion = (command[numVersionLength] & versionMask) >> versionShift;
         int recLength = (command[numVersionLength] & lengthMask);
         if (((recVersion != version) || (recLength != length))) {
             Log.e(TAG, "wrong Version (" + recVersion + ") or bufferLength(" + recLength + ")");
-            return;
+            return false;
         }
         //update values
         current = command[numCurrent] & byteFilter;
@@ -154,8 +155,9 @@ public class SerialDataRx extends SerialData{
         ultrasoundBack = command[numUltrasoundBack] & byteFilter;
         if (ultrasoundBack == byteFilter) ultrasoundBack = -1;
         if (ultrasoundFront == byteFilter) ultrasoundFront = -1;
-        onSerialDataRxIntent = new Intent(carduino.dataContainer.intentStrings.SERIAL_DATA_RX_RECEIVED);
+        onSerialDataRxIntent = new Intent(carduino.getString(R.string.SERIAL_DATA_RX_RECEIVED));
         carduino.sendBroadcast(onSerialDataRxIntent);
         //Log.d(TAG, print());
+        return true;
     }
 }

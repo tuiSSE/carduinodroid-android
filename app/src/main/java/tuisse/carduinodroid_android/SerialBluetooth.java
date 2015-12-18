@@ -29,6 +29,7 @@ public class SerialBluetooth extends SerialConnection {
 
     public SerialBluetooth(Application a, SerialService s) {
         super(a,s);
+        serialType = SerialType.BLUETOOTH;
     }
 
     @Override
@@ -164,14 +165,19 @@ public class SerialBluetooth extends SerialConnection {
     }
 
     @Override
-    protected void receive() throws IOException {
+    protected boolean receive() throws IOException {
+        final int BUFFER_LENGTH = 20;
+        boolean acceptedFrame =  false;
         while(mmInputStream.available()>0){
-            byte[] buffer = new byte[20];
-            int len = mmInputStream.read(buffer,0,20);
+            byte[] buffer = new byte[BUFFER_LENGTH];
+            int len = mmInputStream.read(buffer,0,BUFFER_LENGTH);
             for(int i = 0; i < len; i++){
-                carduino.dataContainer.serialDataRx.append(buffer[i]);
+                if(carduino.dataContainer.serialDataRx.append(buffer[i])){
+                    acceptedFrame = true;
+                };
             }
             //Log.d(TAG, carduino.dataContainer.serialDataTx.byteArrayToHexString(buffer));
         }
+        return acceptedFrame;
     }
 }

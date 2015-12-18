@@ -4,6 +4,7 @@
     <string name="actionSettings">Settings</string>
     <string name="titleDriveActivity">Drive</string>
     <string name="closeApp">Close</string>
+    <string name="exitApp">Exit</string>
     <string name="drive">Drive</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
@@ -43,6 +44,17 @@
     <string name="serialConnectionStatusDescription">Serial Connection Status Description</string>
     <string name="serialDataRxReceivedLabel">Serial Data Rx Received Label</string>
     <string name="serialDataRxReceivedDescription">Serial Data Rx Received Description</string>
+
+    <!--Intent strings -->
+
+    <string name="SERIAL_CONNECTION_STATUS_PERMISSION">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION</string>
+    <string name="SERIAL_CONNECTION_STATUS_CHANGED">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_CHANGED</string>
+    <string name="SERIAL_CONNECTION_STATUS_EXTRA_STATE">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_STATE</string>
+    <string name="SERIAL_CONNECTION_STATUS_EXTRA_NAME">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_NAME</string>
+    <string name="SERIAL_CONNECTION_STATUS_EXTRA_LOGO">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_LOGO</string>
+
+    <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
+    <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
 
 
 </resources>

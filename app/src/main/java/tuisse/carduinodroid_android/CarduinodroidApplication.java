@@ -12,7 +12,6 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     private static final String TAG = "CarduinoApplication";
     public DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
-    private volatile boolean serialServiceRunning = false;
 
     @Override
     public void onCreate() {
@@ -31,14 +30,6 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         dataContainer = null;
         super.onTerminate();
         Log.i(TAG, "onTerminated");
-    }
-
-    public synchronized boolean isSerialServiceRunning() {
-        return this.serialServiceRunning;
-    }
-
-    public synchronized void setSerialServiceRunning(boolean serialServiceRunning) {
-        this.serialServiceRunning = serialServiceRunning;
     }
 
     public synchronized void updateSharedPreferences() {
