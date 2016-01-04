@@ -1,6 +1,8 @@
 package tuisse.carduinodroid_android;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -10,15 +12,18 @@ import android.util.Log;
  */
 public class CarduinodroidApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CarduinoApplication";
-    public DataContainer dataContainer;
+    //private static Context context = null;
+    protected DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
-        dataContainer = new DataContainer(this);
+        dataContainer = new DataContainer();
+        //context = getApplicationContext();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //deleting shared prefs needs to be cleared in a more stable version:
+        //deleting shared prefs needs to be cleared in a more stable VERSION:
         sharedPrefs.edit().clear().apply();
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         Log.i(TAG, "onCreated");
@@ -27,7 +32,9 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     @Override
     public void onTerminate() {
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
+        stopService(new Intent(this, SerialService.class));
         dataContainer = null;
+        //context = null;
         super.onTerminate();
         Log.i(TAG, "onTerminated");
     }
@@ -44,4 +51,10 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         updateSharedPreferences();
         Log.d(TAG, "updatePrefs");
     }
+
+    /*
+    protected Context getAppContext(){
+        return CarduinodroidApplication.context;
+    }
+    */
 }

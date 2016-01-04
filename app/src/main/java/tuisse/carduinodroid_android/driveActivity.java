@@ -23,7 +23,7 @@ public class DriveActivity extends AppCompatActivity {
     private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
     private IntentFilter serialConnectionStatusChangeFilter;
 
-    Button buttonReset;
+    private Button buttonReset;
     private CheckBox checkBoxStatus;
     private CheckBox checkBoxFrontLight;
     private CheckBox checkBoxFailsafeStop;
@@ -44,7 +44,7 @@ public class DriveActivity extends AppCompatActivity {
     private TextView textViewTemperature;
 
     private void reset(){
-        carduino.dataContainer.serialDataTx.reset();
+        carduino.dataContainer.serialData.serialTx.reset();
         seekBarSpeed.setMax(254);
         seekBarSteer.setMax(254);
         seekBarSpeed.setProgress(127);
@@ -69,19 +69,19 @@ public class DriveActivity extends AppCompatActivity {
 
     private void refresh(){
         textViewDistanceFront.setText(String.format(getString(R.string.distanceFront),
-                String.valueOf(carduino.dataContainer.serialDataRx.getUltrasoundFront() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundFront() )));
         textViewDistanceBack.setText(String.format(getString(R.string.distanceBack),
-                String.valueOf(carduino.dataContainer.serialDataRx.getUltrasoundBack() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundBack() )));
         textViewAbsBattery.setText(String.format(getString(R.string.absoluteBattery),
-                String.valueOf(carduino.dataContainer.serialDataRx.getAbsoluteBatteryCapacity() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getAbsoluteBatteryCapacity() )));
         textViewRelBattery.setText(String.format(getString(R.string.relativeBattery),
-                String.valueOf(carduino.dataContainer.serialDataRx.getPercentBatteryCapacity() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getPercentBatteryCapacity() )));
         textViewCurrent.setText(String.format(getString(R.string.current),
-                String.valueOf(carduino.dataContainer.serialDataRx.getCurrent() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getCurrent() )));
         textViewVoltage.setText(String.format(getString(R.string.voltage),
-                String.valueOf(carduino.dataContainer.serialDataRx.getVoltage() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getVoltage() )));
         textViewTemperature.setText(String.format(getString(R.string.temperature),
-                String.valueOf(carduino.dataContainer.serialDataRx.getDs2745Temperature() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getDs2745Temperature() )));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class DriveActivity extends AppCompatActivity {
         serialDataRxReceiver = new serialDataRxReceiver();
         serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
 
-        this.carduino = (CarduinodroidApplication) getApplication();
+        carduino = (CarduinodroidApplication) getApplication();
         buttonReset             = (Button) findViewById(R.id.buttonReset);
         checkBoxFrontLight      = (CheckBox) findViewById(R.id.checkBoxFrontLight);
         checkBoxStatus          = (CheckBox) findViewById(R.id.checkBoxStatus);
@@ -134,7 +134,7 @@ public class DriveActivity extends AppCompatActivity {
                 if (checkBoxStatus.isChecked()) {
                     val = 1;
                 }
-                carduino.dataContainer.serialDataTx.setStatusLed(val);
+                carduino.dataContainer.serialData.serialTx.setStatusLed(val);
             }
         });
 
@@ -145,7 +145,7 @@ public class DriveActivity extends AppCompatActivity {
                 if(checkBoxFrontLight.isChecked()){
                     val = 1;
                 }
-                carduino.dataContainer.serialDataTx.setFrontLight(val);
+                carduino.dataContainer.serialData.serialTx.setFrontLight(val);
             }
         });
 
@@ -156,7 +156,7 @@ public class DriveActivity extends AppCompatActivity {
                 if(checkBoxResetAccCurrent.isChecked()){
                     val = 1;
                 }
-                carduino.dataContainer.serialDataTx.setResetAccCur(val);
+                carduino.dataContainer.serialData.serialTx.setResetAccCur(val);
             }
         });
 
@@ -167,7 +167,7 @@ public class DriveActivity extends AppCompatActivity {
                 if(checkBoxFailsafeStop.isChecked()){
                     val = 1;
                 }
-                carduino.dataContainer.serialDataTx.setFailSafeStop(val);
+                carduino.dataContainer.serialData.serialTx.setFailSafeStop(val);
             }
         });
 
@@ -175,7 +175,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textViewSpeed.setText(String.format(getString(R.string.speed), (progress - 127)));
-                carduino.dataContainer.serialDataTx.setSpeed(progress - 127);
+                carduino.dataContainer.serialData.serialTx.setSpeed(progress - 127);
             }
 
             @Override
@@ -193,7 +193,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 textViewSteer.setText(String.format(getString(R.string.steer), (progress - 127)));
-                carduino.dataContainer.serialDataTx.setSteer(progress - 127);
+                carduino.dataContainer.serialData.serialTx.setSteer(progress - 127);
             }
 
             @Override

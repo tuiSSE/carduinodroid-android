@@ -1,34 +1,28 @@
 package tuisse.carduinodroid_android;
-
-import android.app.Application;
 import android.content.Intent;
 import android.util.Log;
 
 /**
  * Created by keX on 07.12.2015.
  */
-public class SerialDataRx extends SerialData{
-    private final String TAG = "CarduinoSerialDataRx";
-    private Intent onSerialDataRxIntent;
+public class SerialProtocolRx extends SerialProtocol {
+    private final String TAG = "CarduinoSerialRx";
 
-    private final int numCurrent = 2;
-    private final int numAbsBattCap = 3;
-    private final int numRelBattCap = 4;
-    private final int numVoltage = 5;
-    private final int numTemperature = 6;
-    private final int numUltrasoundFront = 7;
-    private final int numUltrasoundBack = 8;
-    private final int numCheck = 9;
+    private final int NUM_CURRENT = 2;
+    private final int NUM_ABSOLUTE_BATTERY_CAPACITY = 3;
+    private final int NUM_RELATIVE_BATTERY_CAPACITY = 4;
+    private final int NUM_VOLTAGE = 5;
+    private final int NUM_TEMPERATURE = 6;
+    private final int NUM_ULTRASOUND_FRONT = 7;
+    private final int NUM_ULTRASOUND_BACK = 8;
+    private final int NUM_CHECK = 9;
 
-
-    private final int percentBatteryCapacityMask = 0xfe;
-    private final int percentBatteryCapacityShift = 1;
-    private final int byteFilter = 0xff;
+    private final int BYTE_MASK = 0xff;
 
     //byte 0 Start
     //byte 1 Version+Length
-    private final int length = 7;
-    private final int bufferLength = length + bufferLengthOffset;
+    private final int LENGTH = 7;
+    private final int BUFFER_LENGTH = LENGTH + BUFFER_LENGTH_PROTOCOL_OFFSET;
     //byte 1
     private int current;//in 0.1mA
     //byte 2
@@ -44,11 +38,10 @@ public class SerialDataRx extends SerialData{
     //byte 7
     private int ultrasoundBack;//in 1cm
 
-    private byte[] rxBuffer = new byte[bufferLength+1];
+    private byte[] rxBuffer = new byte[BUFFER_LENGTH +1];
     private int    rxBufferLength = 0;
 
-    public SerialDataRx(Application a) {
-        super(a);
+    public SerialProtocolRx() {
         reset();
     }
 
@@ -101,7 +94,7 @@ public class SerialDataRx extends SerialData{
     }
 
     public synchronized boolean append(byte inChar){
-        if(inChar == startByte){
+        if(inChar == START_BYTE){
             rxBufferLength = 0;
         }
 
@@ -109,18 +102,18 @@ public class SerialDataRx extends SerialData{
         rxBuffer[rxBufferLength++] = inChar;
         //check if a full data packet was received
 
-        if(rxBuffer[numStart] != startByte){
+        if(rxBuffer[NUM_START] != START_BYTE){
             rxBufferLength = 0;
             return false;
         }
-        if(rxBufferLength >= bufferLength) {
-            if (rxBuffer[numVersionLength] != getVersionLength(length)) {
+        if(rxBufferLength >= BUFFER_LENGTH) {
+            if (rxBuffer[NUM_VERSION_LENGTH] != getVersionLength(LENGTH)) {
                 rxBufferLength = 0;
                 return false;
             }
-            if (rxBuffer[numCheck] != getCheck(rxBuffer, numCheck)) {
+            if (rxBuffer[NUM_CHECK] != getCheck(rxBuffer, NUM_CHECK)) {
                 rxBufferLength = 0;
-                Log.e(TAG, "wrong Check byte on receive: " + rxBuffer[numCheck]+ " should be: " + getCheck(rxBuffer, numCheck));
+                Log.e(TAG, "wrong Check byte on receive: " + rxBuffer[NUM_CHECK]+ " should be: " + getCheck(rxBuffer, NUM_CHECK));
                 return false;
             }
             //update values
@@ -131,32 +124,30 @@ public class SerialDataRx extends SerialData{
     }
 
     private synchronized boolean set(byte[] command) {
-        if (command.length < bufferLength) {
-            Log.e(TAG, "bufferLength out of bounds" + command.length);
+        if (command.length < BUFFER_LENGTH) {
+            Log.e(TAG, "BUFFER_LENGTH out of bounds" + command.length);
             return false;
         }
-        if(command[numStart] != startByte){
-            Log.e(TAG, "wrong Startbyte " + command[numStart]);
+        if(command[NUM_START] != START_BYTE){
+            Log.e(TAG, "wrong Startbyte " + command[NUM_START]);
             return false;
         }
-        int recVersion = (command[numVersionLength] & versionMask) >> versionShift;
-        int recLength = (command[numVersionLength] & lengthMask);
-        if (((recVersion != version) || (recLength != length))) {
-            Log.e(TAG, "wrong Version (" + recVersion + ") or bufferLength(" + recLength + ")");
+        int recVersion = (command[NUM_VERSION_LENGTH] & VERSION_MSK) >> VERSION_SHF;
+        int recLength = (command[NUM_VERSION_LENGTH] & LENGTH_MSK);
+        if (((recVersion != VERSION) || (recLength != LENGTH))) {
+            Log.e(TAG, "wrong Version (" + recVersion + ") or BUFFER_LENGTH(" + recLength + ")");
             return false;
         }
         //update values
-        current = command[numCurrent] & byteFilter;
-        absoluteBatteryCapacity = command[numAbsBattCap] & byteFilter;
-        percentBatteryCapacity = ((command[numRelBattCap] & percentBatteryCapacityMask) >> percentBatteryCapacityShift) & byteFilter;
-        voltage = command[numVoltage] & byteFilter;
-        ds2745temperature = command[numTemperature] & byteFilter;
-        ultrasoundFront = command[numUltrasoundFront] & byteFilter;
-        ultrasoundBack = command[numUltrasoundBack] & byteFilter;
-        if (ultrasoundBack == byteFilter) ultrasoundBack = -1;
-        if (ultrasoundFront == byteFilter) ultrasoundFront = -1;
-        onSerialDataRxIntent = new Intent(carduino.getString(R.string.SERIAL_DATA_RX_RECEIVED));
-        carduino.sendBroadcast(onSerialDataRxIntent);
+        current = command[NUM_CURRENT] & BYTE_MASK;
+        absoluteBatteryCapacity = command[NUM_ABSOLUTE_BATTERY_CAPACITY] & BYTE_MASK;
+        percentBatteryCapacity = command[NUM_RELATIVE_BATTERY_CAPACITY]  & BYTE_MASK;
+        voltage = command[NUM_VOLTAGE] & BYTE_MASK;
+        ds2745temperature = command[NUM_TEMPERATURE] & BYTE_MASK;
+        ultrasoundFront = command[NUM_ULTRASOUND_FRONT] & BYTE_MASK;
+        ultrasoundBack = command[NUM_ULTRASOUND_BACK] & BYTE_MASK;
+        if (ultrasoundBack == BYTE_MASK) ultrasoundBack = -1;
+        if (ultrasoundFront == BYTE_MASK) ultrasoundFront = -1;
         //Log.d(TAG, print());
         return true;
     }

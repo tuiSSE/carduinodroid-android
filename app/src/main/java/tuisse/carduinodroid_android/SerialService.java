@@ -13,6 +13,7 @@ import android.util.Log;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
+    static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
     private SerialConnection serial;
     //private PowerManager.WakeLock mWakeLock;
@@ -23,6 +24,10 @@ public class SerialService extends Service {
     @Nullable
     private NotificationManager mNotificationManager = null;
     private final NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(this);
+
+    protected CarduinodroidApplication getCarduino(){
+        return carduino;
+    }
 
     private void setupNotifications() { //called in onCreate()
         if (mNotificationManager == null) {
@@ -52,8 +57,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(serial.serialState.getStateName())
-                .setContentText(serial.serialState.getStateName());
+                .setTicker(carduino.dataContainer.serialData.getSerialState().getStateName())
+                .setContentText(carduino.dataContainer.serialData.getSerialState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -75,13 +80,14 @@ public class SerialService extends Service {
 */
         setupNotifications();
         carduino = (CarduinodroidApplication) getApplication();
-        serial = new SerialBluetooth(getApplication(),this);
+        serial = new SerialBluetooth(this);
         Log.d(TAG, "onCreated");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        isDestroyed = false;
         if(serial.isError()) {
             Log.e(TAG, "resetting serial");
             serial.reset();
@@ -99,6 +105,10 @@ public class SerialService extends Service {
                 else{
                     stopSelf();
                 }
+                if(isDestroyed){
+                    //if service should stop during connection, stop all threads
+                    serial.close();
+                }
             }
         }, "connectSerialThread").start();
         return START_STICKY;
@@ -107,6 +117,7 @@ public class SerialService extends Service {
     @Override
     public void onDestroy () {
         super.onDestroy();
+        isDestroyed = true;
         serial.close();
         mNotificationManager.cancel(NOTIFICATION);
        // mWakeLock.release();

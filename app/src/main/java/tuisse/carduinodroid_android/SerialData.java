@@ -1,73 +1,76 @@
 package tuisse.carduinodroid_android;
 
 import android.app.Application;
-import android.util.Log;
 
 /**
- * Created by keX on 11.12.2015.
+ * Created by keX on 04.01.2016.
  */
-abstract public class SerialData {
-    private final String TAG = "CarduinoSerialData";
-    protected CarduinodroidApplication carduino;
+public class SerialData {
+    public SerialProtocolRx serialRx;
+    public SerialProtocolTx serialTx;
 
-    //start byte
-    //protected final int length;
-    protected final byte startByte = (byte) 0x80;
-    protected final int  version = 2;
-    protected final int  versionShift = 4;
-    protected final int  versionMask = 0x70;
-    protected final int  lengthMask = 0x0f;
-    protected final int  bufferLengthOffset = 3;
-    protected final int  checkMask = 0x01;
-    protected final int  parityBit = 7;
-    protected final int  parityMask = 0x80;
+    private SerialState serialState;
+    private SerialType serialType;
+    private String serialName;
 
-    protected final int numStart = 0;
-    protected final int numVersionLength = 1;
+    public SerialData(){
 
-    public SerialData(Application a) {
-        carduino = (CarduinodroidApplication) a;
+        serialRx = new SerialProtocolRx();
+        serialTx = new SerialProtocolTx();
+
+        serialState = SerialState.IDLE;
+        serialName = "";
+        serialType = SerialType.NONE;
     }
 
-    public synchronized String byteArrayToHexString(byte[] array) {
-        StringBuffer hexString = new StringBuffer();
-        for (byte b : array) {
-            int intVal = b & 0xff;
-            if (intVal < 0x10)
-                hexString.append("0");
-            hexString.append(Integer.toHexString(intVal));
-            hexString.append(" ");
-        }
-        return hexString.toString();
+    public synchronized void setSerialState(SerialState state){
+        serialState = state;
     }
 
-    protected synchronized byte getVersionLength(int dataLength){
-        if(version == 15) {
-            Log.e(TAG, "version must not be 15");
-            return (byte) 0x00;
-        }
-        return  (byte) (0x00 | ((dataLength) & lengthMask) | ((version << versionShift) & versionMask));
+    public synchronized SerialState getSerialState(){
+        return serialState;
     }
 
-    protected synchronized byte getCheck(byte[] cmd, int numCheck){
-        if(numCheck+1 > cmd.length){
-            Log.e(TAG, "get Check buffer length to small " + cmd.length + " it should at least be " + (numCheck+1));
-            return (byte) 0x00;
+    public synchronized void setSerialType(SerialType type){
+        serialType = type;
+    }
+
+    public synchronized SerialType getSerialType(){
+        return serialType;
+    }
+
+    public synchronized void setSerialName(String s){
+        serialName = s;
+    }
+
+    public synchronized String getSerialName(){
+        return serialName;
+    }
+
+    public synchronized int getLogoId(){
+        int logo;
+        switch (serialState){
+            case  TRYCONNECT:
+                if(serialType == SerialType.BLUETOOTH)
+                    logo = R.drawable.serial_bt_try_connect;
+                else
+                    logo = R.drawable.serial_usb_try_connect;
+                break;
+            case  RUNNING:
+            case  CONNECTED:
+                if(serialType == SerialType.BLUETOOTH)
+                    logo = R.drawable.serial_bt_connected;
+                else
+                    logo = R.drawable.serial_usb_connected;
+                break;
+            case ERROR:
+            case STREAMERROR:
+                logo = R.drawable.serial_error;
+                break;
+            default:
+                logo = R.drawable.serial_idle;
+                break;
         }
-        byte check = 0x00;
-        //calculate xor over all byte in frame
-        for (int i = 0; i < numCheck; i++){
-            check ^= cmd[i];
-        }
-        //calculate parity
-        int parity = 0; //even parity
-        for (int i = 0; i < parityBit; i++){
-            if(((check >> i) & checkMask) == checkMask){
-                parity ^= parityMask;
-            }
-        }
-        check &= ~parityMask; //unset bit 7;
-        check |= parity;//set parity bit
-        return check;
+        return logo;
     }
 }

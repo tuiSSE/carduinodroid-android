@@ -6,33 +6,33 @@ import android.util.Log;
 /**
  * Created by keX on 07.12.2015.
  */
-public class SerialDataTx extends SerialData {
-    private final String TAG = "CarduinoSerialDataTx";
+public class SerialProtocolTx extends SerialProtocol {
+    private final String TAG = "CarduinoSerialTx";
 
-    private final int numSpeed = 2;
-    private final int numSteer = 3;
-    private final int numStatus = 4;
-    private final int numCheck = 5;
+    private final int NUM_SPEED = 2;
+    private final int NUM_STEER = 3;
+    private final int NUM_STATUS = 4;
+    private final int NUM_CHECK = 5;
 
     //byte 0 Start
     //byte 1 Version+Length
-    private final int length = 3;
-    private final int bufferLength = length + bufferLengthOffset;
+    private final int LENGTH = 3;
+    private final int BUFFER_LENGTH = LENGTH + BUFFER_LENGTH_PROTOCOL_OFFSET;
     //byte 2 Speed
-    private final int speedMax = 127;//forwards
-    private final int speedMin = -127;//backwards
+    private final int VAL_SPEED_MAX = 127;//forwards
+    private final int VAL_SPEED_MIN = -127;//backwards
     //byte 3 Steer
-    private final int steerMax = 127;//right
-    private final int steerMin = -127;//left
+    private final int VAL_STEER_MAX = 127;//right
+    private final int VAL_STEER_MIN = -127;//left
     //byte 4
-    private final int statusLedShift = 0;
-    private final int statusLedMask = 1 << statusLedShift;
-    private final int frontLightShift = 1;
-    private final int frontLightMask = 1 << frontLightShift;
-    private final int resetAccCurShift = 4;
-    private final int resetAccCurMask = 1 << resetAccCurShift;
-    private final int failSafeStopShift = 5;
-    private final int failSafeStopMask = 1 << failSafeStopShift;
+    private final int STATUS_LED_SHF = 0;
+    private final int STATUS_LED_MSK = 1 << STATUS_LED_SHF;
+    private final int FRONT_LIGHT_SHF = 1;
+    private final int FRONT_LIGHT_MSK = 1 << FRONT_LIGHT_SHF;
+    private final int RESET_ACCUMULATED_CURRENT_SHF = 4;
+    private final int RESET_ACCUMULATED_CURRENT_MSK = 1 << RESET_ACCUMULATED_CURRENT_SHF;
+    private final int FAILSAFE_STOP_SHF = 5;
+    private final int FAILSAFE_STOP_MSK = 1 << FAILSAFE_STOP_SHF;
 
     private int speed;
     private int steer;
@@ -41,8 +41,7 @@ public class SerialDataTx extends SerialData {
     private int failSafeStop;
     private int resetAccCur;
 
-    public SerialDataTx(Application a){
-        super(a);
+    public SerialProtocolTx(){
         reset();
     }
 
@@ -56,8 +55,8 @@ public class SerialDataTx extends SerialData {
     }
 
     public synchronized String print(){
-        return  " version      "+ version+
-                " length       "+ length+
+        return  " VERSION      "+ VERSION +
+                " LENGTH       "+ LENGTH +
                 " speedVal     "+ speed+
                 " steerVal     "+ steer+
                 " statusLed    "+ statusLed+
@@ -67,18 +66,18 @@ public class SerialDataTx extends SerialData {
     }
 
     public synchronized byte[] get() {
-        byte[] command = new byte[bufferLength];
-        command[0] = startByte;
-        command[1] = getVersionLength(length);
-        command[numSpeed] = getSpeed();
-        command[numSteer] = getSteer();
-        command[numStatus] = getStatus();
-        command[numCheck] = getCheck(command, numCheck);
+        byte[] command = new byte[BUFFER_LENGTH];
+        command[0] = START_BYTE;
+        command[1] = getVersionLength(LENGTH);
+        command[NUM_SPEED] = getSpeed();
+        command[NUM_STEER] = getSteer();
+        command[NUM_STATUS] = getStatus();
+        command[NUM_CHECK] = getCheck(command, NUM_CHECK);
         return command;
     }
 
     public synchronized byte getSpeed(){
-        if((byte) speed == startByte){
+        if((byte) speed == START_BYTE){
             Log.e(TAG, "speed must not be -128");
             speed = 0;
         }
@@ -86,7 +85,7 @@ public class SerialDataTx extends SerialData {
     }
 
     public synchronized byte getSteer(){
-        if((byte) steer == startByte){
+        if((byte) steer == START_BYTE){
             Log.e(TAG, "steer must not be -128");
             steer = 0;
         }
@@ -95,14 +94,14 @@ public class SerialDataTx extends SerialData {
 
     public synchronized byte getStatus(){
         return (byte) (0x00
-                | ((statusLed << statusLedShift) & statusLedMask)
-                | ((frontLight << frontLightShift) & frontLightMask)
-                | ((failSafeStop << failSafeStopShift) & failSafeStopMask)
-                | ((resetAccCur << resetAccCurShift) & resetAccCurMask));
+                | ((statusLed << STATUS_LED_SHF) & STATUS_LED_MSK)
+                | ((frontLight << FRONT_LIGHT_SHF) & FRONT_LIGHT_MSK)
+                | ((failSafeStop << FAILSAFE_STOP_SHF) & FAILSAFE_STOP_MSK)
+                | ((resetAccCur << RESET_ACCUMULATED_CURRENT_SHF) & RESET_ACCUMULATED_CURRENT_MSK));
     }
 
     public synchronized void setSpeed(int _speed) {
-        if ((_speed < speedMin) || (_speed > speedMax)) {
+        if ((_speed < VAL_SPEED_MIN) || (_speed > VAL_SPEED_MAX)) {
             Log.e(TAG, "setSpeed out of bounds" + _speed);
         }
         else {
@@ -111,7 +110,7 @@ public class SerialDataTx extends SerialData {
     }
 
     public synchronized void setSteer(int _steer) {
-        if ((_steer < steerMin) || (_steer > steerMax)) {
+        if ((_steer < VAL_STEER_MIN) || (_steer > VAL_STEER_MAX)) {
             Log.e(TAG, "setSteer out of bounds" + _steer);
         }
         else {

@@ -27,22 +27,22 @@ public class SerialBluetooth extends SerialConnection {
     private OutputStream mmOutputStream = null;
     private InputStream mmInputStream = null;
 
-    public SerialBluetooth(Application a, SerialService s) {
-        super(a,s);
-        serialType = SerialType.BLUETOOTH;
+    public SerialBluetooth(SerialService s) {
+        super(s);
+        getSerialData().setSerialType(SerialType.BLUETOOTH);
     }
 
     @Override
     public boolean find() {
         if (isIdle())
             setSerialState(SerialState.TRYCONNECT);
-        // Verbindung mit Bluetooth-Adapter herstellen
+        // Try to get connection with Bluetooth-Adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             Log.e(TAG, "No bluetooth adapter available");
             setSerialState(SerialState.ERROR);
         } else {
-            Log.d(TAG, "Bluetooth-Adapter ist bereit");
+            Log.d(TAG, "Bluetooth-Adapter is ready");
         }
         if (!mBluetoothAdapter.isEnabled()) {
             mBluetoothAdapter.enable();
@@ -61,7 +61,7 @@ public class SerialBluetooth extends SerialConnection {
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getName().contains("HC-06")) {
                     mmDevice = device;
-                    serialName = mmDevice.getName();
+                    getSerialData().setSerialName(mmDevice.getName());
                     break;
                 }
             }
@@ -118,7 +118,7 @@ public class SerialBluetooth extends SerialConnection {
         }
 
         if (isConnected()) {
-            Log.i(TAG, "Verbunden mit " + serialName);
+            Log.i(TAG, "Verbunden mit " + getSerialData().getSerialName());
         } else {
             Log.e(TAG, "Verbindungsfehler mit " + uuid.toString());
         }
@@ -129,7 +129,7 @@ public class SerialBluetooth extends SerialConnection {
     public boolean close() {
         try {
             if(!isError()){
-                serialName = "";
+                getSerialData().setSerialName("");
             }
             if(isRunning()){
                 setSerialState(SerialState.IDLE);
@@ -147,7 +147,7 @@ public class SerialBluetooth extends SerialConnection {
 
         } catch (IOException e) {
             Log.e(TAG, "Fehler beim Beenden des Streams und Schliessen des Sockets: " + e.toString());
-            serialName = e.toString();
+            getSerialData().setSerialName(e.toString());
             setSerialState(SerialState.ERROR);
         }
         mBluetoothAdapter = null;
@@ -160,23 +160,23 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     protected void send() throws IOException {
-        //Log.d(TAG,carduino.dataContainer.serialDataTx.byteArrayToHexString(carduino.dataContainer.serialDataTx.get()));
-        mmOutputStream.write(carduino.dataContainer.serialDataTx.get());
+        //Log.d(TAG,getSerialData().serialTx.byteArrayToHexString(getSerialData().serialTx.get()));
+        mmOutputStream.write(getSerialData().serialTx.get());
     }
 
     @Override
-    protected boolean receive() throws IOException {
+    protected int receive() throws IOException {
         final int BUFFER_LENGTH = 20;
-        boolean acceptedFrame =  false;
+        int acceptedFrame = 0;
         while(mmInputStream.available()>0){
             byte[] buffer = new byte[BUFFER_LENGTH];
             int len = mmInputStream.read(buffer,0,BUFFER_LENGTH);
             for(int i = 0; i < len; i++){
-                if(carduino.dataContainer.serialDataRx.append(buffer[i])){
-                    acceptedFrame = true;
+                if(getSerialData().serialRx.append(buffer[i])){
+                    acceptedFrame++;
                 };
             }
-            //Log.d(TAG, carduino.dataContainer.serialDataTx.byteArrayToHexString(buffer));
+            //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
         }
         return acceptedFrame;
     }

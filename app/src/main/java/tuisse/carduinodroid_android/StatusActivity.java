@@ -39,8 +39,6 @@ public class StatusActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         serialConnectionStatusChangeReceiver = new SerialConnectionStatusChangeReceiver();
         serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-        //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
-        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
 
         //get the Views
         closeButton = (Button) findViewById(R.id.buttonClose);
@@ -56,7 +54,9 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClickClose");
+                stopService(new Intent(StatusActivity.this, SerialService.class));
                 moveTaskToBack(true);
+
             }
         });
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -96,13 +96,16 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
+        imageViewSerialConnectionStatus.setImageResource(carduino.dataContainer.serialData.getLogoId());
         Log.d(TAG, "onStatusActivityResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
+        unregisterReceiver(serialConnectionStatusChangeReceiver);
         Log.d(TAG, "onStatusActivityPause");
     }
 
@@ -127,8 +130,6 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //stopService(new Intent(StatusActivity.this, SerialService.class));
-        unregisterReceiver(serialConnectionStatusChangeReceiver);
         Log.d(TAG, "onStatusActivityDestroy");
     }
 
@@ -157,7 +158,6 @@ public class StatusActivity extends AppCompatActivity {
             int resId = intent.getIntExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), R.drawable.serial_idle);
             textViewSerialConnectionStatus.setText(String.format(getString(R.string.serialConnectionStatus),status,name));
             imageViewSerialConnectionStatus.setImageResource(resId);
-
         }
     }
 }

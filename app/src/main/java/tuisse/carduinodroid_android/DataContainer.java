@@ -6,15 +6,11 @@ import android.app.Application;
  * Created by keX on 10.12.2015.
  */
 public class DataContainer {
-    protected CarduinodroidApplication carduino;
+    protected Preferences preferences;
+    protected SerialData serialData;
 
-    public Preferences preferences;
-    public SerialDataRx serialDataRx;
-    public SerialDataTx serialDataTx;
-
-    public DataContainer(Application a){
-        carduino = (CarduinodroidApplication) a;
-        serialDataRx = new SerialDataRx(a);
-        serialDataTx = new SerialDataTx(a);
+    public DataContainer(){
+        serialData = new SerialData();
+        preferences = new Preferences();
     }
 }
