@@ -56,7 +56,6 @@ public class StatusActivity extends AppCompatActivity {
                 Log.d(TAG, "onClickClose");
                 stopService(new Intent(StatusActivity.this, SerialService.class));
                 moveTaskToBack(true);
-
             }
         });
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -137,15 +136,19 @@ public class StatusActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String action = intent.getAction();
-        Log.d(TAG,"Notification send intent");
         if (action == null) {
+            Log.d(TAG,"Notification send empty intent");
             return;
         }
         switch (action) {
             case SerialService.EXIT_ACTION:
                 Log.d(TAG,"Notification send EXIT_ACTION");
                 stopService(new Intent(StatusActivity.this, SerialService.class));
+                moveTaskToBack(true);
                 break;
+            default:
+                Log.d(TAG,"Notification send unknown intent");
+                return;
         }
     }
 

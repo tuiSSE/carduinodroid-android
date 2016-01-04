@@ -1,7 +1,5 @@
 package tuisse.carduinodroid_android;
 
-import android.app.Application;
-
 /**
  * Created by keX on 04.01.2016.
  */
@@ -9,7 +7,7 @@ public class SerialData {
     public SerialProtocolRx serialRx;
     public SerialProtocolTx serialTx;
 
-    private SerialState serialState;
+    private ConnectionState connectionState;
     private SerialType serialType;
     private String serialName;
 
@@ -18,17 +16,17 @@ public class SerialData {
         serialRx = new SerialProtocolRx();
         serialTx = new SerialProtocolTx();
 
-        serialState = SerialState.IDLE;
+        connectionState = ConnectionState.IDLE;
         serialName = "";
         serialType = SerialType.NONE;
     }
 
-    public synchronized void setSerialState(SerialState state){
-        serialState = state;
+    public synchronized void setConnectionState(ConnectionState state){
+        connectionState = state;
     }
 
-    public synchronized SerialState getSerialState(){
-        return serialState;
+    public synchronized ConnectionState getConnectionState(){
+        return connectionState;
     }
 
     public synchronized void setSerialType(SerialType type){
@@ -49,7 +47,7 @@ public class SerialData {
 
     public synchronized int getLogoId(){
         int logo;
-        switch (serialState){
+        switch (connectionState){
             case  TRYCONNECT:
                 if(serialType == SerialType.BLUETOOTH)
                     logo = R.drawable.serial_bt_try_connect;

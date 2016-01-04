@@ -4,9 +4,9 @@ package tuisse.carduinodroid_android;
  * Created by keX on 21.12.2015.
  */
 
-public enum SerialState {
+public enum ConnectionState {
     IDLE(0), TRYCONNECT(1), CONNECTED(1), RUNNING(3), ERROR(-1), STREAMERROR(-2);
-    SerialState(int s) {
+    ConnectionState(int s) {
         state = s;
     }
     private int state;

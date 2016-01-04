@@ -1,6 +1,5 @@
 package tuisse.carduinodroid_android;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -16,7 +15,7 @@ public class SerialService extends Service {
     static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
     private SerialConnection serial;
-    //private PowerManager.WakeLock mWakeLock;
+    private PowerManager.WakeLock mWakeLock;
 
     private static final int NOTIFICATION = 1337;
     public static final String EXIT_ACTION = "tuisse.carduinodroid_android.EXIT";
@@ -57,8 +56,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(carduino.dataContainer.serialData.getSerialState().getStateName())
-                .setContentText(carduino.dataContainer.serialData.getSerialState().getStateName());
+                .setTicker(carduino.dataContainer.serialData.getConnectionState().getStateName())
+                .setContentText(carduino.dataContainer.serialData.getConnectionState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -120,7 +119,7 @@ public class SerialService extends Service {
         isDestroyed = true;
         serial.close();
         mNotificationManager.cancel(NOTIFICATION);
-       // mWakeLock.release();
+        //mWakeLock.release();
         //disconnect
         Log.i(TAG, "onDestroyed");
     }

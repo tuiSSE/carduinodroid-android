@@ -1,6 +1,5 @@
 package tuisse.carduinodroid_android;
 
-import android.app.Application;
 import android.content.Intent;
 import android.util.Log;
 import java.io.IOException;
@@ -35,43 +34,43 @@ abstract public class SerialConnection {
     abstract protected int receive() throws IOException;
 
     protected boolean reset() {
-        setSerialState(SerialState.IDLE);
+        setSerialState(ConnectionState.IDLE);
         serialSendThread.interrupt();
         serialReceiveThread.interrupt();
         return true;
     }
 
     protected void start() {
-        setSerialState(SerialState.RUNNING);
+        setSerialState(ConnectionState.RUNNING);
         serialSendThread.start();
         serialReceiveThread.start();
     }
 
     public boolean isIdle() {
-        return getSerialData().getSerialState() == SerialState.IDLE;
+        return getSerialData().getConnectionState() == ConnectionState.IDLE;
     }
     public boolean isConnected() {
-        return getSerialData().getSerialState() == SerialState.CONNECTED;
+        return getSerialData().getConnectionState() == ConnectionState.CONNECTED;
     }
     public boolean isError() {
-        return (getSerialData().getSerialState() == SerialState.ERROR) || (getSerialData().getSerialState() == SerialState.STREAMERROR);
+        return (getSerialData().getConnectionState() == ConnectionState.ERROR) || (getSerialData().getConnectionState() == ConnectionState.STREAMERROR);
     }
     public boolean isTryConnect() {
-        return getSerialData().getSerialState() == SerialState.TRYCONNECT;
+        return getSerialData().getConnectionState() == ConnectionState.TRYCONNECT;
     }
     public boolean isRunning() {
-        return getSerialData().getSerialState() == SerialState.RUNNING;
+        return getSerialData().getConnectionState() == ConnectionState.RUNNING;
     }
-    public SerialState getSerialState() {
-        return getSerialData().getSerialState();
+    public ConnectionState getSerialState() {
+        return getSerialData().getConnectionState();
     }
 
-    protected void setSerialState(SerialState state){
-        if(state != getSerialData().getSerialState()) {
-            getSerialData().setSerialState(state);
-            Log.d(TAG, "serial State changed: " + getSerialData().getSerialState().getStateName());
+    protected void setSerialState(ConnectionState state){
+        if(state != getSerialData().getConnectionState()) {
+            getSerialData().setConnectionState(state);
+            Log.d(TAG, "serial State changed: " + getSerialData().getConnectionState().getStateName());
             Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-            onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE), getSerialData().getSerialState().getStateName());
+            onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE), getSerialData().getConnectionState().getStateName());
             onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), getSerialData().getLogoId());
             onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME), getSerialData().getSerialName());
             //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
@@ -100,13 +99,13 @@ abstract public class SerialConnection {
                         if(lastReceiveTime + TIMEOUT < System.currentTimeMillis()){
                             Log.e(TAG, "Receive timed out");
                             getSerialData().setSerialName("time out");
-                            setSerialState(SerialState.STREAMERROR);
+                            setSerialState(ConnectionState.STREAMERROR);
                             serialService.stopSelf();
                         }
                     } catch (java.io.IOException e){
                         Log.e(TAG, "Receive failed: " + e.toString());
                         getSerialData().setSerialName("time out");
-                        setSerialState(SerialState.STREAMERROR);
+                        setSerialState(ConnectionState.STREAMERROR);
                         serialService.stopSelf();
                     }
                     Thread.sleep(DELAY);
@@ -115,7 +114,7 @@ abstract public class SerialConnection {
                         Log.d(TAG,"pulse SerialReceive");
                     }
                 } catch (InterruptedException e) {
-                    setSerialState(SerialState.IDLE);
+                    setSerialState(ConnectionState.IDLE);
                     Log.d(TAG, "SerialReceiveThread stopped" + e.toString());
                     serialService.stopSelf();
                 }
@@ -139,7 +138,7 @@ abstract public class SerialConnection {
                     } catch (java.io.IOException e){
                         Log.e(TAG, "Send failed: " + e.toString());
                         getSerialData().setSerialName("Connection timed out");
-                        setSerialState(SerialState.STREAMERROR);
+                        setSerialState(ConnectionState.STREAMERROR);
                         serialService.stopSelf();
                     }
                     Thread.sleep(DELAY);
@@ -148,7 +147,7 @@ abstract public class SerialConnection {
                         Log.d(TAG, "pulse SerialSend");
                     }
                 } catch (InterruptedException e) {
-                    setSerialState(SerialState.IDLE);
+                    setSerialState(ConnectionState.IDLE);
                     Log.d(TAG, "SerialSendThread stopped" + e.toString());
                     serialService.stopSelf();
                 }

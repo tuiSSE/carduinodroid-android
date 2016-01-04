@@ -18,7 +18,7 @@ public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
     private CarduinodroidApplication carduino;
 
-    private serialDataRxReceiver serialDataRxReceiver;
+    private SerialDataRxReceiver serialDataRxReceiver;
     private IntentFilter serialDataRxFilter;
     private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
     private IntentFilter serialConnectionStatusChangeFilter;
@@ -95,7 +95,7 @@ public class DriveActivity extends AppCompatActivity {
         serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
 
-        serialDataRxReceiver = new serialDataRxReceiver();
+        serialDataRxReceiver = new SerialDataRxReceiver();
         serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
 
         carduino = (CarduinodroidApplication) getApplication();
@@ -213,6 +213,7 @@ public class DriveActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
         registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        refresh();
     }
 
     @Override
@@ -222,7 +223,7 @@ public class DriveActivity extends AppCompatActivity {
         unregisterReceiver(serialDataRxReceiver);
     }
 
-    class serialDataRxReceiver extends BroadcastReceiver {
+    private class SerialDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             //Log.d(TAG,"onDriveActivityReceiverReceive");

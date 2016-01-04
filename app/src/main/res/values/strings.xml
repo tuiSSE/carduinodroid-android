@@ -1,5 +1,5 @@
 <resources>
-    <string name="appName">Carduinodroid</string>
+    <string name="appName">Cardudroid</string>
 
     <string name="actionSettings">Settings</string>
     <string name="titleDriveActivity">Drive</string>
