@@ -124,7 +124,4 @@ public class SerialService extends Service {
         //disconnect
         Log.i(TAG, "onDestroyed");
     }
-
-
-
 }

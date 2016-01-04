@@ -8,9 +8,11 @@ import android.app.Application;
 public class DataContainer {
     protected Preferences preferences;
     protected SerialData serialData;
+    protected IpData ipData;
 
     public DataContainer(){
         serialData = new SerialData();
+        ipData = new IpData();
         preferences = new Preferences();
     }
 }
