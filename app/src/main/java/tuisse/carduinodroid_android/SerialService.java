@@ -79,8 +79,15 @@ public class SerialService extends Service {
 */
         setupNotifications();
         carduino = (CarduinodroidApplication) getApplication();
-        serial = new SerialBluetooth(this);
-        Log.d(TAG, "onCreated");
+
+        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+            serial = new SerialBluetooth(this);
+            Log.d(TAG, "onCreated SerialBluetooth");
+        }
+        else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
+            serial = new SerialUsb(this);
+            Log.d(TAG, "onCreated SerialUsb");
+        }
     }
 
     @Override

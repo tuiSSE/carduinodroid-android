@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="serial">
-        <item>@string/bluetooth</item>
-        <item>@string/usb</item>
+        <item>@string/serialBluetooth</item>
+        <item>@string/serialUsb</item>
+        <item>@string/serialAuto</item>
     </string-array>
+
     <string-array name="serial_values">
-        <item>0</item>
         <item>1</item>
+        <item>2</item>
+        <item>3</item>
     </string-array>
 
     <string-array name="remote">

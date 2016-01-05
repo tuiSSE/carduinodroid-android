@@ -31,8 +31,9 @@
 
 
     <string name="serial">select Serial Connection</string>
-    <string name="bluetooth">serial: Bluetooth</string>
-    <string name="usb">serial: USB</string>
+    <string name="serialBluetooth">serial: Bluetooth</string>
+    <string name="serialUsb">serial: USB</string>
+    <string name="serialAuto">serial: Auto</string>
     <string name="isSlave">ServiceApplication</string>
     <string name="isRemote">RemoteApplication</string>
     <string name="default_ip">141.24.11.1</string>

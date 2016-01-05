@@ -8,7 +8,7 @@ import java.io.IOException;
  * Created by keX on 09.12.2015.
  */
 abstract public class SerialConnection {
-    private final String            TAG = "CarduinoSerial";
+    private final String            TAG = "CarduinoSerialConn";
     protected final int             DELAY = 100;//100ms
     protected final int             HEARTBEAT = 100;
     protected final int             TIMEOUT = 800;//800ms
@@ -21,10 +21,6 @@ abstract public class SerialConnection {
         serialService = s;
         serialSendThread      = new SerialSendThread();
         serialReceiveThread   = new SerialReceiveThread();
-    }
-
-    protected SerialData getSerialData(){
-        return serialService.getCarduino().dataContainer.serialData;
     }
 
     abstract protected boolean find();
@@ -46,27 +42,8 @@ abstract public class SerialConnection {
         serialReceiveThread.start();
     }
 
-    public boolean isIdle() {
-        return getSerialData().getConnectionState() == ConnectionState.IDLE;
-    }
-    public boolean isConnected() {
-        return getSerialData().getConnectionState() == ConnectionState.CONNECTED;
-    }
-    public boolean isError() {
-        return (getSerialData().getConnectionState() == ConnectionState.ERROR) || (getSerialData().getConnectionState() == ConnectionState.STREAMERROR);
-    }
-    public boolean isTryConnect() {
-        return getSerialData().getConnectionState() == ConnectionState.TRYCONNECT;
-    }
-    public boolean isRunning() {
-        return getSerialData().getConnectionState() == ConnectionState.RUNNING;
-    }
-    public ConnectionState getSerialState() {
-        return getSerialData().getConnectionState();
-    }
-
     protected void setSerialState(ConnectionState state){
-        if(state != getSerialData().getConnectionState()) {
+        if(state.isNotEqual(getSerialData().getConnectionState())) {
             getSerialData().setConnectionState(state);
             Log.d(TAG, "serial State changed: " + getSerialData().getConnectionState().getStateName());
             Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
@@ -154,4 +131,23 @@ abstract public class SerialConnection {
             }
         }
     }//SerialSendThread
+
+    protected SerialData getSerialData(){
+        return serialService.getCarduino().dataContainer.serialData;
+    }
+    protected boolean isIdle() {
+        return getSerialData().getConnectionState().isIdle();
+    }
+    protected boolean isConnected() {
+        return getSerialData().getConnectionState().isConnected();
+    }
+    protected boolean isError() {
+        return getSerialData().getConnectionState().isError();
+    }
+    protected boolean isTryConnect() {
+        return getSerialData().getConnectionState().isTryConnect();
+    }
+    protected boolean isRunning() {
+        return getSerialData().getConnectionState().isRunning();
+    }
 }

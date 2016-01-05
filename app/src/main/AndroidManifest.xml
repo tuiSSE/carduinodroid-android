@@ -4,6 +4,8 @@
 
     <uses-sdk android:minSdkVersion="16" />
 
+    <uses-feature android:name="android.hardware.usb.host" />
+
     <permission
         android:name="tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION"
         android:description="@string/serialConnectionStatusDescription"
@@ -28,7 +30,7 @@
     <application
         android:name=".CarduinodroidApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/logo"
         android:label="@string/appName"
         android:theme="@style/AppTheme">
         <activity
@@ -37,7 +39,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
+            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
         </activity>
 
         <activity

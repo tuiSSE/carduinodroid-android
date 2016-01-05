@@ -24,7 +24,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         //context = getApplicationContext();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         //deleting shared prefs needs to be cleared in a more stable VERSION:
-        sharedPrefs.edit().clear().apply();
+        sharedPrefs.edit().clear();
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         Log.i(TAG, "onCreated");
     }
@@ -32,24 +32,31 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     @Override
     public void onTerminate() {
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
-        stopService(new Intent(this, SerialService.class));
         dataContainer = null;
         //context = null;
         super.onTerminate();
         Log.i(TAG, "onTerminated");
     }
 
+    public synchronized int getIntPref(SharedPreferences prefs,String key, int def) {
+        String value = prefs.getString(key, null);
+        return value == null ? def : Integer.valueOf(value);
+    }
+
     public synchronized void updateSharedPreferences() {
-        if (dataContainer.preferences == null)
+        if (dataContainer.preferences == null){
+            Log.d(TAG,"no preferences initialized");
             dataContainer.preferences = new Preferences();
-        dataContainer.preferences.serialBluetooth1Usb0 = sharedPrefs.getInt("serialBluetooth1Usb0", 1);
+        }
+        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 0)));
         dataContainer.preferences.rcNetwork1Activity0 = sharedPrefs.getBoolean("rcNetwork1Activity0", true);
     }
 
     @Override
     public synchronized void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "updating Prefs");
         updateSharedPreferences();
-        Log.d(TAG, "updatePrefs");
+        Log.d(TAG, "updated Prefs");
     }
 
     /*

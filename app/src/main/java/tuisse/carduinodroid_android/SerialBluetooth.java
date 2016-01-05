@@ -29,8 +29,9 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     public boolean find() {
-        if (isIdle())
+        if (isIdle()) {
             setSerialState(ConnectionState.TRYCONNECT);
+        }
         // Try to get connection with Bluetooth-Adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -103,12 +104,14 @@ public class SerialBluetooth extends SerialConnection {
             }
 
             // Inputstream erstellen
-            try {
-                mmInputStream = mmSocket.getInputStream();
-                setSerialState(ConnectionState.CONNECTED);
-            } catch (IOException e) {
-                Log.e(TAG, "InputStream Fehler: " + e.toString());
-                setSerialState(ConnectionState.STREAMERROR);
+            if(!isError()) {
+                try {
+                    mmInputStream = mmSocket.getInputStream();
+                    setSerialState(ConnectionState.CONNECTED);
+                } catch (IOException e) {
+                    Log.e(TAG, "InputStream Fehler: " + e.toString());
+                    setSerialState(ConnectionState.STREAMERROR);
+                }
             }
         }
 

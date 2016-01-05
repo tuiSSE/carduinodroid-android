@@ -18,15 +18,15 @@
             android:summaryOn="@string/isSlave"/>
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Connection" >
+        android:title="Serial Connection" >
         <ListPreference
-            android:key="serialBluetooth1USB0"
+            android:key="serialType"
             android:dependency="remote"
-            android:defaultValue="0"
+            android:defaultValue="1"
             android:entries="@array/serial"
             android:entryValues="@array/serial_values"
             android:summary="@string/serial"
-            android:title="@string/bluetooth" />
+            android:title="@string/serialBluetooth" />
         <CheckBoxPreference
             android:key="rcNetwork1Activity0"
             android:dependency="remote"
@@ -36,7 +36,7 @@
             android:title="Remote Control" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:title="Connection" >
+        android:title="Ip Connection" >
         <EditTextPreference
             android:key="targetIP"
             android:defaultValue="@string/default_ip"

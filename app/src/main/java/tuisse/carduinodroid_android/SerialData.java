@@ -12,13 +12,12 @@ public class SerialData {
     private String serialName;
 
     public SerialData(){
-
         serialRx = new SerialProtocolRx();
         serialTx = new SerialProtocolTx();
 
-        connectionState = ConnectionState.IDLE;
-        serialName = "";
-        serialType = SerialType.NONE;
+        setConnectionState(ConnectionState.IDLE);
+        setSerialName("");
+        setSerialType(SerialType.NONE);
     }
 
     public synchronized void setConnectionState(ConnectionState state){
@@ -49,17 +48,21 @@ public class SerialData {
         int logo;
         switch (connectionState){
             case  TRYCONNECT:
-                if(serialType == SerialType.BLUETOOTH)
+                if(serialType.isBluetooth())
                     logo = R.drawable.serial_bt_try_connect;
-                else
+                else if(serialType.isUsb())
                     logo = R.drawable.serial_usb_try_connect;
+                else
+                    logo = R.drawable.serial_error;
                 break;
             case  RUNNING:
             case  CONNECTED:
-                if(serialType == SerialType.BLUETOOTH)
+                if(serialType.isBluetooth())
                     logo = R.drawable.serial_bt_connected;
-                else
+                else if(serialType.isUsb())
                     logo = R.drawable.serial_usb_connected;
+                else
+                    logo = R.drawable.serial_error;
                 break;
             case ERROR:
             case STREAMERROR:
