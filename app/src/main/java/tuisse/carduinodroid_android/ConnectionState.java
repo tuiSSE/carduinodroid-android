@@ -5,7 +5,7 @@ package tuisse.carduinodroid_android;
  */
 
 public enum ConnectionState {
-    IDLE(0), TRYCONNECT(1), CONNECTED(1), RUNNING(3), ERROR(-1), STREAMERROR(-2);
+    IDLE(0),TRYFIND(1),FOUND(2), TRYCONNECT(3), CONNECTED(4), RUNNING(5), ERROR(-1), STREAMERROR(-2);
     ConnectionState(int s) {
         state = s;
     }
@@ -18,12 +18,18 @@ public enum ConnectionState {
                 s = IDLE;
                 break;
             case 1:
-                s = TRYCONNECT;
+                s = TRYFIND;
                 break;
             case 2:
-                s = CONNECTED;
+                s = FOUND;
                 break;
             case 3:
+                s = TRYCONNECT;
+                break;
+            case 4:
+                s = CONNECTED;
+                break;
+            case 5:
                 s = RUNNING;
                 break;
             case -1:
@@ -42,9 +48,11 @@ public enum ConnectionState {
         String s = "";
         switch (state){
             case  0: s = "Idle";break;
-            case  1: s = "Try to connect ...";break;
-            case  2: s = "Connected";break;
-            case  3: s = "Running";break;
+            case  1: s = "Try to find";break;
+            case  2: s = "Found";break;
+            case  3: s = "Try to connect ...";break;
+            case  4: s = "Connected";break;
+            case  5: s = "Running";break;
             case -2: s = "Streamerror";break;
             default: s = "Error";break;
         }
@@ -53,6 +61,12 @@ public enum ConnectionState {
 
     public synchronized boolean isIdle(){
         return this == IDLE;
+    }
+    public synchronized boolean isTryFind(){
+        return this == TRYFIND;
+    }
+    public synchronized boolean isFound(){
+        return this == FOUND;
     }
     public synchronized boolean isTryConnect(){
         return this == TRYCONNECT;

@@ -12,7 +12,6 @@ import android.util.Log;
  */
 public class CarduinodroidApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CarduinoApplication";
-    //private static Context context = null;
     protected DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
 
@@ -21,10 +20,8 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     public void onCreate() {
         super.onCreate();
         dataContainer = new DataContainer();
-        //context = getApplicationContext();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //deleting shared prefs needs to be cleared in a more stable VERSION:
-        sharedPrefs.edit().clear();
+        updateSharedPreferences();
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         Log.i(TAG, "onCreated");
     }
@@ -33,7 +30,6 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     public void onTerminate() {
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         dataContainer = null;
-        //context = null;
         super.onTerminate();
         Log.i(TAG, "onTerminated");
     }
@@ -49,6 +45,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
             dataContainer.preferences = new Preferences();
         }
         dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 0)));
+        dataContainer.preferences.setBluetoothDeviceName(sharedPrefs.getString("bluetoothDeviceName", getString(R.string.defaultBluetoothDeviceName)));
         dataContainer.preferences.rcNetwork1Activity0 = sharedPrefs.getBoolean("rcNetwork1Activity0", true);
     }
 
@@ -58,10 +55,4 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         updateSharedPreferences();
         Log.d(TAG, "updated Prefs");
     }
-
-    /*
-    protected Context getAppContext(){
-        return CarduinodroidApplication.context;
-    }
-    */
 }

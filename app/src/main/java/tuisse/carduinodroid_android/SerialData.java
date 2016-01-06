@@ -47,6 +47,8 @@ public class SerialData {
     public synchronized int getLogoId(){
         int logo;
         switch (connectionState){
+            case  TRYFIND:
+            case  FOUND:
             case  TRYCONNECT:
                 if(serialType.isBluetooth())
                     logo = R.drawable.serial_bt_try_connect;
@@ -55,8 +57,8 @@ public class SerialData {
                 else
                     logo = R.drawable.serial_error;
                 break;
-            case  RUNNING:
             case  CONNECTED:
+            case  RUNNING:
                 if(serialType.isBluetooth())
                     logo = R.drawable.serial_bt_connected;
                 else if(serialType.isUsb())

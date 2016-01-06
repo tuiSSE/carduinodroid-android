@@ -39,8 +39,8 @@
         android:title="Ip Connection" >
         <EditTextPreference
             android:key="targetIP"
-            android:defaultValue="@string/default_ip"
-            android:summary="@string/default_ip"
+            android:defaultValue="@string/defaultIp"
+            android:summary="@string/defaultIp"
             android:title="Remote IP" />
     </PreferenceCategory>
 

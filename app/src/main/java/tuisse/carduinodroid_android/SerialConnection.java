@@ -2,6 +2,8 @@ package tuisse.carduinodroid_android;
 
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.IOException;
 
 /**
@@ -137,6 +139,9 @@ abstract public class SerialConnection {
     }
     protected boolean isIdle() {
         return getSerialData().getConnectionState().isIdle();
+    }
+    protected boolean isFound() {
+        return getSerialData().getConnectionState().isFound();
     }
     protected boolean isConnected() {
         return getSerialData().getConnectionState().isConnected();

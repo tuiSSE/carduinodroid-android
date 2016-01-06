@@ -1,6 +1,9 @@
 <resources>
-    <string name="appName">Cardudroid</string>
+    <!-- application name -->
+    <string name="appName">Carduinodroid</string>
+    <string name="appNameShort">Cardudroid</string>
 
+    <!-- activity names and button labels -->
     <string name="actionSettings">Settings</string>
     <string name="titleDriveActivity">Drive</string>
     <string name="closeApp">Close</string>
@@ -10,6 +13,7 @@
     <string name="stopSerialService">Stop Serial</string>
     <string name="titleActivitySettings">Settings</string>
 
+    <!-- serial data display strings -->
     <string name="speed">Speed %1$d</string>
     <string name="steer">Steering %1$d</string>
     <string name="status">Status LED</string>
@@ -20,7 +24,6 @@
     <string name="reset">Reset</string>
 
     <string name="notAvailable">"N/A"</string>
-
     <string name="distanceFront">%1$s\u0009 Distance Front [cm]</string>
     <string name="distanceBack">%1$s\u0009 Distance Back [cm]</string>
     <string name="current">%1$s\u0009 Current [mA]</string>
@@ -29,16 +32,31 @@
     <string name="absoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
     <string name="temperature">%1$s\u0009 Temperature [°C]</string>
 
-
+    <!-- preference strings -->
     <string name="serial">select Serial Connection</string>
     <string name="serialBluetooth">serial: Bluetooth</string>
     <string name="serialUsb">serial: USB</string>
     <string name="serialAuto">serial: Auto</string>
     <string name="isSlave">ServiceApplication</string>
     <string name="isRemote">RemoteApplication</string>
-    <string name="default_ip">141.24.11.1</string>
+    <string name="defaultIp">141.24.11.1</string>
 
     <string name="serialConnectionStatus">Serial Connection: %1$s %2$s</string>
+
+    <!-- Bluetooth errors -->
+    <string name="noBluetoothAdapter">no bluetooth on mobile available</string>
+    <string name="defaultBluetoothDeviceName"> </string>
+    <string name="noBluetoothDevicePaired">no bluetooth device paired</string>
+    <string name="noCarduinoBluetoothDeviceFound">no carduino bluetooth device found, check carduinodroid bluetooth settings</string>
+
+    <!-- Arduino versions -->
+    <string name="no_arduino">no compatible Arduino</string>
+    <string name="arduino_uno">Arduino Uno</string>
+    <string name="arduino_uno_r3">Arduino Uno R3</string>
+    <string name="arduino_mega">Arduino Mega 2560</string>
+    <string name="arduino_mega_r3">Arduino Mega 2560 R3</string>
+    <string name="arduino_mega_adk">Arduino Mega 2560 ADK</string>
+    <string name="arduino_mega_adk_r3">Arduino Mega 2560 ADK R3</string>
 
     <!-- permissions -->
     <string name="serialConnectionStatusLabel">Serial Connection Status Label</string>
@@ -47,7 +65,6 @@
     <string name="serialDataRxReceivedDescription">Serial Data Rx Received Description</string>
 
     <!--Intent strings -->
-
     <string name="SERIAL_CONNECTION_STATUS_PERMISSION">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION</string>
     <string name="SERIAL_CONNECTION_STATUS_CHANGED">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_CHANGED</string>
     <string name="SERIAL_CONNECTION_STATUS_EXTRA_STATE">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_STATE</string>
@@ -56,6 +73,7 @@
 
     <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
     <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
+    <string name="USB_PERMISSION">tuisse.carduinodroid_android.USB_PERMISSION</string>
 
 
 </resources>

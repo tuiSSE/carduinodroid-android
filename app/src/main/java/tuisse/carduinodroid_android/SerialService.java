@@ -95,7 +95,7 @@ public class SerialService extends Service {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
         if(serial.isError()) {
-            Log.e(TAG, "resetting serial");
+            Log.i(TAG, "resetting serial");
             serial.reset();
         }
         if (!serial.isIdle()) {
@@ -104,8 +104,10 @@ public class SerialService extends Service {
         }
         new Thread(new Runnable() {
             public void run() {
-                serial.find();
-                if(serial.connect()) {
+                if(!serial.find()){
+                    stopSelf();
+                }
+                else if(serial.connect()) {
                     serial.start();
                 }
                 else{
@@ -124,10 +126,10 @@ public class SerialService extends Service {
     public void onDestroy () {
         super.onDestroy();
         isDestroyed = true;
+        //disconnect
         serial.close();
         mNotificationManager.cancel(NOTIFICATION);
         //mWakeLock.release();
-        //disconnect
         Log.i(TAG, "onDestroyed");
     }
 }
