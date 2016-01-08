@@ -32,23 +32,25 @@
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/appNameShort"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".StatusActivity"
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
+
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
             </intent-filter>
-            <meta-data android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </activity>
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/titleActivitySettings" />
-
         <activity
             android:name=".DriveActivity"
             android:label="@string/titleDriveActivity" />
@@ -56,11 +58,14 @@
         <service
             android:name=".SerialService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="true" />
         <service
             android:name=".IpService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="true"/>
+
     </application>
 
 </manifest>

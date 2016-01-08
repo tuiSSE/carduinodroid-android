@@ -44,34 +44,58 @@ public class SerialData {
         return serialName;
     }
 
-    public synchronized int getLogoId(){
+    public synchronized int getSerialConnLogoId(){
         int logo;
         switch (connectionState){
             case  TRYFIND:
             case  FOUND:
             case  TRYCONNECT:
-                if(serialType.isBluetooth())
-                    logo = R.drawable.serial_bt_try_connect;
-                else if(serialType.isUsb())
-                    logo = R.drawable.serial_usb_try_connect;
-                else
-                    logo = R.drawable.serial_error;
+                logo = R.drawable.status_try_connect;
                 break;
             case  CONNECTED:
             case  RUNNING:
-                if(serialType.isBluetooth())
-                    logo = R.drawable.serial_bt_connected;
-                else if(serialType.isUsb())
-                    logo = R.drawable.serial_usb_connected;
-                else
-                    logo = R.drawable.serial_error;
+                logo = R.drawable.status_connected;
                 break;
             case ERROR:
+                logo = R.drawable.status_error;
+                break;
             case STREAMERROR:
-                logo = R.drawable.serial_error;
+                logo = R.drawable.status_connected_error;
+                break;
+            case TRYCONNECTERROR:
+                logo = R.drawable.status_try_connect_error;
                 break;
             default:
-                logo = R.drawable.serial_idle;
+                logo = R.drawable.status_idle;
+                break;
+        }
+        return logo;
+    }
+
+    public synchronized int getSerialTypeLogoId(SerialType pref){
+        int logo;
+        switch (serialType){
+            case NONE:
+                logo = R.drawable.serial_type_none;
+                break;
+            case USB:
+                if(pref.isAuto()){
+                    logo = R.drawable.serial_type_auto_usb;
+                }
+                else{
+                    logo = R.drawable.serial_type_usb;
+                }
+                break;
+            case BLUETOOTH:
+                if(pref.isAuto()){
+                    logo = R.drawable.serial_type_auto_bt;
+                }
+                else{
+                    logo = R.drawable.serial_type_bt;
+                }
+                break;
+            default:
+                logo = R.drawable.serial_type_none;
                 break;
         }
         return logo;

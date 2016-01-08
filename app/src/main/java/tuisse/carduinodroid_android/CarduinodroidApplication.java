@@ -14,6 +14,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     private static final String TAG = "CarduinoApplication";
     protected DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
+    private SharedPreferences prefMain;
 
 
     @Override
@@ -21,6 +22,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         super.onCreate();
         dataContainer = new DataContainer();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefMain = this.getSharedPreferences(getString(R.string.preference_main), this.MODE_PRIVATE);
         updateSharedPreferences();
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         Log.i(TAG, "onCreated");
@@ -40,19 +42,27 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     }
 
     public synchronized void updateSharedPreferences() {
+        if(dataContainer == null){
+            Log.e(TAG,"no dataContainer initialized");
+        }
         if (dataContainer.preferences == null){
             Log.d(TAG,"no preferences initialized");
             dataContainer.preferences = new Preferences();
         }
-        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 0)));
-        dataContainer.preferences.setBluetoothDeviceName(sharedPrefs.getString("bluetoothDeviceName", getString(R.string.defaultBluetoothDeviceName)));
+
+        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 1)));
         dataContainer.preferences.rcNetwork1Activity0 = sharedPrefs.getBoolean("rcNetwork1Activity0", true);
+
+        dataContainer.preferences.setBluetoothDeviceName(prefMain.getString("bluetoothDeviceName", getString(R.string.defaultBluetoothDeviceName)));
+        Log.d(TAG, "updating Prefs");
+
+        Log.d(TAG,"serialType: " + dataContainer.preferences.getSerialPref().toString());
+        Log.d(TAG,"rcNetwork1Activity0: " + dataContainer.preferences.rcNetwork1Activity0);
+        Log.d(TAG,"bluetoothDeviceName: "+ dataContainer.preferences.getBluetoothDeviceName());
     }
 
     @Override
     public synchronized void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Log.d(TAG, "updating Prefs");
         updateSharedPreferences();
-        Log.d(TAG, "updated Prefs");
     }
 }

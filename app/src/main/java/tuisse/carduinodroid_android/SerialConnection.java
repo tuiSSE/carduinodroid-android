@@ -50,7 +50,8 @@ abstract public class SerialConnection {
             Log.d(TAG, "serial State changed: " + getSerialData().getConnectionState().getStateName());
             Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
             onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE), getSerialData().getConnectionState().getStateName());
-            onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), getSerialData().getLogoId());
+            onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), getSerialData().getSerialConnLogoId());
+            onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_TYPE_EXTRA_LOGO), getSerialData().getSerialTypeLogoId(serialService.getCarduino().dataContainer.preferences.getSerialPref()));
             onSerialConnectionStatusChangeIntent.putExtra(serialService.getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME), getSerialData().getSerialName());
             //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
             serialService.sendBroadcast(onSerialConnectionStatusChangeIntent);

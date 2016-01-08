@@ -7,7 +7,10 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,12 +20,18 @@ public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
 
-    private Button closeButton;
-    private Button settingsButton;
+    private ImageView imageViewExit;
+    private ImageView imageViewSettings;
+    private Toolbar driveButton;
+/*
+
     private Button driveButton;
     private Button startSerialButton;
     private Button stopSerialButton;
-    private ImageView imageViewSerialConnectionStatus;
+    */
+    private ImageView imageViewConnectionSerial;
+    private ImageView imageViewDeviceArduino;
+    private ImageView imageViewDeviceIp;
     private TextView textViewSerialConnectionStatus;
     private CarduinodroidApplication carduino;
 
@@ -41,24 +50,35 @@ public class StatusActivity extends AppCompatActivity {
         serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
 
         //get the Views
+
+        Toolbar topToolbar = (Toolbar) findViewById(R.id.topToolbar);
+        setSupportActionBar(topToolbar);
+        driveButton = (Toolbar) findViewById(R.id.driveButton);
+        imageViewExit = (ImageView) findViewById(R.id.imageViewExit);
+        imageViewSettings = (ImageView) findViewById(R.id.imageViewSettings);
+
+        imageViewDeviceArduino = (ImageView) findViewById(R.id.imageViewDeviceArduino);
+        imageViewDeviceIp = (ImageView) findViewById(R.id.imageViewDeviceIp);
+        /*
         closeButton = (Button) findViewById(R.id.buttonClose);
         settingsButton = (Button) findViewById(R.id.buttonSettings);
         driveButton = (Button) findViewById(R.id.buttonDrive);
         startSerialButton = (Button) findViewById(R.id.buttonSerialStart);
         stopSerialButton = (Button) findViewById(R.id.buttonSerialStop);
+        */
         textViewSerialConnectionStatus = (TextView) findViewById(R.id.textViewSerialConnectionStatus);
-        imageViewSerialConnectionStatus = (ImageView) findViewById(R.id.imageViewSerialConnectionStatus);
+        imageViewConnectionSerial = (ImageView) findViewById(R.id.imageViewConnectionSerial);
         textViewSerialConnectionStatus.setText("");
 
-        closeButton.setOnClickListener(new View.OnClickListener() {
+        imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onClickClose");
+                Log.d(TAG, "onClickExit");
                 stopService(new Intent(StatusActivity.this, SerialService.class));
                 moveTaskToBack(true);
             }
         });
-        settingsButton.setOnClickListener(new View.OnClickListener() {
+        imageViewSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
@@ -74,7 +94,7 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
-        startSerialButton.setOnClickListener(new View.OnClickListener() {
+        imageViewDeviceArduino.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startService(new Intent(StatusActivity.this, SerialService.class));
@@ -82,7 +102,7 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
-        stopSerialButton.setOnClickListener(new View.OnClickListener() {
+        imageViewDeviceIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopService(new Intent(StatusActivity.this, SerialService.class));
@@ -90,6 +110,7 @@ public class StatusActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     @Override
@@ -97,7 +118,7 @@ public class StatusActivity extends AppCompatActivity {
         super.onResume();
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        imageViewSerialConnectionStatus.setImageResource(carduino.dataContainer.serialData.getLogoId());
+        imageViewConnectionSerial.setImageResource(carduino.dataContainer.serialData.getSerialConnLogoId());
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -151,16 +172,38 @@ public class StatusActivity extends AppCompatActivity {
                 return;
         }
     }
+/*
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_status, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+*/
     private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG,"onReceive status change event");
             String status = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE));
             String name = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME));
-            int resId = intent.getIntExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), R.drawable.serial_idle);
+            int resId = intent.getIntExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), R.drawable.serial_type_none);
             textViewSerialConnectionStatus.setText(String.format(getString(R.string.serialConnectionStatus),status,name));
-            imageViewSerialConnectionStatus.setImageResource(resId);
+            imageViewConnectionSerial.setImageResource(resId);
         }
     }
 }

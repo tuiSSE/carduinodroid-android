@@ -4,17 +4,20 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
     static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
     private SerialConnection serial;
+    private Handler handler;
     private PowerManager.WakeLock mWakeLock;
 
     private static final int NOTIFICATION = 1337;
@@ -42,7 +45,7 @@ public class SerialService extends Service {
                         .setAction(EXIT_ACTION),
                 0);
         mNotificationBuilder
-                .setSmallIcon(R.drawable.logo_inv)
+                .setSmallIcon(R.drawable.logo_white)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(getText(R.string.appName))
@@ -72,6 +75,7 @@ public class SerialService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        handler = new Handler();
 /*
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -131,5 +135,23 @@ public class SerialService extends Service {
         mNotificationManager.cancel(NOTIFICATION);
         //mWakeLock.release();
         Log.i(TAG, "onDestroyed");
+    }
+
+    protected void sendToast(final String message){
+        handler.post(new Runnable() {
+            public void run() {
+                Toast toast = Toast.makeText(SerialService.this, message, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+    }
+
+    protected void sendToast(final int messageId){
+        handler.post(new Runnable() {
+            public void run() {
+                Toast toast = Toast.makeText(SerialService.this, getString(messageId), Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
     }
 }

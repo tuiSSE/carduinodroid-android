@@ -19,7 +19,6 @@
         android:id="@+id/buttonReset"
         android:layout_gravity="center_horizontal" />
 
-
     <CheckBox
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

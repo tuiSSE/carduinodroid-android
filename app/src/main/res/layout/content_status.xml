@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="tuisse.carduinodroid_android.statusActivity"
+    tools:showIn="@layout/activity_status">
+
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewDeviceIp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/device_remote"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultIp"
+        android:id="@+id/textViewDeviceRemoteIp"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/imageViewStatusSerial"
+        android:layout_toEndOf="@+id/imageViewStatusSerial"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/textMargin"/>
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewStatusIp"
+        android:layout_below="@+id/imageViewDeviceIp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/status_idle" />
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewDeviceTransceiver"
+        android:layout_below="@+id/imageViewStatusIp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/device_mobile_na" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/defaultIp"
+        android:id="@+id/textViewDeviceTransceiverIp"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/imageViewStatusIp"
+        android:layout_toRightOf="@+id/imageViewStatusSerial"
+        android:layout_toEndOf="@+id/imageViewStatusSerial"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/textMargin"/>
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:padding="@dimen/imageMargin"
+        android:id="@+id/imageViewConnectionSerial"
+        android:layout_below="@+id/imageViewDeviceTransceiver"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/status_idle" />
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewStatusSerial"
+        android:src="@drawable/serial_type_auto_usb"
+        android:layout_below="@+id/imageViewDeviceTransceiver"
+        android:layout_toRightOf="@+id/imageViewConnectionSerial"
+        android:layout_toEndOf="@+id/imageViewConnectionSerial" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/serialConnectionStatus"
+        android:id="@+id/textViewSerialConnectionStatus"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/imageViewDeviceTransceiver"
+        android:layout_toRightOf="@+id/imageViewStatusSerial"
+        android:layout_toEndOf="@+id/imageViewStatusSerial"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/textMargin"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/imageViewSettingsBluetooth"
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:layout_below="@+id/imageViewDeviceTransceiver"
+        android:layout_margin="0dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/icon_settings" />
+    <!--
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewSettingsBluetooth"
+        android:layout_below="@+id/imageViewDeviceTransceiver"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/icon_settings" />
+        -->
+    <ImageView
+        android:layout_width="@dimen/imageSize"
+        android:layout_height="@dimen/imageSize"
+        android:scaleType="fitCenter"
+        android:id="@+id/imageViewDeviceArduino"
+        android:layout_below="@+id/imageViewConnectionSerial"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/device_arduino" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/driveButton"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/AppTheme"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent" android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="match_parent"
+                android:id="@+id/imageViewGo"
+                android:src="@drawable/icon_goto"
+                android:gravity="center_vertical"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/drive"
+                android:layout_alignParentTop="true"
+                android:gravity="center_vertical"
+                android:textSize="@dimen/toolbarHeaderSize"
+                android:paddingStart="@dimen/toolbarHeaderPadding"
+                android:paddingLeft="@dimen/toolbarHeaderPadding" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+
+
+</RelativeLayout>
+    <!--
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        tools:context="tuisse.carduinodroid_android.statusActivity">
+
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+            <ImageView
+                android:layout_width="@dimen/imageSize"
+                android:layout_height="@dimen/imageSize"
+                android:paddingEnd="@dimen/imageMargin"
+                android:paddingRight="@dimen/imageMargin"
+                android:src="@drawable/logo"
+                android:id="@+id/imageViewLogo"/>
+
+            <ImageView
+                android:layout_width="@dimen/imageSize"
+                android:layout_height="@dimen/imageSize"
+                android:paddingEnd="@dimen/imageMargin"
+                android:paddingRight="@dimen/imageMargin"
+                android:src="@drawable/serial_idle"
+                android:id="@+id/imageViewSerialConnectionStatus" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/exitApp"
+            android:id="@+id/buttonClose"
+            android:layout_gravity="center_horizontal" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/actionSettings"
+            android:id="@+id/buttonSettings"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/startSerialService"
+            android:id="@+id/buttonSerialStart"
+            android:layout_gravity="center_horizontal" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/stopSerialService"
+            android:id="@+id/buttonSerialStop"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bluetoothPair"
+            android:id="@+id/buttonBluetoothPair"
+            android:visibility="invisible"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/serialConnectionStatus"
+            android:id="@+id/textViewSerialConnectionStatus"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/drive"
+            android:id="@+id/buttonDrive" />
+
+
+</LinearLayout>
+    -->

@@ -2,6 +2,7 @@
     <!-- application name -->
     <string name="appName">Carduinodroid</string>
     <string name="appNameShort">Cardudroid</string>
+    <string name="logoDescription">Carduinodroid logo</string>
 
     <!-- activity names and button labels -->
     <string name="actionSettings">Settings</string>
@@ -12,6 +13,7 @@
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
     <string name="titleActivitySettings">Settings</string>
+    <string name="bluetoothPair">Pair Bluetooth Devices</string>
 
     <!-- serial data display strings -->
     <string name="speed">Speed %1$d</string>
@@ -41,12 +43,20 @@
     <string name="isRemote">RemoteApplication</string>
     <string name="defaultIp">141.24.11.1</string>
 
-    <string name="serialConnectionStatus">Serial Connection: %1$s %2$s</string>
+    <string name="serialConnectionStatus">%1$s %2$s</string>
 
-    <!-- Bluetooth errors -->
+    <!-- Promtdialog Buttontexts -->
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="openBluetoothSettingsTitle">Open bluetooth settings</string>
+    <string name="openBluetoothSettingsText">Pair your Carduinodroid with this mobile</string>
+
+    <!-- Bluetooth messages -->
     <string name="noBluetoothAdapter">no bluetooth on mobile available</string>
-    <string name="defaultBluetoothDeviceName"> </string>
+    <string name="defaultBluetoothDeviceName"></string>
+    <string name="bluetoothEnable">enabled Bluetooth</string>
     <string name="noBluetoothDevicePaired">no bluetooth device paired</string>
+    <string name="noBluetoothDeviceChosen">no bluetooth device chosen</string>
     <string name="noCarduinoBluetoothDeviceFound">no carduino bluetooth device found, check carduinodroid bluetooth settings</string>
 
     <!-- Arduino versions -->
@@ -70,10 +80,15 @@
     <string name="SERIAL_CONNECTION_STATUS_EXTRA_STATE">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_STATE</string>
     <string name="SERIAL_CONNECTION_STATUS_EXTRA_NAME">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_NAME</string>
     <string name="SERIAL_CONNECTION_STATUS_EXTRA_LOGO">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA_LOGO</string>
+    <string name="SERIAL_CONNECTION_TYPE_EXTRA_LOGO">tuisse.carduinodroid_android.SERIAL_CONNECTION_TYPE_EXTRA_LOGO</string>
 
     <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
     <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
     <string name="USB_PERMISSION">tuisse.carduinodroid_android.USB_PERMISSION</string>
+
+    <!-- preferences -->
+    <string name="preference_main">tuisse.carduinodroid_android.PREFERENCE_MAIN</string>
+    <string name="title_activity_main">mainActivity</string>
 
 
 </resources>
