@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,6 +24,10 @@ public class StatusActivity extends AppCompatActivity {
 
     private ImageView imageViewExit;
     private ImageView imageViewSettings;
+
+    private ImageView imageViewSettingsRemoteIp;
+    private ImageView imageViewSettingsTransceiver;
+    private ImageView imageViewSettingsBluetooth;
     private Toolbar driveButton;
 /*
 
@@ -31,7 +37,7 @@ public class StatusActivity extends AppCompatActivity {
     */
     private ImageView imageViewConnectionSerial;
     private ImageView imageViewDeviceArduino;
-    private ImageView imageViewDeviceIp;
+    private ImageView imageViewDeviceRemoteIp;
     private TextView textViewSerialConnectionStatus;
     private CarduinodroidApplication carduino;
 
@@ -58,7 +64,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettings = (ImageView) findViewById(R.id.imageViewSettings);
 
         imageViewDeviceArduino = (ImageView) findViewById(R.id.imageViewDeviceArduino);
-        imageViewDeviceIp = (ImageView) findViewById(R.id.imageViewDeviceIp);
+        imageViewDeviceRemoteIp = (ImageView) findViewById(R.id.imageViewDeviceRemoteIp);
         /*
         closeButton = (Button) findViewById(R.id.buttonClose);
         settingsButton = (Button) findViewById(R.id.buttonSettings);
@@ -68,6 +74,20 @@ public class StatusActivity extends AppCompatActivity {
         */
         textViewSerialConnectionStatus = (TextView) findViewById(R.id.textViewSerialConnectionStatus);
         imageViewConnectionSerial = (ImageView) findViewById(R.id.imageViewConnectionSerial);
+
+        imageViewSettingsRemoteIp = (ImageView) findViewById(R.id.imageViewSettingsRemoteIp);
+        imageViewSettingsTransceiver = (ImageView) findViewById(R.id.imageViewSettingsTransceiver);
+        imageViewSettingsBluetooth = (ImageView) findViewById(R.id.imageViewSettingsBluetooth);
+
+        Drawable[] layers = new Drawable[2];
+        layers[0] = getResources().getDrawable(R.drawable.buttonshape_primary_light);
+        layers[1] = getResources().getDrawable(R.drawable.icon_settings);
+        LayerDrawable layerDrawable = new LayerDrawable(layers);
+        imageViewSettingsRemoteIp.setImageDrawable(layerDrawable);
+        imageViewSettingsTransceiver.setImageDrawable(layerDrawable);
+        imageViewSettingsBluetooth.setImageDrawable(layerDrawable);
+
+
         textViewSerialConnectionStatus.setText("");
 
         imageViewExit.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +122,7 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
-        imageViewDeviceIp.setOnClickListener(new View.OnClickListener() {
+        imageViewDeviceRemoteIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopService(new Intent(StatusActivity.this, SerialService.class));

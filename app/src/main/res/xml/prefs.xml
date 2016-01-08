@@ -25,7 +25,7 @@
             android:defaultValue="1"
             android:entries="@array/serial"
             android:entryValues="@array/serial_values"
-            android:summary="@string/serial"
+            android:summary="@string/serialSelect"
             android:title="@string/serialBluetooth" />
         <CheckBoxPreference
             android:key="rcNetwork1Activity0"

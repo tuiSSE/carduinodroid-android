@@ -15,6 +15,32 @@
     <string name="titleActivitySettings">Settings</string>
     <string name="bluetoothPair">Pair Bluetooth Devices</string>
 
+    <!-- imageviewDescriptions -->
+    <string name="imageViewDeviceRemoteIpDesc">describes the remote device</string>
+    <string name="imageViewSettingsRemoteIpDesc">settings for the remote device</string>
+    <string name="imageViewStatusIpDesc">describes the ip connection status</string>
+    <string name="imageViewDeviceTransceiverDesc">descibes the transceiver device</string>
+    <string name="imageViewSettingsTransceiverDesc">settings for the transceiver device</string>
+    <string name="imageViewConnectionSerialDesc">describes the serial connection status</string>
+    <string name="imageViewTypeSerialDesc">describes the serial connection type</string>
+    <string name="imageViewSettingsBluetoothDesc">settings for the bluetooth device</string>
+    <string name="imageViewDeviceArduinoDesc">describes the arduino device</string>
+    <string name="imageViewGoDrive">forwards to the drive view</string>
+
+    <string name="imageViewSwitchModeDesc">switch user modes</string>
+
+    <string name="ipConnection">IP Status:</string>
+    <string name="ipConnectionStatus">%1$s</string>
+    <string name="ipConnectionStatusError">%1$s</string>
+    <string name="serialConnection">Serial Status:</string>
+    <string name="serialConnectionStatus">%1$s</string>
+    <string name="serialConnectionStatusError">%1$s</string>
+
+    <!-- ControlMode -->
+    <string name="controlModeTransceiver">Mode: Transceiver</string>
+    <string name="controlModeRC">Mode: Remote Control</string>
+    <string name="controlModeDirect">Mode: Direct</string>
+
     <!-- serial data display strings -->
     <string name="speed">Speed %1$d</string>
     <string name="steer">Steering %1$d</string>
@@ -35,15 +61,14 @@
     <string name="temperature">%1$s\u0009 Temperature [°C]</string>
 
     <!-- preference strings -->
-    <string name="serial">select Serial Connection</string>
+    <string name="serialSelect">select Serial Connection</string>
     <string name="serialBluetooth">serial: Bluetooth</string>
     <string name="serialUsb">serial: USB</string>
     <string name="serialAuto">serial: Auto</string>
     <string name="isSlave">ServiceApplication</string>
     <string name="isRemote">RemoteApplication</string>
     <string name="defaultIp">141.24.11.1</string>
-
-    <string name="serialConnectionStatus">%1$s %2$s</string>
+    <string name="localIp">127.0.0.1</string>
 
     <!-- Promtdialog Buttontexts -->
     <string name="ok">Ok</string>
@@ -60,6 +85,7 @@
     <string name="noCarduinoBluetoothDeviceFound">no carduino bluetooth device found, check carduinodroid bluetooth settings</string>
 
     <!-- Arduino versions -->
+    <string name="arduino">Arduino</string>
     <string name="no_arduino">no compatible Arduino</string>
     <string name="arduino_uno">Arduino Uno</string>
     <string name="arduino_uno_r3">Arduino Uno R3</string>

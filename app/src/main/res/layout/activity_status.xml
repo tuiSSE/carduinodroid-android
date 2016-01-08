@@ -19,7 +19,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:contentInsetRight="@dimen/insetBorder"
+            app:contentInsetEnd="@dimen/insetBorder"
+            app:contentInsetLeft="@dimen/insetBorder"
+            app:contentInsetStart="@dimen/insetBorder">
 
             <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent" android:layout_height="match_parent">

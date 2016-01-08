@@ -1,15 +1,18 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="insetBorder">16dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fabMargin">16dp</dimen>
 
     <dimen name="textMargin">8dp</dimen>
 
-    <dimen name="toolbarIconSize">50dp</dimen>
+    <dimen name="toolbarIconSize">44dp</dimen>
     <dimen name="toolbarHeaderSize">20sp</dimen>
     <dimen name="toolbarHeaderPadding">16dp</dimen>
 
+    <dimen name="toolbarSecondHeaderSize">17sp</dimen>
+    <dimen name="switchModeToolbarHeight">30dp</dimen>
+
     <dimen name="imageMargin">5dp</dimen>
-    <dimen name="imageSize">50dp</dimen>
+    <dimen name="imageSize">55dp</dimen>
 </resources>
