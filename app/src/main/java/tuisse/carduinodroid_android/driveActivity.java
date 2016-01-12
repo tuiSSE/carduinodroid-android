@@ -234,9 +234,10 @@ public class DriveActivity extends AppCompatActivity {
     private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,"onReceive status change event");
-            String status = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE));
-            String name = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME));
+            if(intent.toString().equals(R.string.SERIAL_CONNECTION_STATUS_CHANGED)){
+                Log.d(TAG,"onReceive status change event");
+                //TODO: update status
+            }
         }
     }
 

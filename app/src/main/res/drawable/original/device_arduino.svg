@@ -15,7 +15,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="arduino.svg">
+   sodipodi:docname="device_arduino.svg">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -24,7 +24,7 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="-159.49998"
+     inkscape:cx="-325.99998"
      inkscape:cy="124.71868"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -580,7 +580,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -605,7 +605,7 @@
        style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:1.99999988;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <g
        id="g4676"
-       transform="matrix(0,2.4531022,-2.6335999,0,2696.684,584.43712)"
+       transform="matrix(-2.4531022,0,0,-2.6335999,467.92509,3499.0462)"
        style="stroke-width:1.99999988;stroke-miterlimit:4;stroke-dasharray:none">
       <rect
          transform="matrix(-2.4673859e-4,-0.99999997,0.99999998,-1.8108413e-4,0,0)"

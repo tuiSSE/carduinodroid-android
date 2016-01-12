@@ -22,23 +22,43 @@ public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
 
+    //main toolbar
     private ImageView imageViewExit;
     private ImageView imageViewSettings;
 
-    private ImageView imageViewSettingsRemoteIp;
-    private ImageView imageViewSettingsTransceiver;
-    private ImageView imageViewSettingsBluetooth;
-    private Toolbar driveButton;
-/*
 
-    private Button driveButton;
-    private Button startSerialButton;
-    private Button stopSerialButton;
-    */
-    private ImageView imageViewConnectionSerial;
-    private ImageView imageViewDeviceArduino;
     private ImageView imageViewDeviceRemoteIp;
-    private TextView textViewSerialConnectionStatus;
+    private TextView  textViewDeviceRemoteIpName;
+    private TextView  textViewDeviceRemoteIp;
+    private ImageView imageViewSettingsRemoteIp;
+
+    private ImageView imageViewIpConnection;
+    private TextView  textViewIpConnection;
+    private TextView  textViewIpConnectionStatus;
+    private TextView  textViewIpConnectionError;
+
+    private ImageView imageViewDeviceTransceiver;
+    private TextView  textViewDeviceTransceiverIpName;
+    private TextView  textViewDeviceTransceiverIp;
+    private ImageView imageViewSettingsTransceiver;
+
+    private ImageView imageViewSerialConnection;
+    private TextView  textViewSerialConnection;
+    private TextView  textViewSerialConnectionStatus;
+    private TextView  textViewSerialConnectionError;
+    private ImageView imageViewSettingsBluetooth;
+
+    private ImageView imageViewDeviceArduino;
+    private TextView  textViewDeviceArduinoName;
+    private TextView  textViewDeviceArduino;
+
+    //switch mode toolbar
+    private ImageView imageViewSwitchModePrev;
+    private ImageView imageViewSwitchModeNext;
+    private TextView  textviewSwitchMode;
+    //druve button toolbar
+    private Toolbar driveButton;
+
     private CarduinodroidApplication carduino;
 
     private IntentFilter serialConnectionStatusChangeFilter;
@@ -52,43 +72,52 @@ public class StatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_status);
         // prevent the application from switching to landscape-mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        serialConnectionStatusChangeReceiver = new SerialConnectionStatusChangeReceiver();
-        serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+        serialConnectionStatusChangeReceiver =  new SerialConnectionStatusChangeReceiver();
+        serialConnectionStatusChangeFilter =    new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
 
         //get the Views
+        Toolbar topToolbar =                (Toolbar  ) findViewById(R.id.topToolbar);
+        imageViewExit =                     (ImageView) findViewById(R.id.imageViewExit);
+        imageViewSettings =                 (ImageView) findViewById(R.id.imageViewSettings);
 
-        Toolbar topToolbar = (Toolbar) findViewById(R.id.topToolbar);
+        imageViewDeviceRemoteIp =           (ImageView) findViewById(R.id.imageViewDeviceRemoteIp);
+        textViewDeviceRemoteIpName =        (TextView ) findViewById(R.id.textViewDeviceRemoteIpName);
+        textViewDeviceRemoteIp =            (TextView ) findViewById(R.id.textViewDeviceRemoteIp);
+        imageViewSettingsRemoteIp =         (ImageView) findViewById(R.id.imageViewSettingsRemoteIp);
+
+        imageViewIpConnection =             (ImageView) findViewById(R.id.imageViewIpConnection);
+        textViewIpConnection =              (TextView ) findViewById(R.id.textViewIpConnection);
+        textViewIpConnectionStatus =        (TextView ) findViewById(R.id.textViewIpConnectionStatus);
+        textViewIpConnectionError =         (TextView ) findViewById(R.id.textViewIpConnectionError);
+
+        imageViewDeviceTransceiver =        (ImageView) findViewById(R.id.imageViewDeviceTransceiver);
+        textViewDeviceTransceiverIpName =   (TextView ) findViewById(R.id.textViewDeviceTransceiverIpName);
+        textViewDeviceTransceiverIp =       (TextView ) findViewById(R.id.textViewDeviceTransceiverIp);
+        imageViewSettingsTransceiver =      (ImageView) findViewById(R.id.imageViewSettingsTransceiver);
+
+        imageViewSerialConnection =         (ImageView) findViewById(R.id.imageViewSerialConnection);
+        textViewSerialConnection =          (TextView ) findViewById(R.id.textViewSerialConnection);
+        textViewSerialConnectionStatus =    (TextView ) findViewById(R.id.textViewSerialConnectionStatus);
+        textViewSerialConnectionError =     (TextView ) findViewById(R.id.textViewSerialConnectionError);
+        imageViewSettingsBluetooth =        (ImageView) findViewById(R.id.imageViewSettingsBluetooth);
+
+        imageViewDeviceArduino =            (ImageView) findViewById(R.id.imageViewDeviceArduino);
+        textViewDeviceArduinoName =         (TextView ) findViewById(R.id.textViewDeviceArduinoName);
+        textViewDeviceArduino =             (TextView ) findViewById(R.id.textViewDeviceArduino);
+        //mode switch toolbar
+        imageViewSwitchModePrev =           (ImageView) findViewById(R.id.imageViewSwitchModePrev);
+        imageViewSwitchModeNext =           (ImageView) findViewById(R.id.imageViewSwitchModeNext);
+        textviewSwitchMode      =           (TextView ) findViewById(R.id.textviewSwitchMode);
+        //drive button toolbar
+        driveButton =                       (Toolbar  ) findViewById(R.id.driveButton);
+
         setSupportActionBar(topToolbar);
-        driveButton = (Toolbar) findViewById(R.id.driveButton);
-        imageViewExit = (ImageView) findViewById(R.id.imageViewExit);
-        imageViewSettings = (ImageView) findViewById(R.id.imageViewSettings);
+        LayerDrawable settingsIcon = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings);
+        imageViewSettingsRemoteIp.setImageDrawable(settingsIcon);
+        imageViewSettingsTransceiver.setImageDrawable(settingsIcon);
+        imageViewSettingsBluetooth.setImageDrawable(settingsIcon);
 
-        imageViewDeviceArduino = (ImageView) findViewById(R.id.imageViewDeviceArduino);
-        imageViewDeviceRemoteIp = (ImageView) findViewById(R.id.imageViewDeviceRemoteIp);
-        /*
-        closeButton = (Button) findViewById(R.id.buttonClose);
-        settingsButton = (Button) findViewById(R.id.buttonSettings);
-        driveButton = (Button) findViewById(R.id.buttonDrive);
-        startSerialButton = (Button) findViewById(R.id.buttonSerialStart);
-        stopSerialButton = (Button) findViewById(R.id.buttonSerialStop);
-        */
-        textViewSerialConnectionStatus = (TextView) findViewById(R.id.textViewSerialConnectionStatus);
-        imageViewConnectionSerial = (ImageView) findViewById(R.id.imageViewConnectionSerial);
-
-        imageViewSettingsRemoteIp = (ImageView) findViewById(R.id.imageViewSettingsRemoteIp);
-        imageViewSettingsTransceiver = (ImageView) findViewById(R.id.imageViewSettingsTransceiver);
-        imageViewSettingsBluetooth = (ImageView) findViewById(R.id.imageViewSettingsBluetooth);
-
-        Drawable[] layers = new Drawable[2];
-        layers[0] = getResources().getDrawable(R.drawable.buttonshape_primary_light);
-        layers[1] = getResources().getDrawable(R.drawable.icon_settings);
-        LayerDrawable layerDrawable = new LayerDrawable(layers);
-        imageViewSettingsRemoteIp.setImageDrawable(layerDrawable);
-        imageViewSettingsTransceiver.setImageDrawable(layerDrawable);
-        imageViewSettingsBluetooth.setImageDrawable(layerDrawable);
-
-
-        textViewSerialConnectionStatus.setText("");
+        updateControlMode();
 
         imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,14 +132,6 @@ public class StatusActivity extends AppCompatActivity {
             public void onClick(View v) {
                 startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
                 Log.d(TAG, "onClickSettings");
-            }
-        });
-
-        driveButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(StatusActivity.this, DriveActivity.class));
-                Log.d(TAG, "onClickDrive");
             }
         });
 
@@ -131,6 +152,32 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
+        imageViewSwitchModePrev.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                carduino.dataContainer.preferences.setControlModePrev();
+                updateControlMode();
+                Log.d(TAG, "onClickSwitchModePrev");
+            }
+        });
+
+        imageViewSwitchModeNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                carduino.dataContainer.preferences.setControlModeNext();
+                updateControlMode();
+                Log.d(TAG, "onClickSwitchModeNext");
+            }
+        });
+
+        driveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(StatusActivity.this, DriveActivity.class));
+                Log.d(TAG, "onClickDrive");
+            }
+        });
+
     }
 
     @Override
@@ -138,7 +185,7 @@ public class StatusActivity extends AppCompatActivity {
         super.onResume();
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        imageViewConnectionSerial.setImageResource(carduino.dataContainer.serialData.getSerialConnLogoId());
+        updateControlMode();
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -189,41 +236,115 @@ public class StatusActivity extends AppCompatActivity {
                 break;
             default:
                 Log.d(TAG,"Notification send unknown intent");
-                return;
+                break;
         }
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_status, menu);
-        return true;
+
+    private void updateControlMode(){
+        //stop services
+        stopService(new Intent(StatusActivity.this, SerialService.class));
+
+        imageViewSettingsRemoteIp.setVisibility(View.INVISIBLE);
+        imageViewSettingsTransceiver.setVisibility(View.INVISIBLE);
+        imageViewSettingsBluetooth.setVisibility(View.INVISIBLE);
+
+        switch (carduino.dataContainer.preferences.getControlMode()){
+            case TRANSCEIVER:
+                textviewSwitchMode.setText(R.string.controlModeTransceiver);
+                imageViewSettingsTransceiver.setVisibility(View.VISIBLE);
+                imageViewDeviceRemoteIp.setImageResource(R.drawable.device_remote);
+                textViewDeviceRemoteIpName.setText(R.string.labelIpRemote);
+                imageViewDeviceTransceiver.setImageResource(R.drawable.device_mobile_transceive);
+                textViewDeviceTransceiverIpName.setText(R.string.labelIpLocal);
+                //visible if using bluetooth
+                if(carduino.dataContainer.serialData.getSerialType().isAutoBluetooth() || carduino.dataContainer.serialData.getSerialType().isNone()){
+                    imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
+                }
+                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE,""));
+                updateIp();
+                break;
+            case REMOTE:
+                textviewSwitchMode.setText(R.string.controlModeRC);
+                imageViewSettingsRemoteIp.setVisibility(View.VISIBLE);
+                imageViewDeviceRemoteIp.setImageResource(R.drawable.device_mobile_send);
+                textViewDeviceRemoteIpName.setText(R.string.labelIpLocal);
+                textViewDeviceTransceiverIpName.setText(R.string.labelIpTransceiver);
+                imageViewDeviceTransceiver.setImageResource(R.drawable.device_mobile_na);
+                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.UNKNOWN, ""));
+                updateIp();
+                break;
+            default://DIRECT
+                textviewSwitchMode.setText(R.string.controlModeDirect);
+                //always visible
+                imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
+                imageViewDeviceRemoteIp.setImageResource(R.drawable.device_mobile_send);
+                textViewDeviceRemoteIpName.setText(R.string.labelIpDirect);
+                imageViewDeviceTransceiver.setImageResource(R.drawable.device_no_ip_device);
+                textViewDeviceTransceiverIpName.setText("");
+                textViewDeviceTransceiverIp.setText("");
+                textViewDeviceRemoteIp.setText("");
+                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                break;
+        }
+        updateStatus();
+
+        //start services
+
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    private void updateStatus(){
+        textViewDeviceArduino.setText(carduino.dataContainer.serialData.getSerialName());
+        if(carduino.dataContainer.serialData.getSerialType().isBluetooth()){
+            textViewDeviceArduinoName.setText(R.string.serialDeviceBluetooth);
+        }
+        else{
+            textViewDeviceArduinoName.setText(R.string.serialDeviceArduino);
+        }
+        //serial connection
+        imageViewSerialConnection.setImageDrawable(carduino.dataContainer.serialData.getSerialConnLogoId(carduino.dataContainer.preferences.getSerialPref()));
+        textViewSerialConnection.setText(R.string.serialConnection);
+        textViewSerialConnectionStatus.setText(carduino.dataContainer.serialData.getSerialState().getStateName());
+        textViewSerialConnectionError.setText(carduino.dataContainer.serialData.getSerialState().getError());
+        if(!carduino.dataContainer.serialData.getSerialState().getError().equals("")){
+            //set focus for marquee
+            textViewSerialConnectionError.setSelected(true);
         }
 
-        return super.onOptionsItemSelected(item);
+        switch (carduino.dataContainer.preferences.getControlMode()){
+            case DIRECT:
+                //ip connection
+                imageViewIpConnection.setImageDrawable(Utils.assembleDrawables(R.drawable.status_no_ip_device));
+                textViewIpConnection.setText("");
+                textViewIpConnectionStatus.setText("");
+                textViewIpConnectionError.setText("");
+                break;
+            default:
+                //ip connection
+                imageViewIpConnection.setImageDrawable(carduino.dataContainer.ipData.getSerialConnLogoId());
+                textViewIpConnection.setText(R.string.ipConnection);
+                textViewIpConnectionStatus.setText(carduino.dataContainer.ipData.getIpState().getStateName());
+                textViewIpConnectionError.setText(carduino.dataContainer.ipData.getIpState().getError());
+                if(!carduino.dataContainer.ipData.getIpState().getError().equals("")){
+                    //set focus for marquee
+                    textViewIpConnectionError.setSelected(true);
+                }
+                updateIp();
+        }
     }
-*/
+
+    private void updateIp(){
+        //// TODO: 12.01.201 implement
+        textViewDeviceRemoteIp.setText(carduino.dataContainer.ipData.getRemoteIp());
+        textViewDeviceTransceiverIp.setText(carduino.dataContainer.ipData.getTransceiverIp());
+    }
+
     private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG,"onReceive status change event");
-            String status = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_STATE));
-            String name = intent.getStringExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_NAME));
-            int resId = intent.getIntExtra(getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA_LOGO), R.drawable.serial_type_none);
-            textViewSerialConnectionStatus.setText(String.format(getString(R.string.serialConnectionStatus),status,name));
-            imageViewConnectionSerial.setImageResource(resId);
+            updateStatus();
         }
     }
+
+
 }

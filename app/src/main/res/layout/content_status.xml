@@ -9,70 +9,11 @@
     tools:context="tuisse.carduinodroid_android.statusActivity"
     tools:showIn="@layout/activity_status">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/SwitchModeToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/switchModeToolbarHeight"
-        android:background="@color/colorPrimaryLight"
-        app:theme="@style/AppTheme.ToolBarStyle"
-        app:contentInsetRight="@dimen/insetBorder"
-        app:contentInsetEnd="@dimen/insetBorder"
-        app:contentInsetLeft="@dimen/insetBorder"
-        app:contentInsetStart="@dimen/insetBorder"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true">
-
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageView
-                android:layout_width="@dimen/toolbarIconSize"
-                android:layout_height="match_parent"
-                android:id="@+id/imageViewSwitchModePrev"
-                android:src="@drawable/icon_prev"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:contentDescription="@string/imageViewSwitchModeDesc" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/controlModeTransceiver"
-                android:textSize="@dimen/toolbarSecondHeaderSize"
-                android:paddingStart="@dimen/toolbarHeaderPadding"
-                android:paddingLeft="@dimen/toolbarHeaderPadding"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/imageViewSwitchModePrev"
-                android:layout_toEndOf="@+id/imageViewSwitchModePrev"
-                android:layout_toStartOf="@+id/imageViewSwitchModeNext"
-                android:layout_toLeftOf="@+id/imageViewSwitchModeNext"
-                android:textColor="@android:color/white" />
-
-            <ImageView
-                android:layout_width="@dimen/toolbarIconSize"
-                android:layout_height="match_parent"
-                android:id="@+id/imageViewSwitchModeNext"
-                android:src="@drawable/icon_next"
-                android:gravity="center_vertical"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:contentDescription="@string/imageViewSwitchModeDesc" />
-
-        </RelativeLayout>
-    </android.support.v7.widget.Toolbar>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/insetBorder"
-        android:layout_below="@+id/SwitchModeToolbar"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true">
 
@@ -87,17 +28,32 @@
             android:src="@drawable/device_remote"
             android:contentDescription="@string/imageViewDeviceRemoteIpDesc" />
         <TextView
-            android:text="@string/defaultIp"
-            android:id="@+id/textViewDeviceRemoteIp"
+            android:text="@string/labelIpRemote"
+            android:id="@+id/textViewDeviceRemoteIpName"
             android:layout_alignParentTop="true"
+            android:textStyle="bold"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_marginLeft="@dimen/textMargin"
+            android:layout_marginStart="@dimen/textMargin" />
+        <TextView
+            android:text="@string/ipDummyRemote"
+            android:id="@+id/textViewDeviceRemoteIp"
+            android:layout_below="@+id/textViewDeviceRemoteIpName"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin" />
         <ImageView
@@ -116,7 +72,7 @@
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:scaleType="fitCenter"
-            android:id="@+id/imageViewStatusIp"
+            android:id="@+id/imageViewIpConnection"
             android:layout_below="@+id/imageViewDeviceRemoteIp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -126,14 +82,15 @@
             android:text="@string/ipConnection"
             android:id="@+id/textViewIpConnection"
             android:layout_below="@+id/imageViewDeviceRemoteIp"
+            android:textStyle="bold"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
         <TextView
@@ -144,24 +101,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
         <TextView
-            android:text="@string/ipConnectionStatusError"
-            android:id="@+id/textViewIpConnectionStatusError"
+            android:text="@string/ipConnectionError"
+            android:id="@+id/textViewIpConnectionError"
             android:layout_below="@+id/textViewIpConnectionStatus"
+
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
 
@@ -170,23 +133,38 @@
             android:layout_height="@dimen/imageSize"
             android:scaleType="fitCenter"
             android:id="@+id/imageViewDeviceTransceiver"
-            android:layout_below="@+id/imageViewStatusIp"
+            android:layout_below="@+id/imageViewIpConnection"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:src="@drawable/device_mobile_na"
             android:contentDescription="@string/imageViewDeviceTransceiverDesc"/>
         <TextView
-            android:text="@string/localIp"
-            android:id="@+id/textViewDeviceTransceiverIp"
-            android:layout_below="@+id/imageViewStatusIp"
+            android:text="@string/labelIpTransceiver"
+            android:id="@+id/textViewDeviceTransceiverIpName"
+            android:layout_below="@+id/imageViewIpConnection"
+            android:textStyle="bold"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_marginLeft="@dimen/textMargin"
+            android:layout_marginStart="@dimen/textMargin"/>
+        <TextView
+            android:text="@string/ipDummyTransceiver"
+            android:id="@+id/textViewDeviceTransceiverIp"
+            android:layout_below="@+id/textViewDeviceTransceiverIpName"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
         <ImageView
@@ -195,7 +173,7 @@
             android:scaleType="fitCenter"
             android:id="@+id/imageViewSettingsTransceiver"
             android:padding="@dimen/imageMargin"
-            android:layout_below="@+id/imageViewStatusIp"
+            android:layout_below="@+id/imageViewIpConnection"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:src="@drawable/buttonshape_primary_light"
@@ -205,35 +183,26 @@
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:scaleType="fitCenter"
-            android:id="@+id/imageViewConnectionSerial"
+            android:id="@+id/imageViewSerialConnection"
             android:layout_below="@+id/imageViewDeviceTransceiver"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:src="@drawable/status_idle"
             android:contentDescription="@string/imageViewConnectionSerialDesc"/>
-        <ImageView
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
-            android:scaleType="fitCenter"
-            android:id="@+id/imageViewTypeSerial"
-            android:src="@drawable/serial_type_auto_usb"
-            android:layout_below="@+id/imageViewDeviceTransceiver"
-            android:layout_toRightOf="@+id/imageViewConnectionSerial"
-            android:layout_toEndOf="@+id/imageViewConnectionSerial"
-            android:contentDescription="@string/imageViewTypeSerialDesc"/>
 
         <TextView
             android:text="@string/serialConnection"
             android:id="@+id/textViewSerialConnection"
             android:layout_below="@+id/imageViewDeviceTransceiver"
+            android:textStyle="bold"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
         <TextView
@@ -244,24 +213,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
         <TextView
-            android:text="@string/serialConnectionStatusError"
+            android:text="@string/serialConnectionError"
             android:id="@+id/textViewSerialConnectionError"
             android:layout_below="@+id/textViewSerialConnectionStatus"
+
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
 
@@ -293,33 +268,108 @@
             android:layout_height="@dimen/imageSize"
             android:scaleType="fitCenter"
             android:id="@+id/imageViewDeviceArduino"
-            android:layout_below="@+id/imageViewConnectionSerial"
+            android:layout_below="@+id/imageViewSerialConnection"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:src="@drawable/device_arduino"
             android:contentDescription="@string/imageViewDeviceArduinoDesc"/>
-
         <TextView
-            android:text="@string/arduino"
-            android:id="@+id/textViewDeviceArduino"
-            android:layout_below="@+id/imageViewConnectionSerial"
+            android:text="@string/serialDeviceArduino"
+            android:id="@+id/textViewDeviceArduinoName"
+            android:layout_below="@+id/imageViewSerialConnection"
+            android:textStyle="bold"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_toLeftOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toStartOf="@+id/imageViewSettingsBluetooth"
-            android:layout_toRightOf="@+id/imageViewTypeSerial"
-            android:layout_toEndOf="@+id/imageViewTypeSerial"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_marginLeft="@dimen/textMargin"
+            android:layout_marginStart="@dimen/textMargin"/>
+        <TextView
+            android:text="@string/serialDeviceNone"
+            android:id="@+id/textViewDeviceArduino"
+            android:layout_below="@+id/textViewDeviceArduinoName"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_toLeftOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toStartOf="@+id/imageViewSettingsRemoteIp"
+            android:layout_toRightOf="@+id/imageViewDeviceRemoteIp"
+            android:layout_toEndOf="@+id/imageViewDeviceRemoteIp"
             android:layout_marginLeft="@dimen/textMargin"
             android:layout_marginStart="@dimen/textMargin"/>
 
     </RelativeLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbarSwitchMode"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/switchModeToolbarHeight"
+        android:background="@color/colorPrimaryLight"
+        app:theme="@style/AppTheme.ToolBarStyle"
+        app:contentInsetRight="@dimen/insetBorder"
+        app:contentInsetEnd="@dimen/insetBorder"
+        app:contentInsetLeft="@dimen/insetBorder"
+        app:contentInsetStart="@dimen/insetBorder"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/driveButton">
+
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="match_parent"
+                android:id="@+id/imageViewSwitchModePrev"
+                android:src="@drawable/icon_prev"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:contentDescription="@string/imageViewSwitchModeDesc" />
+
+            <TextView
+                android:id="@+id/textviewSwitchMode"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/controlModeTransceiver"
+                android:textSize="@dimen/toolbarSecondHeaderSize"
+                android:paddingStart="@dimen/toolbarHeaderPadding"
+                android:paddingLeft="@dimen/toolbarHeaderPadding"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/imageViewSwitchModePrev"
+                android:layout_toEndOf="@+id/imageViewSwitchModePrev"
+                android:layout_toStartOf="@+id/imageViewSwitchModeNext"
+                android:layout_toLeftOf="@+id/imageViewSwitchModeNext"
+                android:textColor="@android:color/white" />
+
+            <ImageView
+                android:layout_width="@dimen/toolbarIconSize"
+                android:layout_height="match_parent"
+                android:id="@+id/imageViewSwitchModeNext"
+                android:src="@drawable/icon_next"
+                android:gravity="center_vertical"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:contentDescription="@string/imageViewSwitchModeDesc" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.Toolbar>
+
     <android.support.v7.widget.Toolbar
         android:id="@+id/driveButton"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimaryLight"
+        android:background="@color/colorPrimary"
         app:theme="@style/AppTheme.ToolBarStyle"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:contentInsetRight="@dimen/insetBorder"

@@ -4,85 +4,76 @@ package tuisse.carduinodroid_android;
  * Created by keX on 21.12.2015.
  */
 
-public enum ConnectionState {
-    IDLE(0),TRYFIND(1),FOUND(2), TRYCONNECT(3), CONNECTED(4), RUNNING(5), ERROR(-1), STREAMERROR(-2), TRYCONNECTERROR(-3);
-    ConnectionState(int s) {
-        state = s;
-    }
-    private int state;
+public class ConnectionState {
+    private ConnectionEnum state;
+    private String error;
 
-    public static ConnectionState fromInteger(int x) {
-        ConnectionState s;
-        switch(x) {
-            case 0:
-                s = IDLE;
-                break;
-            case 1:
-                s = TRYFIND;
-                break;
-            case 2:
-                s = FOUND;
-                break;
-            case 3:
-                s = TRYCONNECT;
-                break;
-            case 4:
-                s = CONNECTED;
-                break;
-            case 5:
-                s = RUNNING;
-                break;
-            case -1:
-                s = ERROR;
-                break;
-            case -2:
-                s = STREAMERROR;
-                break;
-            case -3:
-                s = TRYCONNECTERROR;
-                break;
-            default:
-                s = ERROR;
+    ConnectionState(ConnectionEnum s) {
+        state = s;
+        if(isError()) {
+            error = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateDefaultError);
         }
-        return s;
+        else {
+            error = "";
+        }
+    }
+    ConnectionState(ConnectionEnum s,String e) {
+        state = s;
+        if(isError()) {
+            error = e;
+        }
+        else {
+            error = "";
+        }
+    }
+    public synchronized ConnectionEnum getState(){
+        return state;
+    }
+
+    public synchronized String getError(){
+        return error;
     }
 
     public synchronized String getStateName(){
         String s = "";
         switch (state){
-            case  0: s = "Idle";break;
-            case  1: s = "Try to find";break;
-            case  2: s = "Found";break;
-            case  3: s = "Try to connect ...";break;
-            case  4: s = "Connected";break;
-            case  5: s = "Running";break;
-            case -2: s = "Streamerror";break;
-            case -3: s = "Error try to connect";break;
-            default: s = "Error";break;
+            case  IDLE:             s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateIdle);break;
+            case  TRYFIND:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryFind);break;
+            case  FOUND:            s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateFound);break;
+            case  TRYCONNECT:       s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnect);break;
+            case  CONNECTED:        s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateConnected);break;
+            case  RUNNING:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateRunning);break;
+            case  STREAMERROR:      s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateStreamError);break;
+            case  TRYCONNECTERROR:  s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnectError);break;
+            case  UNKNOWN:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateUnknown);break;
+            default:                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateError);break;
         }
         return s;
     }
 
     public synchronized boolean isIdle(){
-        return this == IDLE;
+        return state == ConnectionEnum.IDLE;
     }
     public synchronized boolean isTryFind(){
-        return this == TRYFIND;
+        return state == ConnectionEnum.TRYFIND;
     }
     public synchronized boolean isFound(){
-        return this == FOUND;
+        return state == ConnectionEnum.FOUND;
     }
     public synchronized boolean isTryConnect(){
-        return this == TRYCONNECT;
+        return state == ConnectionEnum.TRYCONNECT;
     }
     public synchronized boolean isConnected(){
-        return this == CONNECTED;
+        return state == ConnectionEnum.CONNECTED;
     }
     public synchronized boolean isRunning(){
-        return this == RUNNING;
+        return state == ConnectionEnum.RUNNING;
     }
     public synchronized boolean isError(){
-        return this == ERROR || this == STREAMERROR || this == TRYCONNECTERROR;
+        return state == ConnectionEnum.ERROR || state == ConnectionEnum.STREAMERROR || state == ConnectionEnum.TRYCONNECTERROR;
+    }
+    public synchronized boolean isUnknown(){
+        return state == ConnectionEnum.UNKNOWN;
     }
     public synchronized boolean isIdleError(){
         return this.isError() || this.isIdle();

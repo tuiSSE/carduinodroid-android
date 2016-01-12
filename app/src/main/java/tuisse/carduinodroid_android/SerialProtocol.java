@@ -27,12 +27,18 @@ abstract public class SerialProtocol {
     public synchronized String byteArrayToHexString(byte[] array) {
         StringBuffer hexString = new StringBuffer();
         for (byte b : array) {
-            int intVal = b & 0xff;
-            if (intVal < 0x10)
-                hexString.append("0");
-            hexString.append(Integer.toHexString(intVal));
-            hexString.append(" ");
+            hexString.append(byteToHexString(b));
         }
+        return hexString.toString();
+    }
+
+    public synchronized String byteToHexString(byte b){
+        StringBuffer hexString = new StringBuffer();
+        int intVal = b & 0xff;
+        if (intVal < 0x10)
+            hexString.append("0");
+        hexString.append(Integer.toHexString(intVal));
+        hexString.append(" ");
         return hexString.toString();
     }
 

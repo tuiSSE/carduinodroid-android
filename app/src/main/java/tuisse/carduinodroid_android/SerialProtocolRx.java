@@ -97,7 +97,6 @@ public class SerialProtocolRx extends SerialProtocol {
         if(inChar == START_BYTE){
             rxBufferLength = 0;
         }
-
         //add char to buffer
         rxBuffer[rxBufferLength++] = inChar;
         //check if a full data packet was received
@@ -113,7 +112,7 @@ public class SerialProtocolRx extends SerialProtocol {
             }
             if (rxBuffer[NUM_CHECK] != getCheck(rxBuffer, NUM_CHECK)) {
                 rxBufferLength = 0;
-                Log.e(TAG, "wrong Check byte on receive: " + rxBuffer[NUM_CHECK]+ " should be: " + getCheck(rxBuffer, NUM_CHECK));
+                Log.e(TAG, "wrong Check byte on receive: 0x" + byteToHexString(rxBuffer[NUM_CHECK])+ " calculated: 0x" + byteToHexString(getCheck(rxBuffer, NUM_CHECK)));
                 return false;
             }
             //update values
@@ -129,7 +128,7 @@ public class SerialProtocolRx extends SerialProtocol {
             return false;
         }
         if(command[NUM_START] != START_BYTE){
-            Log.e(TAG, "wrong Startbyte " + command[NUM_START]);
+            Log.e(TAG, "wrong Startbyte " + byteToHexString(command[NUM_START]));
             return false;
         }
         int recVersion = (command[NUM_VERSION_LENGTH] & VERSION_MSK) >> VERSION_SHF;

@@ -59,8 +59,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(carduino.dataContainer.serialData.getConnectionState().getStateName())
-                .setContentText(carduino.dataContainer.serialData.getConnectionState().getStateName());
+                .setTicker(carduino.dataContainer.serialData.getSerialState().getStateName())
+                .setContentText(carduino.dataContainer.serialData.getSerialState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -83,47 +83,61 @@ public class SerialService extends Service {
 */
         setupNotifications();
         carduino = (CarduinodroidApplication) getApplication();
-
-        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-            serial = new SerialBluetooth(this);
-            Log.d(TAG, "onCreated SerialBluetooth");
-        }
-        else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
-            serial = new SerialUsb(this);
-            Log.d(TAG, "onCreated SerialUsb");
-        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
-        if(serial.isError()) {
-            Log.i(TAG, "resetting serial");
-            serial.reset();
+        if(serial == null){
+            //create new serial
+            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+                serial = new SerialBluetooth(this);
+                Log.d(TAG, "onCreated SerialBluetooth");
+            }
+            else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
+                serial = new SerialUsb(this);
+                Log.d(TAG, "onCreated SerialUsb");
+            }
         }
-        if (!serial.isIdle()) {
-            Log.d(TAG, "serial already started");
+        if(serial != null){
+            if(serial.isUnknown()){
+                Log.e(TAG,"FATAL: this device should not start serial service!");
+                stopSelf();
+                return START_NOT_STICKY;
+            }
+            if(serial.isError()) {
+                Log.i(TAG, "resetting serial");
+                serial.reset();
+            }
+            if (!serial.isIdle()) {
+                Log.d(TAG, "serial already started");
+                return START_STICKY;
+            }
+            new Thread(new Runnable() {
+                public void run() {
+                    if(!serial.find()){
+                        stopSelf();
+                    }
+                    else if(serial.connect()) {
+                        serial.start();
+                    }
+                    else{
+                        stopSelf();
+                    }
+                    if(isDestroyed){
+                        //if service should stop during connection, stop all threads
+                        serial.close();
+                    }
+                }
+            }, "connectSerialThread").start();
             return START_STICKY;
         }
-        new Thread(new Runnable() {
-            public void run() {
-                if(!serial.find()){
-                    stopSelf();
-                }
-                else if(serial.connect()) {
-                    serial.start();
-                }
-                else{
-                    stopSelf();
-                }
-                if(isDestroyed){
-                    //if service should stop during connection, stop all threads
-                    serial.close();
-                }
-            }
-        }, "connectSerialThread").start();
-        return START_STICKY;
+        else{
+            Log.e(TAG, "FATAL on start: serial is not created");
+            stopSelf();
+        }
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -131,8 +145,16 @@ public class SerialService extends Service {
         super.onDestroy();
         isDestroyed = true;
         //disconnect
-        serial.close();
-        mNotificationManager.cancel(NOTIFICATION);
+        if(serial != null){
+            serial.close();
+            serial = null;
+        }
+        else{
+            Log.e(TAG, "FATAL on close: serial is not created");
+        }
+        if(mNotificationManager != null){
+            mNotificationManager.cancel(NOTIFICATION);
+        }
         //mWakeLock.release();
         Log.i(TAG, "onDestroyed");
     }

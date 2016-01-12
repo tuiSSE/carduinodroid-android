@@ -15,16 +15,18 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     protected DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
     private SharedPreferences prefMain;
+    private static Context appContext = null;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
+        appContext = getApplicationContext();
         dataContainer = new DataContainer();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefMain = this.getSharedPreferences(getString(R.string.preference_main), this.MODE_PRIVATE);
-        updateSharedPreferences();
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+        updateSharedPreferences();
         Log.i(TAG, "onCreated");
     }
 
@@ -32,6 +34,7 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
     public void onTerminate() {
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         dataContainer = null;
+        appContext = null;
         super.onTerminate();
         Log.i(TAG, "onTerminated");
     }
@@ -53,16 +56,26 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 1)));
         dataContainer.preferences.rcNetwork1Activity0 = sharedPrefs.getBoolean("rcNetwork1Activity0", true);
 
-        dataContainer.preferences.setBluetoothDeviceName(prefMain.getString("bluetoothDeviceName", getString(R.string.defaultBluetoothDeviceName)));
+        dataContainer.preferences.setBluetoothDeviceName(prefMain.getString("bluetoothDeviceName", getString(R.string.serialDefaultBluetoothDeviceName)));
+        dataContainer.preferences.setControlMode(ControlMode.fromInteger(prefMain.getInt("controlMode", 0)));
         Log.d(TAG, "updating Prefs");
 
         Log.d(TAG,"serialType: " + dataContainer.preferences.getSerialPref().toString());
         Log.d(TAG,"rcNetwork1Activity0: " + dataContainer.preferences.rcNetwork1Activity0);
         Log.d(TAG,"bluetoothDeviceName: "+ dataContainer.preferences.getBluetoothDeviceName());
+        Log.d(TAG,"controlMode: "+ dataContainer.preferences.getControlMode());
     }
 
     @Override
     public synchronized void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateSharedPreferences();
+    }
+
+    public static Context getAppContext(){
+        if(appContext == null){
+            //should never happen
+            Log.e(TAG,"undefined app state: no app context");
+        }
+        return appContext;
     }
 }

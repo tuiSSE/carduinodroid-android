@@ -11,8 +11,8 @@
     <dimen name="toolbarHeaderPadding">16dp</dimen>
 
     <dimen name="toolbarSecondHeaderSize">17sp</dimen>
-    <dimen name="switchModeToolbarHeight">30dp</dimen>
+    <dimen name="switchModeToolbarHeight">44dp</dimen>
 
     <dimen name="imageMargin">5dp</dimen>
-    <dimen name="imageSize">55dp</dimen>
+    <dimen name="imageSize">60dp</dimen>
 </resources>

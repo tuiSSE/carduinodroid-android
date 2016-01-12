@@ -1,13 +1,18 @@
 package tuisse.carduinodroid_android;
 
+import android.graphics.drawable.LayerDrawable;
+import android.util.Log;
+
 /**
  * Created by keX on 04.01.2016.
  */
 public class SerialData {
+    private final String TAG = "CarduinoSerialData";
+
     public SerialProtocolRx serialRx;
     public SerialProtocolTx serialTx;
 
-    private ConnectionState connectionState;
+    private ConnectionState serialState;
     private SerialType serialType;
     private String serialName;
 
@@ -15,17 +20,17 @@ public class SerialData {
         serialRx = new SerialProtocolRx();
         serialTx = new SerialProtocolTx();
 
-        setConnectionState(ConnectionState.IDLE);
-        setSerialName("");
+        serialState = new ConnectionState(ConnectionEnum.IDLE,"");
+        setSerialName(CarduinodroidApplication.getAppContext().getString(R.string.serialDeviceNone));
         setSerialType(SerialType.NONE);
     }
 
-    public synchronized void setConnectionState(ConnectionState state){
-        connectionState = state;
+    public synchronized void setSerialState(ConnectionState state){
+        serialState = state;
     }
 
-    public synchronized ConnectionState getConnectionState(){
-        return connectionState;
+    public synchronized ConnectionState getSerialState(){
+        return serialState;
     }
 
     public synchronized void setSerialType(SerialType type){
@@ -44,60 +49,77 @@ public class SerialData {
         return serialName;
     }
 
-    public synchronized int getSerialConnLogoId(){
-        int logo;
-        switch (connectionState){
+    public synchronized LayerDrawable getSerialConnLogoId(SerialType serialPref){
+        int state;
+        int type;
+        switch (serialState.getState()){
             case  TRYFIND:
             case  FOUND:
             case  TRYCONNECT:
-                logo = R.drawable.status_try_connect;
+                state = R.drawable.status_try_connect;
                 break;
             case  CONNECTED:
             case  RUNNING:
-                logo = R.drawable.status_connected;
+                state = R.drawable.status_connected;
                 break;
             case ERROR:
-                logo = R.drawable.status_error;
+                state = R.drawable.status_error;
                 break;
             case STREAMERROR:
-                logo = R.drawable.status_connected_error;
+                state = R.drawable.status_connected_error;
                 break;
             case TRYCONNECTERROR:
-                logo = R.drawable.status_try_connect_error;
+                state = R.drawable.status_try_connect_error;
+                break;
+            case UNKNOWN:
+                state = R.drawable.status_unknown;
                 break;
             default:
-                logo = R.drawable.status_idle;
+                state = R.drawable.status_idle;
                 break;
         }
-        return logo;
+        if(serialState.isUnknown()){
+            type = R.drawable.serial_type_none;
+        }
+        else{
+            switch (serialType){
+                case BLUETOOTH:
+                    if(serialPref.isAuto())
+                        type = R.drawable.serial_type_auto_bt;
+                    else
+                        type = R.drawable.serial_type_bt;
+                    break;
+                case USB:
+                    if(serialPref.isAuto())
+                        type = R.drawable.serial_type_auto_usb;
+                    else
+                        type = R.drawable.serial_type_usb;
+                    break;
+                case AUTO:
+                    //should never happen
+                    Log.e(TAG, "serialType is Auto");
+                    type = R.drawable.serial_type_none;
+                    break;
+                default://NONE
+                    switch (serialPref){
+                        case USB:
+                            type = R.drawable.serial_type_none_usb;
+                            break;
+                        case BLUETOOTH:
+                            type = R.drawable.serial_type_none_bt;
+                            break;
+                        case AUTO:
+                            type = R.drawable.serial_type_none_auto;
+                            break;
+                        default://NONE
+                            //should never happen
+                            Log.e(TAG, "serialType is NONE, serialPref is NONE");
+                            type = R.drawable.serial_type_none;
+                            break;
+                    }
+            }
+        }
+        return Utils.assembleDrawables(state,type);
     }
 
-    public synchronized int getSerialTypeLogoId(SerialType pref){
-        int logo;
-        switch (serialType){
-            case NONE:
-                logo = R.drawable.serial_type_none;
-                break;
-            case USB:
-                if(pref.isAuto()){
-                    logo = R.drawable.serial_type_auto_usb;
-                }
-                else{
-                    logo = R.drawable.serial_type_usb;
-                }
-                break;
-            case BLUETOOTH:
-                if(pref.isAuto()){
-                    logo = R.drawable.serial_type_auto_bt;
-                }
-                else{
-                    logo = R.drawable.serial_type_bt;
-                }
-                break;
-            default:
-                logo = R.drawable.serial_type_none;
-                break;
-        }
-        return logo;
-    }
 }

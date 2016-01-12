@@ -4,7 +4,8 @@ package tuisse.carduinodroid_android;
  * Created by keX on 04.01.2016.
  */
 public enum IpType {
-    NONE(0),IP(1),SERIAL_ONLY(2);
+    //// TODO: 12.01.2016 support mobile?!
+    NONE(0),WLAN(1),MOBILE(2);
     IpType(int t){
         type = t;
     }
