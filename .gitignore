@@ -8,3 +8,7 @@
 /captures
 .idea/dictionaries/keX.xml
 carduinodroid-android.vpp~*
+.idea/gradle.xml
+.idea/modules.xml
+.idea/vcs.xml
+settings.gradle
