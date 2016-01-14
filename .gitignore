@@ -1,12 +1,8 @@
 *.iml
 .gradle
+.idea
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
 /build
 /captures
-.idea/dictionaries/keX.xml
 carduinodroid-android.vpp~*
-.idea/gradle.xml
-.idea/misc.xml
