@@ -260,7 +260,9 @@ public class StatusActivity extends AppCompatActivity {
                 if(carduino.dataContainer.serialData.getSerialType().isAutoBluetooth() || carduino.dataContainer.serialData.getSerialType().isNone()){
                     imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
                 }
-                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE,""));
+                if(carduino.dataContainer.serialData.getSerialState().isUnknown()) {
+                    carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                }
                 updateIp();
                 break;
             case REMOTE:
@@ -283,7 +285,9 @@ public class StatusActivity extends AppCompatActivity {
                 textViewDeviceTransceiverIpName.setText("");
                 textViewDeviceTransceiverIp.setText("");
                 textViewDeviceRemoteIp.setText("");
-                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                if(carduino.dataContainer.serialData.getSerialState().isUnknown()) {
+                    carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                }
                 break;
         }
         updateStatus();
@@ -329,6 +333,7 @@ public class StatusActivity extends AppCompatActivity {
                     textViewIpConnectionError.setSelected(true);
                 }
                 updateIp();
+                break;
         }
     }
 
