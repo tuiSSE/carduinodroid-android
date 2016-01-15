@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -16,7 +18,7 @@ public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
     static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
-    private SerialConnection serial;
+    private static SerialConnection serial = null;
     private Handler handler;
     private PowerManager.WakeLock mWakeLock;
 
@@ -89,31 +91,34 @@ public class SerialService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
-        if(serial == null){
-            //create new serial
-            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+        if(carduino.dataContainer.serialData.getSerialState().isUnknown()){
+            Log.e(TAG,"FATAL: this device should not start serial service!");
+            stopSelf();
+            return START_STICKY;
+        }
+        if(carduino.dataContainer.serialData.getSerialState().isError()) {
+            Log.i(TAG, "resetting serial");
+            serial.reset();
+        }
+        if (!carduino.dataContainer.serialData.getSerialState().isIdle()) {
+            Log.d(TAG, "serial already started");
+            return START_STICKY;
+        }
+        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+            if(!carduino.dataContainer.serialData.getSerialType().isBluetooth() || (serial == null)) {
                 serial = new SerialBluetooth(this);
                 Log.d(TAG, "onCreated SerialBluetooth");
+                sendToast("onCreated SerialBluetooth");
             }
-            else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
+        }
+        else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
+            if(!carduino.dataContainer.serialData.getSerialType().isUsb() || (serial == null)) {
                 serial = new SerialUsb(this);
                 Log.d(TAG, "onCreated SerialUsb");
+                sendToast("onCreated SerialUsb");
             }
         }
         if(serial != null){
-            if(serial.isUnknown()){
-                Log.e(TAG,"FATAL: this device should not start serial service!");
-                stopSelf();
-                return START_NOT_STICKY;
-            }
-            if(serial.isError()) {
-                Log.i(TAG, "resetting serial");
-                serial.reset();
-            }
-            if (!serial.isIdle()) {
-                Log.d(TAG, "serial already started");
-                return START_STICKY;
-            }
             new Thread(new Runnable() {
                 public void run() {
                     if(!serial.find()){
@@ -135,9 +140,10 @@ public class SerialService extends Service {
         }
         else{
             Log.e(TAG, "FATAL on start: serial is not created");
+            sendToast("FATAL on start: serial is not created");
             stopSelf();
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -147,16 +153,18 @@ public class SerialService extends Service {
         //disconnect
         if(serial != null){
             serial.close();
-            serial = null;
+            //serial = null;
         }
         else{
-            Log.e(TAG, "FATAL on close: serial is not created");
+            Log.e(TAG, "FATAL on close: serial was not created");
+            sendToast("FATAL on start: serial was not created");
         }
         if(mNotificationManager != null){
             mNotificationManager.cancel(NOTIFICATION);
         }
         //mWakeLock.release();
         Log.i(TAG, "onDestroyed");
+        sendToast("serialService onDestroyed");
     }
 
     protected void sendToast(final String message){

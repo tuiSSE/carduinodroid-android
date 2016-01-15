@@ -38,74 +38,88 @@ public class SerialUsb extends SerialConnection {
 
     public SerialUsb(SerialService s) {
         super(s);
-        getSerialData().setSerialType(SerialType.USB);
+        if(getSerialData() != null) {
+            getSerialData().setSerialType(SerialType.USB);
+        }
+        else{
+            serialService.sendToast("no getSerialData()");
+        }
     }
 
     @Override
     protected boolean find() {
         if (isIdle()) {
             setSerialState(ConnectionEnum.TRYFIND);
-        }
-        //try to connect to usb device
-        usbManager = (UsbManager) serialService.getSystemService(Context.USB_SERVICE);
-        if (usbManager == null) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbManager));
-            setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbManager);
-        } else {
-            HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
-            Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
-            usbDevice = null;
-            while (deviceIterator.hasNext()){
-                UsbDevice tempUsbDevice = deviceIterator.next();
+            //try to connect to usb device
+            usbManager = (UsbManager) serialService.getSystemService(Context.USB_SERVICE);
+            if (usbManager != null){
+                HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
+                if (deviceList != null) {
+                    Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
+                    //usbDevice = null;
+                    while (deviceIterator.hasNext()) {
+                        UsbDevice tempUsbDevice = deviceIterator.next();
 
-                // Print device information. If you think your device should be able
-                // to communicate with this app, add it to accepted products below.
-                Log.d(TAG, "VendorId: " + tempUsbDevice.getVendorId());
-                Log.d(TAG, "ProductId: " + tempUsbDevice.getProductId());
-                Log.d(TAG, "DeviceName: " + tempUsbDevice.getDeviceName());
-                Log.d(TAG, "DeviceId: " + tempUsbDevice.getDeviceId());
-                Log.d(TAG, "DeviceClass: " + tempUsbDevice.getDeviceClass());
-                Log.d(TAG, "DeviceSubclass: " + tempUsbDevice.getDeviceSubclass());
-                Log.d(TAG, "InterfaceCount: " + tempUsbDevice.getInterfaceCount());
-                Log.d(TAG, "DeviceProtocol: " + tempUsbDevice.getDeviceProtocol());
+                        // Print device information. If you think your device should be able
+                        // to communicate with this app, add it to accepted products below.
+                        Log.d(TAG, "VendorId: " + tempUsbDevice.getVendorId());
+                        Log.d(TAG, "ProductId: " + tempUsbDevice.getProductId());
+                        Log.d(TAG, "DeviceName: " + tempUsbDevice.getDeviceName());
+                        Log.d(TAG, "DeviceId: " + tempUsbDevice.getDeviceId());
+                        Log.d(TAG, "DeviceClass: " + tempUsbDevice.getDeviceClass());
+                        Log.d(TAG, "DeviceSubclass: " + tempUsbDevice.getDeviceSubclass());
+                        Log.d(TAG, "InterfaceCount: " + tempUsbDevice.getInterfaceCount());
+                        Log.d(TAG, "DeviceProtocol: " + tempUsbDevice.getDeviceProtocol());
 
-                if (tempUsbDevice.getVendorId() == ARDUINO_USB_VENDOR_ID) {
-                    switch (tempUsbDevice.getProductId()) {
-                        case ARDUINO_UNO_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_uno));
-                            usbDevice = tempUsbDevice;
-                            break;
-                        case ARDUINO_UNO_R3_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_uno_r3));
-                            usbDevice = tempUsbDevice;
-                            break;
-                        case ARDUINO_MEGA_2560_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_mega));
-                            usbDevice = tempUsbDevice;
-                            break;
-                        case ARDUINO_MEGA_2560_R3_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_r3));
-                            usbDevice = tempUsbDevice;
-                            break;
-                        case ARDUINO_MEGA_2560_ADK_R3_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk));
-                            usbDevice = tempUsbDevice;
-                            break;
-                        case ARDUINO_MEGA_2560_ADK_USB_PRODUCT_ID:
-                            getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk_r3));
-                            usbDevice = tempUsbDevice;
-                            break;
+                        if (tempUsbDevice.getVendorId() == ARDUINO_USB_VENDOR_ID) {
+                            switch (tempUsbDevice.getProductId()) {
+                                case ARDUINO_UNO_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_uno));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                case ARDUINO_UNO_R3_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_uno_r3));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                case ARDUINO_MEGA_2560_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                case ARDUINO_MEGA_2560_R3_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_r3));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                case ARDUINO_MEGA_2560_ADK_R3_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                case ARDUINO_MEGA_2560_ADK_USB_PRODUCT_ID:
+                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk_r3));
+                                    usbDevice = tempUsbDevice;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
+                if (usbDevice == null) {
+                    Log.e(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
+                    setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
+                }
+                else {
+                    Log.d(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), getSerialData().getSerialName()));
+                    setSerialState(ConnectionEnum.FOUND);
+                }
             }
-            if(usbDevice == null){
-                Log.e(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
-                setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
+            else {
+                Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbManager));
+                setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbManager);
             }
-            else{
-                Log.d(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), getSerialData().getSerialName()));
-                setSerialState(ConnectionEnum.FOUND);
-            }
+        }
+        else {
+            Log.e(TAG, serialService.getString(R.string.serialErrorNotIdle));
+            setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNotIdle);
         }
         return isFound();
     }
@@ -117,17 +131,15 @@ public class SerialUsb extends SerialConnection {
         }
 
         if(!usbManager.hasPermission(usbDevice)){
-            UsbReciever usbReciever = new UsbReciever();
+            Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbPermission));
+            setSerialState(ConnectionEnum.TRYCONNECTERROR, serialService.getString(R.string.serialErrorNoUsbPermission));
+            UsbBroadcastReciever usbReciever = new UsbBroadcastReciever();
             PendingIntent mPermissionIntent = PendingIntent.getBroadcast(serialService, 0, new Intent(
                     serialService.getString(R.string.USB_PERMISSION)), 0);
             IntentFilter filter = new IntentFilter(serialService.getString(R.string.USB_PERMISSION));
             serialService.registerReceiver(usbReciever, filter);
             usbManager.requestPermission(usbDevice, mPermissionIntent);
-            if(!usbManager.hasPermission(usbDevice)) {
-                Log.e(TAG, serialService.getString(R.string.serialUsbDeviceFound));
-                setSerialState(ConnectionEnum.TRYCONNECTERROR, serialService.getString(R.string.serialUsbDeviceFound));
-                return false;
-            }
+            return false;
         }
 
         usbConnection = usbManager.openDevice(usbDevice);
@@ -166,7 +178,7 @@ public class SerialUsb extends SerialConnection {
         }
         if (usbEndpointTx == null) {
             Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbTxEndpoint));
-            setSerialState(ConnectionEnum.TRYCONNECTERROR,R.string.serialErrorNoUsbTxEndpoint);
+            setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbTxEndpoint);
             usbConnection.close();
             return false;
         }
@@ -179,27 +191,35 @@ public class SerialUsb extends SerialConnection {
         //getSerialData().setSerialName(serialService.getString(R.string.serialDeviceNone));
         if(isRunning()){
             setSerialState(ConnectionEnum.IDLE);
+            serialService.sendToast("back to idle");
         }
         else if(!isError()){
             setSerialState(ConnectionEnum.ERROR, R.string.serialErrorUnexpectedClose);
         }
         if (usbConnection != null) {
             usbConnection.close();
-            usbConnection = null;
+            //usbConnection = null;
         }
-        usbManager = null;
-        usbDevice = null;
-        usbEndpointTx = null;
-        usbEndpointRx = null;
+        //usbManager = null;
+        //usbDevice = null;
+        //usbEndpointTx = null;
+        //usbEndpointRx = null;
         return isIdle();
     }
 
 
     @Override
     protected void send() throws IOException {
-        final byte[] buffer = getSerialData().serialTx.get();
-        final int len = usbConnection.bulkTransfer(usbEndpointTx, buffer, buffer.length, 0);
-        Log.d(TAG,"usb send: " + len);
+        byte[] buffer = null;
+        if(getSerialData() != null) {
+            buffer = getSerialData().serialTx.get();
+        }
+        if(buffer != null) {
+            if((buffer.length > 0) && (usbConnection != null) && (usbEndpointTx != null)) {
+                int len = usbConnection.bulkTransfer(usbEndpointTx, buffer, buffer.length, TIMEOUT);
+                //Log.d(TAG,"usb send: " + len);
+            }
+        }
     }
 
     @Override
@@ -207,14 +227,17 @@ public class SerialUsb extends SerialConnection {
         final int BUFFER_LENGTH = RECEIVE_BUFFER_LENGTH;
         int acceptedFrame = 0;
         byte[] buffer = new byte[BUFFER_LENGTH];
-        int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, TIMEOUT);
-        if (len > 0) {
-            for(int i = 0; i < len; i++){
-                if(getSerialData().serialRx.append(buffer[i])){
-                    acceptedFrame++;
-                };
+        if((buffer != null) && (usbConnection != null) && (usbEndpointRx != null) && (getSerialData() != null)) {
+            int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, TIMEOUT);
+            if (len > 0) {
+                for (int i = 0; i < len; i++) {
+                    if (getSerialData().serialRx.append(buffer[i])) {
+                        acceptedFrame++;
+                    }
+                    ;
+                }
+                //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
             }
-            Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
         }
         return acceptedFrame;
     }
@@ -234,7 +257,7 @@ public class SerialUsb extends SerialConnection {
         return lineEncoding;
     }
 
-    class UsbReciever extends BroadcastReceiver{
+    class UsbBroadcastReciever extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

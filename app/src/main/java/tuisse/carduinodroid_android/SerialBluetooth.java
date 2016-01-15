@@ -39,61 +39,65 @@ public class SerialBluetooth extends SerialConnection {
     public boolean find() {
         if (isIdle()) {
             setSerialState(ConnectionEnum.TRYFIND);
-        }
-        // Try to get connection with Bluetooth-Adapter
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorNoBluetoothAdapter));
-            setSerialState(ConnectionEnum.TRYCONNECTERROR,R.string.serialErrorNoBluetoothAdapter);
-            return false;
-        } else {
-            Log.d(TAG, "Bluetooth adapter is ready");
-        }
-        if (!mBluetoothAdapter.isEnabled()) {
-            Log.d(TAG, serialService.getString(R.string.serialBluetoothEnable));
-            serialService.sendToast(serialService.getString(R.string.serialBluetoothEnable));
-            mBluetoothAdapter.enable();
-        }
-        if (mBluetoothAdapter.isDiscovering()) {
-            Log.d(TAG, "stop bluetooth discovery");
-            mBluetoothAdapter.cancelDiscovery();
-        }
-        //if no bluetooth device is registered add it
-        Log.d(TAG, "+" + serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName() + "+" );
-        Log.d(TAG, "+" + serialService.getString(R.string.serialDefaultBluetoothDeviceName) + "+" );
-
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if(pairedDevices != null) {
-            if (pairedDevices.size() > 0) {
-
-                if(serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName().equals(serialService.getString(R.string.serialDefaultBluetoothDeviceName))){
-                    //start preferences
-                    Log.d(TAG, serialService.getString(R.string.serialErrorNoBluetoothDeviceChosen));
-                    serialService.sendToast(R.string.serialErrorNoBluetoothDeviceChosen);
-                    setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDeviceChosen);
-                    return false;
-                }
-
-                for (BluetoothDevice device : pairedDevices) {
-                    Log.d(TAG, "bluetooth device found: " + device.getName());
-                    if (device.getName().contains(serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName())) {
-                        mmDevice = device;
-                        Log.d(TAG, "carduinodroid device found: " + mmDevice.getName());
-                        getSerialData().setSerialName(mmDevice.getName());
-                        setSerialState(ConnectionEnum.FOUND);
-                        break;
-                    }
-                }
-                if (!isFound()) {
-                    Log.e(TAG, serialService.getString(R.string.serialErrorNoCarduinoBluetoothDeviceFound));
-                    setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoCarduinoBluetoothDeviceFound);
-                    return false;
-                }
-            } else {
-                Log.e(TAG, serialService.getString(R.string.serialErrorNoBluetoothDevicePaired));
-                setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDevicePaired);
+            // Try to get connection with Bluetooth-Adapter
+            mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (mBluetoothAdapter == null) {
+                Log.e(TAG, serialService.getString(R.string.serialErrorNoBluetoothAdapter));
+                setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothAdapter);
                 return false;
+            } else {
+                Log.d(TAG, "Bluetooth adapter is ready");
             }
+            if (!mBluetoothAdapter.isEnabled()) {
+                Log.d(TAG, serialService.getString(R.string.serialBluetoothEnable));
+                serialService.sendToast(serialService.getString(R.string.serialBluetoothEnable));
+                mBluetoothAdapter.enable();
+            }
+            if (mBluetoothAdapter.isDiscovering()) {
+                Log.d(TAG, "stop bluetooth discovery");
+                mBluetoothAdapter.cancelDiscovery();
+            }
+            //if no bluetooth device is registered add it
+            Log.d(TAG, "+" + serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName() + "+");
+            Log.d(TAG, "+" + serialService.getString(R.string.serialDefaultBluetoothDeviceName) + "+");
+
+            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            if (pairedDevices != null) {
+                if (pairedDevices.size() > 0) {
+
+                    if (serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName().equals("")) {
+                        //start preferences
+                        Log.d(TAG, serialService.getString(R.string.serialErrorNoBluetoothDeviceChosen));
+                        serialService.sendToast(R.string.serialErrorNoBluetoothDeviceChosen);
+                        setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDeviceChosen);
+                        return false;
+                    }
+
+                    for (BluetoothDevice device : pairedDevices) {
+                        Log.d(TAG, "bluetooth device found: " + device.getName());
+                        if (device.getName().contains(serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName())) {
+                            mmDevice = device;
+                            Log.d(TAG, "carduinodroid device found: " + mmDevice.getName());
+                            getSerialData().setSerialName(mmDevice.getName());
+                            setSerialState(ConnectionEnum.FOUND);
+                            break;
+                        }
+                    }
+                    if (!isFound()) {
+                        Log.e(TAG, serialService.getString(R.string.serialErrorNoCarduinoBluetoothDeviceFound));
+                        setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoCarduinoBluetoothDeviceFound);
+                        return false;
+                    }
+                } else {
+                    Log.e(TAG, serialService.getString(R.string.serialErrorNoBluetoothDevicePaired));
+                    setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDevicePaired);
+                    return false;
+                }
+            }
+        }
+        else{
+            Log.e(TAG, serialService.getString(R.string.serialErrorNotIdle));
+            setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNotIdle);
         }
         return isFound();
     }

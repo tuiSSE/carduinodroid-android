@@ -75,6 +75,9 @@ public class ConnectionState {
     public synchronized boolean isUnknown(){
         return state == ConnectionEnum.UNKNOWN;
     }
+    public synchronized boolean isStarted(){
+        return !(this.isUnknown() || this.isError() || this.isIdle());
+    }
     public synchronized boolean isIdleError(){
         return this.isError() || this.isIdle();
     }

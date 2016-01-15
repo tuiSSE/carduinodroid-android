@@ -30,7 +30,6 @@ public class StatusActivity extends AppCompatActivity {
     private ImageView imageViewDeviceRemoteIp;
     private TextView  textViewDeviceRemoteIpName;
     private TextView  textViewDeviceRemoteIp;
-    private ImageView imageViewSettingsRemoteIp;
 
     private ImageView imageViewIpConnection;
     private TextView  textViewIpConnection;
@@ -62,7 +61,7 @@ public class StatusActivity extends AppCompatActivity {
     private CarduinodroidApplication carduino;
 
     private IntentFilter serialConnectionStatusChangeFilter;
-    private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
+    private SerialConnectionStatusActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
 
 
     @Override
@@ -72,7 +71,7 @@ public class StatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_status);
         // prevent the application from switching to landscape-mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        serialConnectionStatusChangeReceiver =  new SerialConnectionStatusChangeReceiver();
+        serialConnectionStatusChangeReceiver =  new SerialConnectionStatusActivityStatusChangeReceiver();
         serialConnectionStatusChangeFilter =    new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
 
         //get the Views
@@ -83,7 +82,6 @@ public class StatusActivity extends AppCompatActivity {
         imageViewDeviceRemoteIp =           (ImageView) findViewById(R.id.imageViewDeviceRemoteIp);
         textViewDeviceRemoteIpName =        (TextView ) findViewById(R.id.textViewDeviceRemoteIpName);
         textViewDeviceRemoteIp =            (TextView ) findViewById(R.id.textViewDeviceRemoteIp);
-        imageViewSettingsRemoteIp =         (ImageView) findViewById(R.id.imageViewSettingsRemoteIp);
 
         imageViewIpConnection =             (ImageView) findViewById(R.id.imageViewIpConnection);
         textViewIpConnection =              (TextView ) findViewById(R.id.textViewIpConnection);
@@ -113,11 +111,11 @@ public class StatusActivity extends AppCompatActivity {
 
         setSupportActionBar(topToolbar);
         LayerDrawable settingsIcon = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings);
-        imageViewSettingsRemoteIp.setImageDrawable(settingsIcon);
         imageViewSettingsTransceiver.setImageDrawable(settingsIcon);
         imageViewSettingsBluetooth.setImageDrawable(settingsIcon);
 
         updateControlMode();
+
 
         imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,7 +183,7 @@ public class StatusActivity extends AppCompatActivity {
         super.onResume();
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        updateControlMode();
+        updateStatus();
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -244,20 +242,18 @@ public class StatusActivity extends AppCompatActivity {
         //stop services
         stopService(new Intent(StatusActivity.this, SerialService.class));
 
-        imageViewSettingsRemoteIp.setVisibility(View.INVISIBLE);
         imageViewSettingsTransceiver.setVisibility(View.INVISIBLE);
         imageViewSettingsBluetooth.setVisibility(View.INVISIBLE);
 
         switch (carduino.dataContainer.preferences.getControlMode()){
             case TRANSCEIVER:
                 textviewSwitchMode.setText(R.string.controlModeTransceiver);
-                imageViewSettingsTransceiver.setVisibility(View.VISIBLE);
                 imageViewDeviceRemoteIp.setImageResource(R.drawable.device_remote);
                 textViewDeviceRemoteIpName.setText(R.string.labelIpRemote);
                 imageViewDeviceTransceiver.setImageResource(R.drawable.device_mobile_transceive);
                 textViewDeviceTransceiverIpName.setText(R.string.labelIpLocal);
                 //visible if using bluetooth
-                if(carduino.dataContainer.serialData.getSerialType().isAutoBluetooth() || carduino.dataContainer.serialData.getSerialType().isNone()){
+                if(carduino.dataContainer.preferences.getSerialPref().isAutoBluetooth() || carduino.dataContainer.preferences.getSerialPref().isNone()){
                     imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
                 }
                 if(carduino.dataContainer.serialData.getSerialState().isUnknown()) {
@@ -266,8 +262,8 @@ public class StatusActivity extends AppCompatActivity {
                 updateIp();
                 break;
             case REMOTE:
+                imageViewSettingsTransceiver.setVisibility(View.VISIBLE);
                 textviewSwitchMode.setText(R.string.controlModeRC);
-                imageViewSettingsRemoteIp.setVisibility(View.VISIBLE);
                 imageViewDeviceRemoteIp.setImageResource(R.drawable.device_mobile_send);
                 textViewDeviceRemoteIpName.setText(R.string.labelIpLocal);
                 textViewDeviceTransceiverIpName.setText(R.string.labelIpTransceiver);
@@ -343,7 +339,7 @@ public class StatusActivity extends AppCompatActivity {
         textViewDeviceTransceiverIp.setText(carduino.dataContainer.ipData.getTransceiverIp());
     }
 
-    private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
+    private class SerialConnectionStatusActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG,"onReceive status change event");

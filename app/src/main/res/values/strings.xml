@@ -99,18 +99,19 @@
     <string name="localIp">127.0.0.1</string>
 
     <!-- Promtdialog Buttontexts -->
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="openBluetoothSettingsTitle">Open bluetooth settings</string>
     <string name="openBluetoothSettingsText">Pair your Carduinodroid with this mobile</string>
 
     <!-- serial connection -->
-    <string name="serialDefaultBluetoothDeviceName"></string>
+    <string name="serialDefaultBluetoothDeviceName">HC-06</string>
     <string name="serialBluetoothEnable">enabled Bluetooth</string>
     <string name="serialErrorNoBluetoothDevicePaired">no bluetooth paired</string>
     <string name="serialErrorNoBluetoothDeviceChosen">choose bluetooth device</string>
     <string name="serialErrorNoCarduinoBluetoothDeviceFound">no device found</string>
     <string name="serialErrorNoBluetoothAdapter">no bluetooth on mobile available</string>
+    <string name="serialErrorNotIdle">find: was not idle</string>
     <string name="serialErrorReceiveTimeout">receive time out</string>
     <string name="serialErrorReceiveFail">receive failed: %1$s</string>
     <string name="serialErrorSendFail">send failed: %1$s</string>
@@ -126,6 +127,7 @@
     <string name="serialErrorNoUsbManagerPermission">no usb manager permission</string>
     <string name="serialErrorNoArduino">no Arduino</string>
     <string name="serialUsbDeviceFound">%1$s found</string>
+    <string name="serialErrorNoUsbPermission">USB: needs permission</string>
     <string name="serialErrorUsbDeviceOpen">opening USB device failed</string>
     <string name="serialErrorUsbDeviceClaim">claiming USB device failed</string>
     <string name="serialErrorNoUsbRxEndpoint">no Rx endpoint found</string>

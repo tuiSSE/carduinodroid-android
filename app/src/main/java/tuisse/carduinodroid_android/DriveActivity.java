@@ -20,7 +20,7 @@ public class DriveActivity extends AppCompatActivity {
 
     private SerialDataRxReceiver serialDataRxReceiver;
     private IntentFilter serialDataRxFilter;
-    private SerialConnectionStatusChangeReceiver serialConnectionStatusChangeReceiver;
+    private SerialConnectionDriveActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
     private IntentFilter serialConnectionStatusChangeFilter;
 
     private Button buttonReset;
@@ -91,7 +91,7 @@ public class DriveActivity extends AppCompatActivity {
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        serialConnectionStatusChangeReceiver = new SerialConnectionStatusChangeReceiver();
+        serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
         serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
 
@@ -226,18 +226,16 @@ public class DriveActivity extends AppCompatActivity {
     private class SerialDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Log.d(TAG,"onDriveActivityReceiverReceive");
+            Log.d(TAG,"onDriveActivityReceiverReceive");
             refresh();
         }
     }
 
-    private class SerialConnectionStatusChangeReceiver extends BroadcastReceiver {
+    private class SerialConnectionDriveActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.toString().equals(R.string.SERIAL_CONNECTION_STATUS_CHANGED)){
-                Log.d(TAG,"onReceive status change event");
-                //TODO: update status
-            }
+            Log.d(TAG,"onReceive status change event");
+            //TODO: update status
         }
     }
 
