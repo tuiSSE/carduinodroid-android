@@ -112,7 +112,7 @@ public class SerialProtocolRx extends SerialProtocol {
             }
             if (rxBuffer[NUM_CHECK] != getCheck(rxBuffer, NUM_CHECK)) {
                 rxBufferLength = 0;
-                Log.e(TAG, "wrong Check byte on receive: 0x" + byteToHexString(rxBuffer[NUM_CHECK])+ " calculated: 0x" + byteToHexString(getCheck(rxBuffer, NUM_CHECK)));
+                Log.e(TAG, "wrong Check byte on receive: 0x" + byteToHexString(rxBuffer[NUM_CHECK])+ " calculated: 0x" + byteToHexString(getCheck(rxBuffer, NUM_CHECK)) + " rx Buffer: " + byteArrayToHexString(rxBuffer));
                 return false;
             }
             //update values

@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -62,6 +64,9 @@ public class StatusActivity extends AppCompatActivity {
 
     private IntentFilter serialConnectionStatusChangeFilter;
     private SerialConnectionStatusActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
+    private UsbBroadcastReciever usbReciever;
+
+    private IntentFilter usbFilter;
 
 
     @Override
@@ -73,6 +78,10 @@ public class StatusActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         serialConnectionStatusChangeReceiver =  new SerialConnectionStatusActivityStatusChangeReceiver();
         serialConnectionStatusChangeFilter =    new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+
+        usbReciever = new UsbBroadcastReciever();
+        usbFilter = new IntentFilter(getString(R.string.USB_PERMISSION));
+        registerReceiver(usbReciever, usbFilter);
 
         //get the Views
         Toolbar topToolbar =                (Toolbar  ) findViewById(R.id.topToolbar);
@@ -215,6 +224,7 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(usbReciever);
         Log.d(TAG, "onStatusActivityDestroy");
     }
 
@@ -342,8 +352,47 @@ public class StatusActivity extends AppCompatActivity {
     private class SerialConnectionStatusActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,"onReceive status change event");
+            Log.d(TAG,"onReceive status change event: " + carduino.dataContainer.serialData.getSerialState().getStateName());
             updateStatus();
+        }
+    }
+
+
+
+    class UsbBroadcastReciever extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (getString(R.string.USB_PERMISSION).equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if (device != null) {
+                            // call method to set up device communication
+                            startService(new Intent(StatusActivity.this, SerialService.class));
+                            Log.d(TAG, "restart serialService");
+                        }
+                    }
+                }
+            }
+            if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                Log.d(TAG, "ACTION_USB_DEVICE_DETACHED");
+                synchronized (this) {
+                    UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                    if (device != null) {
+                        Log.d(TAG, "EXTRA_DEVICE");
+                        // call your method that cleans up and closes communication with the device
+                        Log.d(TAG, "disconnecting from usb device");
+                        stopService(new Intent(StatusActivity.this, SerialService.class));
+                    }
+                }
+            } else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                startService(new Intent(StatusActivity.this, SerialService.class));
+                Log.d(TAG, "usb cable: serialService started");
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                stopService(new Intent(StatusActivity.this, SerialService.class));
+                Log.d(TAG, "usb cable: serialService stopped");
+            }
         }
     }
 

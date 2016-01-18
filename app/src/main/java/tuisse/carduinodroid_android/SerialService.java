@@ -18,7 +18,7 @@ public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
     static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
-    private static SerialConnection serial = null;
+    private SerialConnection serial = null;
     private Handler handler;
     private PowerManager.WakeLock mWakeLock;
 
@@ -93,31 +93,38 @@ public class SerialService extends Service {
         isDestroyed = false;
         if(carduino.dataContainer.serialData.getSerialState().isUnknown()){
             Log.e(TAG,"FATAL: this device should not start serial service!");
+            serial = null;
             stopSelf();
             return START_STICKY;
         }
         if(carduino.dataContainer.serialData.getSerialState().isError()) {
             Log.i(TAG, "resetting serial");
-            serial.reset();
+            if(serial != null){
+                serial.reset();
+            }
+            else{
+                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+            }
         }
         if (!carduino.dataContainer.serialData.getSerialState().isIdle()) {
             Log.d(TAG, "serial already started");
             return START_STICKY;
         }
         if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-            if(!carduino.dataContainer.serialData.getSerialType().isBluetooth() || (serial == null)) {
+            //if(!carduino.dataContainer.serialData.getSerialType().isBluetooth() || (serial == null)) {
                 serial = new SerialBluetooth(this);
                 Log.d(TAG, "onCreated SerialBluetooth");
                 sendToast("onCreated SerialBluetooth");
-            }
+            //}
         }
         else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
-            if(!carduino.dataContainer.serialData.getSerialType().isUsb() || (serial == null)) {
+            //if(!carduino.dataContainer.serialData.getSerialType().isUsb() || (serial == null)) {
                 serial = new SerialUsb(this);
                 Log.d(TAG, "onCreated SerialUsb");
                 sendToast("onCreated SerialUsb");
-            }
+            //}
         }
+
         if(serial != null){
             new Thread(new Runnable() {
                 public void run() {
@@ -147,24 +154,22 @@ public class SerialService extends Service {
     }
 
     @Override
-    public void onDestroy () {
+    public void onDestroy() {
         super.onDestroy();
         isDestroyed = true;
         //disconnect
         if(serial != null){
             serial.close();
-            //serial = null;
-        }
-        else{
+            serial = null;
+        } else {
             Log.e(TAG, "FATAL on close: serial was not created");
             sendToast("FATAL on start: serial was not created");
         }
-        if(mNotificationManager != null){
+        if(mNotificationManager != null) {
             mNotificationManager.cancel(NOTIFICATION);
         }
         //mWakeLock.release();
         Log.i(TAG, "onDestroyed");
-        sendToast("serialService onDestroyed");
     }
 
     protected void sendToast(final String message){

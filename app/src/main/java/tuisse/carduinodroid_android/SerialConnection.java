@@ -34,7 +34,9 @@ abstract public class SerialConnection {
 
     protected boolean reset() {
         setSerialState(ConnectionEnum.IDLE);
-        serialSendThread.interrupt();
+        if(serialSendThread.isAlive()){
+            serialSendThread.interrupt();
+        }
         serialReceiveThread.interrupt();
         return true;
     }
@@ -59,6 +61,7 @@ abstract public class SerialConnection {
                 getSerialData().setSerialState(new ConnectionState(state, error));
                 Log.d(TAG, "serial State changed: " + getSerialData().getSerialState().getStateName());
                 Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+                //onSerialConnectionStatusChangeIntent.putExtra(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA), getSerialData().getSerialState().getState().ordinal());
                 //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
 
                 if (serialService != null) {
@@ -99,7 +102,7 @@ abstract public class SerialConnection {
                         setSerialState(ConnectionEnum.STREAMERROR, String.format(serialService.getString(R.string.serialErrorReceiveFail),e.toString()));
                         serialService.stopSelf();
                     }
-                    Thread.sleep(DELAY/2);
+                    Thread.sleep(DELAY);
                     if(heartbeat-- == 0){
                         heartbeat = HEARTBEAT;
                         Log.d(TAG,"pulse SerialReceive");

@@ -32,7 +32,12 @@ public class SerialBluetooth extends SerialConnection {
 
     public SerialBluetooth(SerialService s) {
         super(s);
-        getSerialData().setSerialType(SerialType.BLUETOOTH);
+        if(getSerialData() != null) {
+            getSerialData().setSerialType(SerialType.BLUETOOTH);
+        }
+        else{
+            serialService.sendToast("no getSerialData()");
+        }
     }
 
     @Override
@@ -212,7 +217,7 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     protected void send() throws IOException {
-        Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(getSerialData().serialTx.get()));
+        //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(getSerialData().serialTx.get()));
         mmOutputStream.write(getSerialData().serialTx.get());
     }
 
@@ -228,7 +233,7 @@ public class SerialBluetooth extends SerialConnection {
                     acceptedFrame++;
                 };
             }
-            Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
+            //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
         }
         return acceptedFrame;
     }
