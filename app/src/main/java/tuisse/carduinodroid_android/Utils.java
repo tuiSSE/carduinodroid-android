@@ -7,6 +7,7 @@ import android.graphics.drawable.LayerDrawable;
  * Created by keX on 12.01.2016.
  */
 public class Utils {
+
     public static LayerDrawable assembleDrawables(int drawableBack,int drawableFront){
         Drawable[] layers = new Drawable[2];
         layers[0] = CarduinodroidApplication.getAppContext().getResources().getDrawable(drawableBack);

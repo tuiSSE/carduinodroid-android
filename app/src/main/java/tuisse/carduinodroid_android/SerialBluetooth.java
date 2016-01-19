@@ -36,7 +36,7 @@ public class SerialBluetooth extends SerialConnection {
             getSerialData().setSerialType(SerialType.BLUETOOTH);
         }
         else{
-            serialService.sendToast("no getSerialData()");
+            setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
         }
     }
 
@@ -182,7 +182,7 @@ public class SerialBluetooth extends SerialConnection {
                 setSerialState(ConnectionEnum.IDLE);
             }
             else if(isUnknown()){
-                Log.d(TAG,serialService.getString(R.string.serialErrorIsUnknown));
+                Log.d(TAG,serialService.getString(R.string.serialErrorUnused));
             }
             else if(!isError()){
                 setSerialState(ConnectionEnum.ERROR, R.string.serialErrorUnexpectedClose);

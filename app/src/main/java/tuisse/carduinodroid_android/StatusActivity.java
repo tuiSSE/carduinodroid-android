@@ -162,7 +162,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModePrev.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                carduino.dataContainer.preferences.setControlModePrev();
+                carduino.setSharedPrefsInt("controlMode",carduino.dataContainer.preferences.setControlModePrev());
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModePrev");
             }
@@ -171,7 +171,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModeNext.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                carduino.dataContainer.preferences.setControlModeNext();
+                carduino.setSharedPrefsInt("controlMode",carduino.dataContainer.preferences.setControlModeNext());
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModeNext");
             }

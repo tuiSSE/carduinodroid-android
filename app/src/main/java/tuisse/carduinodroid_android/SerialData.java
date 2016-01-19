@@ -121,5 +121,4 @@ public class SerialData {
         }
         return Utils.assembleDrawables(state,type);
     }
-
 }

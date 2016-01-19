@@ -8,12 +8,15 @@ public class DataContainer {
     protected Preferences preferences;
     protected SerialData serialData;
     protected IpData ipData;
-    protected CommunicationStatus communicationStatus;
 
     public DataContainer(){
         serialData = new SerialData();
         ipData = new IpData();
         preferences = new Preferences();
-        communicationStatus = CommunicationStatus.NONE;
+    }
+
+    public synchronized CommunicationStatus getCommunicationStatus(){
+        //TODO: implement
+        return CommunicationStatus.NONE;
     }
 }

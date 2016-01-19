@@ -3,13 +3,13 @@
     <string-array name="serial">
         <item>@string/serialBluetooth</item>
         <item>@string/serialUsb</item>
-        <item>@string/serialAuto</item>
+        <!--<item>@string/serialAuto</item>-->
     </string-array>
 
     <string-array name="serial_values">
         <item>1</item>
         <item>2</item>
-        <item>3</item>
+        <!--<item>3</item>-->
     </string-array>
 
     <string-array name="remote">
@@ -20,4 +20,16 @@
         <item>0</item>
         <item>1</item>
     </integer-array>
+
+    <string-array name="controlMode">
+        <item>@string/controlModeTransceiver</item>
+        <item>@string/controlModeRC</item>
+        <item>@string/controlModeDirect</item>
+    </string-array>
+
+    <string-array name="controlMode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

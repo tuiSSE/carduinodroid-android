@@ -11,21 +11,30 @@ public enum SerialType {
     int type;
 
     public static SerialType fromInteger(int x) {
-        SerialType t;
         switch(x) {
             case 1:
-                t=BLUETOOTH;
-                break;
+                return BLUETOOTH;
             case 2:
-                t = USB;
-                break;
+                return USB;
             case 3:
-                t=AUTO;
-                break;
+                return AUTO;
             default:
-                t=NONE;
+                return NONE;
         }
-        return t;
+    }
+
+    public static int toInteger(SerialType st){
+        int x;
+        switch (st){
+            case BLUETOOTH:
+                return 1;
+            case USB:
+                return 2;
+            case AUTO:
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     public boolean isAutoBluetooth(){

@@ -58,4 +58,14 @@ public enum ControlMode {
         }
         return s;
     }
+
+    public synchronized boolean isTransceiver(){
+        return this == ControlMode.TRANSCEIVER;
+    }
+    public synchronized boolean isRemote(){
+        return this == ControlMode.REMOTE;
+    }
+    public synchronized boolean isDirect(){
+        return this == ControlMode.DIRECT;
+    }
 }

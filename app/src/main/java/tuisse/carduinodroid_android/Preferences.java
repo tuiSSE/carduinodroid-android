@@ -7,7 +7,6 @@ import android.util.Log;
  */
 public class Preferences {
     private SerialType serialPref = SerialType.NONE;
-    public boolean rcNetwork1Activity0 = true;
     private String bluetoothDeviceName = "HC-06";
     private ControlMode controlMode = ControlMode.TRANSCEIVER;
 
@@ -26,14 +25,14 @@ public class Preferences {
         return bluetoothDeviceName;
     }
 
-
     public synchronized void setControlMode(ControlMode cm){
         controlMode = cm;
     }
     public synchronized ControlMode getControlMode(){
         return controlMode;
     }
-    public synchronized void setControlModeNext(){
+
+    public synchronized int setControlModeNext(){
         switch (controlMode){
             case TRANSCEIVER:
                 controlMode = ControlMode.REMOTE;
@@ -48,8 +47,9 @@ public class Preferences {
                 controlMode = ControlMode.TRANSCEIVER;
                 break;
         }
+        return ControlMode.toInteger(controlMode);
     }
-    public synchronized void setControlModePrev(){
+    public synchronized int setControlModePrev(){
         switch (controlMode){
             case TRANSCEIVER:
                 controlMode = ControlMode.DIRECT;
@@ -64,5 +64,21 @@ public class Preferences {
                 controlMode = ControlMode.TRANSCEIVER;
                 break;
         }
+        return ControlMode.toInteger(controlMode);
+    }
+
+
+    public synchronized int toggleSerialType(ConnectionState serialState){
+        if(controlMode.isTransceiver()) {
+            if (serialState.isIdleError()) {
+                if (serialPref.isBluetooth()) {
+                    setSerialPref(SerialType.USB);
+
+                } else {
+                    setSerialPref(SerialType.BLUETOOTH);
+                }
+            }
+        }
+        return SerialType.toInteger(serialPref);
     }
 }

@@ -43,7 +43,7 @@ public class SerialUsb extends SerialConnection {
             getSerialData().setSerialType(SerialType.USB);
         }
         else{
-            serialService.sendToast("no getSerialData()");
+            setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
         }
     }
 
@@ -107,27 +107,38 @@ public class SerialUsb extends SerialConnection {
                     }
                 }
                 if (usbDevice == null) {
-                    Log.e(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
                     setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(serialService.getString(R.string.serialUsbDeviceFound), serialService.getString(R.string.serialErrorNoArduino)));
                     return false;
                 }
                 else {
-                    Log.d(TAG, String.format(serialService.getString(R.string.serialUsbDeviceFound), getSerialData().getSerialName()));
                     setSerialState(ConnectionEnum.FOUND);
                 }
             }
             else {
-                Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbManager));
                 setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbManager);
                 return false;
             }
         }
         else {
-            Log.e(TAG, serialService.getString(R.string.serialErrorNotIdle));
             setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNotIdle);
             return false;
         }
         return isFound();
+    }
+
+
+    private byte[] getLineEncoding(int baudRate) {
+        final byte[] lineEncoding = { (byte) 0x80, 0x25, 0x00, 0x00, 0x00, 0x00, 0x08 };
+        //Get the least significant byte of baudRate,
+        //and put it in first byte of the array being sent
+        lineEncoding[0] = (byte)(baudRate & 0xFF);
+        //Get the 2nd byte of baudRate,
+        //and put it in second byte of the array being sent
+        lineEncoding[1] = (byte)((baudRate >> 8) & 0xFF);
+        //ibid, for 3rd byte (my guess, because you need at least 3 bytes
+        //to encode your 115200+ settings)
+        lineEncoding[2] = (byte)((baudRate >> 16) & 0xFF);
+        return lineEncoding;
     }
 
     @Override
@@ -147,13 +158,11 @@ public class SerialUsb extends SerialConnection {
 
         usbConnection = usbManager.openDevice(usbDevice);
         if (usbConnection == null) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorUsbDeviceOpen));
             setSerialState(ConnectionEnum.TRYCONNECTERROR,R.string.serialErrorUsbDeviceOpen);
             return false;
         }
         if(usbDevice.getInterfaceCount() < 2){
-            Log.e(TAG, "too few interfaces");
-            setSerialState(ConnectionEnum.TRYCONNECTERROR,  "too few interfaces");
+            setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorUsbNumInterface);
             return false;
         }
         usbInterface = usbDevice.getInterface(1);
@@ -174,20 +183,17 @@ public class SerialUsb extends SerialConnection {
             }
         }
         if (usbEndpointRx == null) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbRxEndpoint));
             setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbRxEndpoint);
             //usbConnection.close();
             return false;
         }
         if (usbEndpointTx == null) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbTxEndpoint));
             setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoUsbTxEndpoint);
             //usbConnection.close();
             return false;
         }
 
         if (!usbConnection.claimInterface(usbInterface, true)) {
-            Log.e(TAG, serialService.getString(R.string.serialErrorUsbDeviceClaim));
             setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorUsbDeviceClaim);
             //usbConnection.close();
             return false;
@@ -205,42 +211,16 @@ public class SerialUsb extends SerialConnection {
         else if(!isError()){
             setSerialState(ConnectionEnum.ERROR, R.string.serialErrorUnexpectedClose);
         }
-        /*
-        int i = 0;
-        while (serialSendThread.isAlive()){
-            Log.d(TAG, "send is alive " + ++i);
-            if(i > 2){
-                serialSendThread.interrupt();
-            }
-            try {
-                Thread.sleep(100);
-            }catch (InterruptedException e){
-                Log.e(TAG,"interruptedException: " + e.toString());
-            }
-        }
-        i=0;
-        while (serialReceiveThread.isAlive()){
-            Log.d(TAG, "read is alive "+ ++i);
-            if(i > 2){
-                serialReceiveThread.interrupt();
-            }
-            try {
-                Thread.sleep(100);
-            }catch (InterruptedException e){
-                Log.e(TAG,"interruptedException: " + e.toString());
-            }
-        }
-        */
         serialReceiveThread.interrupt();
         serialSendThread.interrupt();
         if (usbConnection != null) {
             if(usbInterface != null){
                 if(!usbConnection.releaseInterface(usbInterface)){
-                    Log.e(TAG, "usb interface release failed");
-                    setSerialState(ConnectionEnum.ERROR, "usb interface release failed");
+                    serialService.sendToast( R.string.serialErrorUsbRelease);
+                    setSerialState(ConnectionEnum.IDLE, R.string.serialErrorUsbRelease);
                 }
                 else{
-                    Log.d(TAG,"usb interface successfully released");
+                    Log.d(TAG,serialService.getString(R.string.serialUsbRelease));
                 }
             }
             usbConnection.close();
@@ -266,6 +246,9 @@ public class SerialUsb extends SerialConnection {
                 int len = usbConnection.bulkTransfer(usbEndpointTx, buffer, buffer.length, 0);
                 //Log.d(TAG,"usb send: " + len);
             }
+            else{
+                setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
+            }
         }
     }
 
@@ -275,8 +258,8 @@ public class SerialUsb extends SerialConnection {
         final int BUFFER_LENGTH = RECEIVE_BUFFER_LENGTH;
         int acceptedFrame = 0;
         byte[] buffer = new byte[BUFFER_LENGTH];
-        if ((usbConnection != null) && (usbEndpointRx != null) && (getSerialData() != null)) {
-            int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, 50);
+        if ((buffer != null) && (usbConnection != null) && (usbEndpointRx != null) && (getSerialData() != null)) {
+            int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, 100);
             //int len = 6;
             if (len > 0) {
                 for (int i = 0; i < len; i++) {
@@ -288,26 +271,8 @@ public class SerialUsb extends SerialConnection {
             }
         }
         else{
-            Log.e(TAG,"receive went wrong");
+            setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
         }
         return acceptedFrame;
-
-        //return 1;
     }
-
-
-    private byte[] getLineEncoding(int baudRate) {
-        final byte[] lineEncoding = { (byte) 0x80, 0x25, 0x00, 0x00, 0x00, 0x00, 0x08 };
-        //Get the least significant byte of baudRate,
-        //and put it in first byte of the array being sent
-        lineEncoding[0] = (byte)(baudRate & 0xFF);
-        //Get the 2nd byte of baudRate,
-        //and put it in second byte of the array being sent
-        lineEncoding[1] = (byte)((baudRate >> 8) & 0xFF);
-        //ibid, for 3rd byte (my guess, because you need at least 3 bytes
-        //to encode your 115200+ settings)
-        lineEncoding[2] = (byte)((baudRate >> 16) & 0xFF);
-        return lineEncoding;
-    }
-
 }

@@ -57,9 +57,15 @@ abstract public class SerialConnection {
 
     protected synchronized void setSerialState(ConnectionEnum state, String error){
         if(getSerialData().getSerialState() != null) {
-            if (!state.equals(getSerialData().getSerialState().getState())) {//if not equal
+            //if (!state.equals(getSerialData().getSerialState().getState())) {//if not equal
                 getSerialData().setSerialState(new ConnectionState(state, error));
                 Log.d(TAG, "serial State changed: " + getSerialData().getSerialState().getStateName());
+                if(getSerialData().getSerialState().isError()){
+                    Log.e(TAG, error);
+                }
+                else if(!error.equals("")){
+                    Log.w(TAG, error);
+                }
                 Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
                 //onSerialConnectionStatusChangeIntent.putExtra(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA), getSerialData().getSerialState().getState().ordinal());
                 //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
@@ -68,7 +74,7 @@ abstract public class SerialConnection {
                     serialService.sendBroadcast(onSerialConnectionStatusChangeIntent);
                     serialService.showNotification();
                 }
-            }
+            //}
         }
         else{
             Log.e(TAG,"no getSerialData()");

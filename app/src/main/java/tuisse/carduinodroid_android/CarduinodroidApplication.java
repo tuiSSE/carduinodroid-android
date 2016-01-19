@@ -12,9 +12,10 @@ import android.util.Log;
  */
 public class CarduinodroidApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "CarduinoApplication";
-    protected DataContainer dataContainer;
     private SharedPreferences sharedPrefs;
     private SharedPreferences prefMain;
+
+    protected DataContainer dataContainer = null;
     private static Context appContext = null;
 
 
@@ -32,16 +33,17 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
 
     @Override
     public void onTerminate() {
+        super.onTerminate();
         sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         dataContainer = null;
         appContext = null;
-        super.onTerminate();
         Log.i(TAG, "onTerminated");
     }
 
-    public synchronized int getIntPref(SharedPreferences prefs,String key, int def) {
+    public synchronized int getIntPref(SharedPreferences prefs, String key, int defaultVal) {
         String value = prefs.getString(key, null);
-        return value == null ? def : Integer.valueOf(value);
+        Log.d(TAG,"getIntPref: " +value);
+        return value == null ? defaultVal : Integer.valueOf(value);
     }
 
     public synchronized void updateSharedPreferences() {
@@ -53,15 +55,13 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
             dataContainer.preferences = new Preferences();
         }
 
-        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs,"serialType", 1)));
-        dataContainer.preferences.rcNetwork1Activity0 = sharedPrefs.getBoolean("rcNetwork1Activity0", true);
+        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs, "serialType", SerialType.toInteger(SerialType.BLUETOOTH))));
+        dataContainer.preferences.setControlMode(ControlMode.fromInteger(sharedPrefs.getInt("controlMode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
 
         dataContainer.preferences.setBluetoothDeviceName(prefMain.getString("bluetoothDeviceName", getString(R.string.serialDefaultBluetoothDeviceName)));
-        dataContainer.preferences.setControlMode(ControlMode.fromInteger(prefMain.getInt("controlMode", 0)));
         Log.d(TAG, "updating Prefs");
 
         Log.d(TAG,"serialType: " + dataContainer.preferences.getSerialPref().toString());
-        Log.d(TAG,"rcNetwork1Activity0: " + dataContainer.preferences.rcNetwork1Activity0);
         Log.d(TAG,"bluetoothDeviceName: "+ dataContainer.preferences.getBluetoothDeviceName());
         Log.d(TAG,"controlMode: "+ dataContainer.preferences.getControlMode());
     }
@@ -77,5 +77,19 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
             Log.e(TAG,"undefined app state: no app context");
         }
         return appContext;
+    }
+/*
+    public static DataContainer getDataContainer(){
+        if(dataContainer == null){
+            //should never happen
+            Log.e(TAG,"undefined app state: no dataContainer");
+        }
+        return dataContainer;
+    }
+*/
+    public synchronized void setSharedPrefsInt(String key, int val){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putInt(key, val);
+        editor.apply();
     }
 }

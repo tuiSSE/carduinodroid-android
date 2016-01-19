@@ -97,6 +97,7 @@
     <string name="isRemote">RemoteApplication</string>
     <string name="defaultIp">141.24.11.1</string>
     <string name="localIp">127.0.0.1</string>
+    <string name="controlModeTitle">Control Mode</string>
 
     <!-- Promtdialog Buttontexts -->
     <string name="ok">OK</string>
@@ -120,7 +121,7 @@
     <string name="serialErrorSocketClose">Socket can not be closed: %1$s</string>
     <string name="serialErrorInputStream">Inputstream: %1$s</string>
     <string name="serialErrorOutputStream">OutputStream: %1$s</string>
-    <string name="serialErrorIsUnknown">Closing unused serial</string>
+    <string name="serialErrorUnused">Closing unused serial</string>
     <string name="serialErrorUnexpectedClose">unexpected closing</string>
     <string name="serialErrorClose">while closing: %1$s</string>
     <string name="serialErrorNoUsbManager">no usb manager available</string>
@@ -132,6 +133,10 @@
     <string name="serialErrorUsbDeviceClaim">claiming USB device failed</string>
     <string name="serialErrorNoUsbRxEndpoint">no Rx endpoint found</string>
     <string name="serialErrorNoUsbTxEndpoint">no Tx endpoint found</string>
+    <string name="serialErrorNoDataPointer">no pointer to resource</string>
+    <string name="serialErrorUsbRelease">usb interface release failed</string>
+    <string name="serialUsbRelease">usb interface released</string>
+    <string name="serialErrorUsbNumInterface">usb too few interfaces</string>
 
     <!-- Arduino versions -->
     <string name="arduino_uno">Arduino Uno</string>

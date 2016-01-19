@@ -111,18 +111,18 @@ public class SerialService extends Service {
             return START_STICKY;
         }
         if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-            //if(!carduino.dataContainer.serialData.getSerialType().isBluetooth() || (serial == null)) {
                 serial = new SerialBluetooth(this);
                 Log.d(TAG, "onCreated SerialBluetooth");
-                sendToast("onCreated SerialBluetooth");
-            //}
         }
         else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
-            //if(!carduino.dataContainer.serialData.getSerialType().isUsb() || (serial == null)) {
                 serial = new SerialUsb(this);
                 Log.d(TAG, "onCreated SerialUsb");
-                sendToast("onCreated SerialUsb");
-            //}
+        }
+        else{
+            Log.e(TAG, "FATAL on start: serial permission is not either bluetooth or usb");
+            sendToast("FATAL on start: serial permission is not either bluetooth or usb");
+            stopSelf();
+            return START_STICKY;
         }
 
         if(serial != null){
@@ -131,11 +131,11 @@ public class SerialService extends Service {
                     if(!serial.find()){
                         stopSelf();
                     }
-                    else if(serial.connect()) {
-                        serial.start();
+                    else if(!serial.connect()) {
+                        stopSelf();
                     }
                     else{
-                        stopSelf();
+                        serial.start();
                     }
                     if(isDestroyed){
                         //if service should stop during connection, stop all threads
@@ -160,10 +160,8 @@ public class SerialService extends Service {
         //disconnect
         if(serial != null){
             serial.close();
-            serial = null;
         } else {
             Log.e(TAG, "FATAL on close: serial was not created");
-            sendToast("FATAL on start: serial was not created");
         }
         if(mNotificationManager != null) {
             mNotificationManager.cancel(NOTIFICATION);
