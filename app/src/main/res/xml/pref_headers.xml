@@ -5,7 +5,7 @@
     <header
         android:fragment="tuisse.carduinodroid_android.SettingsActivity$ControlModePreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_control_mode" />
+        android:title="@string/pref_header_general" />
 
     <header
         android:fragment="tuisse.carduinodroid_android.SettingsActivity$SerialPreferenceFragment"

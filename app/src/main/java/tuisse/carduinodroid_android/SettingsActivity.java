@@ -45,33 +45,40 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             String stringValue = value.toString();
 
+
+            switch (preference.getKey()){
+                case "pref_key_control_mode":
+                    if(carduino != null) {
+                        Integer intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
+                        carduino.dataContainer.preferences.setControlMode(ControlMode.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getControlMode().toString());
+                    }
+                    break;
+                case "pref_key_reset_battery":
+                    if(carduino != null){
+                        //carduino.dataContainer.serialData.serialTx.setResetAccCur(val);
+                        Log.d(TAG, preference.getKey() + ": " + stringValue);
+                    }
+                case "pref_key_serial_type":
+                    if(carduino != null) {
+                        Integer intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
+                        carduino.dataContainer.preferences.setSerialPref(SerialType.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getSerialPref().toString());
+                        /*
+                        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+                            findPreference("pref_key_bluetooth_device_name").setEnabled(true);
+                        }
+                        else{
+                            findPreference("pref_key_bluetooth_device_name").setEnabled(false);
+                        }
+                        */
+                    }
+                default:
+                        Log.d(TAG, "key not known: " + preference.getKey());
+                    break;
+            }
+
             if (preference instanceof ListPreference) {
-                switch (preference.getKey()){
-                    case "pref_key_control_mode":
-                        if(carduino != null) {
-                            Integer intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
-                            carduino.dataContainer.preferences.setControlMode(ControlMode.fromInteger(intValue));
-                            Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getControlMode().toString());
-                        }
-                        break;
-                    case "pref_key_serial_type":
-                        if(carduino != null) {
-                            Integer intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
-                            carduino.dataContainer.preferences.setSerialPref(SerialType.fromInteger(intValue));
-                            Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getSerialPref().toString());
-                            /*
-                            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-                                findPreference("pref_key_bluetooth_device_name").setEnabled(true);
-                            }
-                            else{
-                                findPreference("pref_key_bluetooth_device_name").setEnabled(false);
-                            }
-                            */
-                        }
-                    default:
-                            Log.d(TAG, "key not known: " + preference.getKey());
-                        break;
-                }
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
@@ -204,7 +211,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_control_mode);
+            addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences

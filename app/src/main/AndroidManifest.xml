@@ -87,7 +87,6 @@
 
             <intent-filter>
                 <action android:name="tuisse.carduinodroid_android.ChooseBluetoothDeviceActivity" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

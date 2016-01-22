@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -30,11 +34,18 @@ public class DriveActivity extends AppCompatActivity {
     private SerialConnectionDriveActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
     private IntentFilter serialConnectionStatusChangeFilter;
 
-    private Button buttonReset;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private float[] mValuesMagnet      = new float[3];
+    private float[] mValuesAccel       = new float[3];
+    private float[] mValuesOrientation = new float[3];
+
+    private float[] mRotationMatrix    = new float[9];
+    private float[] nRotationMatrix    = new float[9];
+
     private CheckBox checkBoxStatus;
     private CheckBox checkBoxFrontLight;
     private CheckBox checkBoxFailsafeStop;
-    private CheckBox checkBoxResetAccCurrent;
 
     private SeekBar seekBarSpeed;
     private SeekBar seekBarSteer;
@@ -50,7 +61,7 @@ public class DriveActivity extends AppCompatActivity {
     private TextView textViewVoltage;
     private TextView textViewTemperature;
 
-    private Sound sound;
+
 
     private void reset(){
         carduino.dataContainer.serialData.serialTx.reset();
@@ -62,7 +73,6 @@ public class DriveActivity extends AppCompatActivity {
         checkBoxStatus.setChecked(false);
         checkBoxFrontLight.setChecked(false);
         checkBoxFailsafeStop.setChecked(true);
-        checkBoxResetAccCurrent.setChecked(false);
 
         textViewSpeed.setText(String.format(getString(R.string.speed), 0));
         textViewSteer.setText(String.format(getString(R.string.steer), 0));
@@ -78,27 +88,25 @@ public class DriveActivity extends AppCompatActivity {
 
     private void refresh(){
         textViewDistanceFront.setText(String.format(getString(R.string.distanceFront),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundFront() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundFront())));
         textViewDistanceBack.setText(String.format(getString(R.string.distanceBack),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundBack() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getUltrasoundBack())));
         textViewAbsBattery.setText(String.format(getString(R.string.absoluteBattery),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getAbsoluteBatteryCapacity() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getAbsoluteBatteryCapacity())));
         textViewRelBattery.setText(String.format(getString(R.string.relativeBattery),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getPercentBatteryCapacity() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getPercentBatteryCapacity())));
         textViewCurrent.setText(String.format(getString(R.string.current),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getCurrent() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getCurrent())));
         textViewVoltage.setText(String.format(getString(R.string.voltage),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getVoltage() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getVoltage())));
         textViewTemperature.setText(String.format(getString(R.string.temperature),
-                String.valueOf(carduino.dataContainer.serialData.serialRx.getDs2745Temperature() )));
+                String.valueOf(carduino.dataContainer.serialData.serialRx.getDs2745Temperature())));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drive);
-
-
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
@@ -109,11 +117,9 @@ public class DriveActivity extends AppCompatActivity {
         serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
 
         carduino = (CarduinodroidApplication) getApplication();
-        buttonReset             = (Button) findViewById(R.id.buttonReset);
         checkBoxFrontLight      = (CheckBox) findViewById(R.id.checkBoxFrontLight);
         checkBoxStatus          = (CheckBox) findViewById(R.id.checkBoxStatus);
         checkBoxFailsafeStop    = (CheckBox) findViewById(R.id.checkBoxFailsafeStop);
-        checkBoxResetAccCurrent = (CheckBox) findViewById(R.id.checkBoxResetAccCurrent);
         seekBarSpeed            = (SeekBar)  findViewById(R.id.seekBarSpeed);
         seekBarSteer            = (SeekBar)  findViewById(R.id.seekBarSteer);
 
@@ -127,23 +133,34 @@ public class DriveActivity extends AppCompatActivity {
         textViewVoltage         = (TextView) findViewById(R.id.textViewVoltage);
         textViewTemperature     = (TextView) findViewById(R.id.textViewTemperature);
 
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        mVisible = true;
+
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+
         fab.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         hide();
-                        if(sound != null){
-                            sound.horn();
-                        }
+                        // register this class as a listener for the orientation and
+                        // accelerometer sensors
+                        mSensorManager.registerListener(mEventListener,
+                                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                                SensorManager.SENSOR_DELAY_GAME);
+                        mSensorManager.registerListener(mEventListener,
+                                mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                                SensorManager.SENSOR_DELAY_GAME);
                         return true;
                     case MotionEvent.ACTION_UP:
+                        mSensorManager.unregisterListener(mEventListener);
                         show();
                         reset();
                         return true;
@@ -152,16 +169,8 @@ public class DriveActivity extends AppCompatActivity {
             }
         });
         hideAll();
-
+        show();
         reset();
-
-        buttonReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "onClickReset");
-                reset();
-            }
-        });
 
         checkBoxStatus.setOnClickListener(new CheckBox.OnClickListener() {
             @Override
@@ -182,17 +191,6 @@ public class DriveActivity extends AppCompatActivity {
                     val = 1;
                 }
                 carduino.dataContainer.serialData.serialTx.setFrontLight(val);
-            }
-        });
-
-        checkBoxResetAccCurrent.setOnClickListener(new CheckBox.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int val = 0;
-                if(checkBoxResetAccCurrent.isChecked()){
-                    val = 1;
-                }
-                carduino.dataContainer.serialData.serialTx.setResetAccCur(val);
             }
         });
 
@@ -247,7 +245,6 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        sound = new Sound();
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
         registerReceiver(serialDataRxReceiver, serialDataRxFilter);
         refresh();
@@ -256,8 +253,6 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        sound.resetVolume();
-        sound = null;
         unregisterReceiver(serialConnectionStatusChangeReceiver);
         unregisterReceiver(serialDataRxReceiver);
     }
@@ -279,24 +274,13 @@ public class DriveActivity extends AppCompatActivity {
     }
 
     /**
-     * Whether or not the system UI should be auto-hidden after
-     * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
-     */
-    private static final boolean AUTO_HIDE = false;
-
-    /**
-     * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
-     * user interaction before hiding the system UI.
-     */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 500;
-
-    /**
      * Some older devices needs a small delay between UI widget updates
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -306,12 +290,15 @@ public class DriveActivity extends AppCompatActivity {
             // Note that some of these constants are new as of API 16 (Jelly Bean)
             // and API 19 (KitKat). It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+            mContentView.setSystemUiVisibility(
+                      View.SYSTEM_UI_FLAG_LOW_PROFILE //hide status bar
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY //API 19
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            );
         }
     };
     private View mControlsView;
@@ -346,7 +333,7 @@ public class DriveActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
+        hide();
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
@@ -361,19 +348,44 @@ public class DriveActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void showAll() {
         // Show the system bar
-        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        mContentView.setSystemUiVisibility(
+                  View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        // Schedule a runnable to display UI elements after a delay
         mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowAllPart2Runnable, UI_ANIMATION_DELAY);
+        show();
     }
 
     private void show() {
+        mVisible = true;
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
+        //mHideHandler.removeCallbacks(mHidePart2Runnable);
         mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
     }
 
+    private final SensorEventListener mEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            try {
+                switch (event.sensor.getType()) {
+                    case Sensor.TYPE_ACCELEROMETER:
+                        System.arraycopy(event.values, 0, mValuesAccel, 0, 3);
+                        break;
 
+                    case Sensor.TYPE_MAGNETIC_FIELD:
+                        System.arraycopy(event.values, 0, mValuesMagnet, 0, 3);
+                        break;
+                }
+                SensorManager.getRotationMatrix(mRotationMatrix, null, mValuesAccel, mValuesMagnet);
+                SensorManager.
+                SensorManager.getOrientation(mRotationMatrix, mValuesOrientation);
+                textViewTemperature.setText("rx: " + String.valueOf(mValuesOrientation[0]) + " ry: " + String.valueOf(mValuesOrientation[1]) + " rz: " + String.valueOf(mValuesOrientation[2]));
+            } catch (Exception e) {
+                Log.e(TAG, e.toString());
+            }
+        }
 
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
 }

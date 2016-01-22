@@ -30,4 +30,11 @@
         android:title="@string/pref_title_control_mode"
         android:icon="@drawable/ic_info_black_24dp"/>
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:summary="@string/pref_summary_reset_battery"
+        android:key="@string/pref_key_reset_battery"
+        android:title="@string/pref_title_reset_battery"/>
+
+
 </PreferenceScreen>

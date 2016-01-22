@@ -98,13 +98,6 @@
             android:background="@color/black_overlay"
             android:orientation="vertical"
             tools:ignore="UselessParent">
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/reset"
-                android:id="@+id/buttonReset"
-                android:layout_gravity="center_horizontal" />
-
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,11 +114,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/failsafeStop"
                 android:id="@+id/checkBoxFailsafeStop" />
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/resetAccCurrent"
-                android:id="@+id/checkBoxResetAccCurrent" />
             <SeekBar
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

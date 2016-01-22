@@ -155,9 +155,9 @@
 
     <!-- Strings related to Settings -->
     <!-- header settings -->
-    <string name="pref_header_control_mode">Control Mode</string>
+    <string name="pref_header_general">Control Mode</string>
     <string name="pref_header_serial">Serial Connection</string>
-    <!-- controlMode settings -->
+    <!-- general settings -->
     <string name="pref_title_control_mode">Control Mode</string>
     <string name="pref_key_control_mode">pref_key_control_mode</string>
     <!-- ControlMode -->
@@ -174,6 +174,10 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <!-- battery reset -->
+    <string name="pref_key_reset_battery">pref_key_reset_battery</string>
+    <string name="pref_title_reset_battery">Reset battery accumulation</string>
+    <string name="pref_summary_reset_battery">Will switch back off if message is delivered</string>
     <!-- serial settings -->
     <string name="pref_title_serial_type">Serial Connection Type</string>
     <string name="pref_key_serial_type">pref_key_serial_type</string>
