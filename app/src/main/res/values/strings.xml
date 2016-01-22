@@ -1,11 +1,12 @@
 <resources>
     <!-- application name -->
-    <string name="appName">Carduinodroid</string>
-    <string name="appNameShort">Cardudroid</string>
-    <string name="logoDescription">Carduinodroid logo</string>
+    <string name="appName">carduinodroid</string>
+    <string name="appNameShort">cardudroid</string>
+    <string name="logoDescription">carduinodroid logo</string>
 
     <!-- activity names and button labels -->
-    <string name="actionSettings">Settings</string>
+    <string name="titleSettings">Settings</string>
+    <string name="titleChooseBtActivity">Choose Bluetooth Device</string>
     <string name="titleDriveActivity">Drive</string>
     <string name="closeApp">Close</string>
     <string name="exitApp">Exit</string>
@@ -48,12 +49,6 @@
     <string name="serialDeviceBluetooth">Bluetooth:</string>
     <string name="serialDeviceNone">N/A</string>
 
-    <!-- ControlMode -->
-    <string name="controlModeTransceiver">Mode: Transceiver</string>
-    <string name="controlModeRC">Mode: Remote Control</string>
-    <string name="controlModeDirect">Mode: Direct</string>
-
-
 
     <!-- ConnectionState -->
     <string name="connectionStateIdle">Idle</string>
@@ -89,15 +84,8 @@
     <string name="temperature">%1$s\u0009 Temperature [°C]</string>
 
     <!-- preference strings -->
-    <string name="serialSelect">select Serial Connection</string>
-    <string name="serialBluetooth">serial: Bluetooth</string>
-    <string name="serialUsb">serial: USB</string>
-    <string name="serialAuto">serial: Auto</string>
-    <string name="isSlave">ServiceApplication</string>
-    <string name="isRemote">RemoteApplication</string>
     <string name="defaultIp">141.24.11.1</string>
     <string name="localIp">127.0.0.1</string>
-    <string name="controlModeTitle">Control Mode</string>
 
     <!-- Promtdialog Buttontexts -->
     <string name="ok">OK</string>
@@ -163,7 +151,50 @@
 
     <!-- preferences -->
     <string name="preference_main">tuisse.carduinodroid_android.PREFERENCE_MAIN</string>
-    <string name="title_activity_main">mainActivity</string>
+    <string name="title_activity_settings">Settings</string>
 
+    <!-- Strings related to Settings -->
+    <!-- header settings -->
+    <string name="pref_header_control_mode">Control Mode</string>
+    <string name="pref_header_serial">Serial Connection</string>
+    <!-- controlMode settings -->
+    <string name="pref_title_control_mode">Control Mode</string>
+    <string name="pref_key_control_mode">pref_key_control_mode</string>
+    <!-- ControlMode -->
+    <string name="controlModeTransceiver">Mode: Transceiver</string>
+    <string name="controlModeRC">Mode: Remote Control</string>
+    <string name="controlModeDirect">Mode: Direct</string>
+    <string-array name="pref_control_mode">
+        <item>@string/controlModeTransceiver</item>
+        <item>@string/controlModeRC</item>
+        <item>@string/controlModeDirect</item>
+    </string-array>
+    <string-array name="pref_control_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <!-- serial settings -->
+    <string name="pref_title_serial_type">Serial Connection Type</string>
+    <string name="pref_key_serial_type">pref_key_serial_type</string>
+    <string name="serialBluetooth">Bluetooth</string>
+    <string name="serialUsb">USB</string>
+    <string name="serialAuto">Auto</string>
+    <string-array name="pref_serial_type">
+        <item>@string/serialBluetooth</item>
+        <item>@string/serialUsb</item>
+        <!--<item>@string/serialAuto</item>-->
+    </string-array>
+    <string-array name="pref_serial_type_values">
+        <item>1</item>
+        <item>2</item>
+        <!--<item>3</item>-->
+    </string-array>
+    <string name="pref_title_bluetooth_device_name">Bluetooth Device</string>
+    <string name="pref_key_bluetooth_device_name">pref_key_bluetooth_device_name</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 </resources>

@@ -10,10 +10,11 @@ import android.util.Log;
 /**
  * Created by keX on 04.12.2015.
  */
-public class CarduinodroidApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class CarduinodroidApplication extends Application /* implements SharedPreferences.OnSharedPreferenceChangeListener */{
     private static final String TAG = "CarduinoApplication";
+
+
     private SharedPreferences sharedPrefs;
-    private SharedPreferences prefMain;
 
     protected DataContainer dataContainer = null;
     private static Context appContext = null;
@@ -25,50 +26,48 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         appContext = getApplicationContext();
         dataContainer = new DataContainer();
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefMain = this.getSharedPreferences(getString(R.string.preference_main), this.MODE_PRIVATE);
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-        updateSharedPreferences();
+        updateSharedPreferences(sharedPrefs, "initialize");
         Log.i(TAG, "onCreated");
     }
 
     @Override
     public void onTerminate() {
         super.onTerminate();
-        sharedPrefs.unregisterOnSharedPreferenceChangeListener(this);
         dataContainer = null;
         appContext = null;
         Log.i(TAG, "onTerminated");
     }
 
-    public synchronized int getIntPref(SharedPreferences prefs, String key, int defaultVal) {
-        String value = prefs.getString(key, null);
-        Log.d(TAG,"getIntPref: " +value);
-        return value == null ? defaultVal : Integer.valueOf(value);
-    }
-
-    public synchronized void updateSharedPreferences() {
+    public synchronized void updateSharedPreferences(SharedPreferences sharedPreferences, String key) {
         if(dataContainer == null){
             Log.e(TAG,"no dataContainer initialized");
         }
         if (dataContainer.preferences == null){
-            Log.d(TAG,"no preferences initialized");
+            Log.d(TAG, "no preferences initialized");
             dataContainer.preferences = new Preferences();
         }
-
-        dataContainer.preferences.setSerialPref(SerialType.fromInteger(getIntPref(sharedPrefs, "serialType", SerialType.toInteger(SerialType.BLUETOOTH))));
-        dataContainer.preferences.setControlMode(ControlMode.fromInteger(sharedPrefs.getInt("controlMode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
-
-        dataContainer.preferences.setBluetoothDeviceName(prefMain.getString("bluetoothDeviceName", getString(R.string.serialDefaultBluetoothDeviceName)));
-        Log.d(TAG, "updating Prefs");
-
-        Log.d(TAG,"serialType: " + dataContainer.preferences.getSerialPref().toString());
-        Log.d(TAG,"bluetoothDeviceName: "+ dataContainer.preferences.getBluetoothDeviceName());
-        Log.d(TAG,"controlMode: "+ dataContainer.preferences.getControlMode());
-    }
-
-    @Override
-    public synchronized void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        updateSharedPreferences();
+        Log.d(TAG, key + ": updating Prefs");
+        switch(key){
+            case "pref_key_serial_type":
+                dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref(key, SerialType.toInteger(SerialType.BLUETOOTH))));
+                Log.d(TAG, key + ": " + dataContainer.preferences.getSerialPref().toString());
+                break;
+            case "pref_key_control_mode":
+                dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref(key, ControlMode.toInteger(ControlMode.TRANSCEIVER))));
+                Log.d(TAG, key + ": " + dataContainer.preferences.getControlMode());
+                break;
+            case "pref_key_bluetooth_device_name":
+                dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString(key, getString(R.string.serialDefaultBluetoothDeviceName)));
+                Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothDeviceName());
+            default:
+                dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref("pref_key_serial_type", SerialType.toInteger(SerialType.BLUETOOTH))));
+                dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref("pref_key_control_mode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
+                dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString("pref_key_bluetooth_device_name", getString(R.string.serialDefaultBluetoothDeviceName)));
+                Log.d(TAG, "pref_key_serial_type: "             + dataContainer.preferences.getSerialPref().toString());
+                Log.d(TAG, "pref_key_control_mode: "            + dataContainer.preferences.getControlMode());
+                Log.d(TAG, "pref_key_bluetooth_device_name: "   + dataContainer.preferences.getBluetoothDeviceName());
+                break;
+        }
     }
 
     public static Context getAppContext(){
@@ -87,9 +86,5 @@ public class CarduinodroidApplication extends Application implements SharedPrefe
         return dataContainer;
     }
 */
-    public synchronized void setSharedPrefsInt(String key, int val){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putInt(key, val);
-        editor.apply();
-    }
+
 }

@@ -23,7 +23,7 @@ public enum SerialType {
         }
     }
 
-    public static int toInteger(SerialType st){
+    public static Integer toInteger(SerialType st){
         int x;
         switch (st){
             case BLUETOOTH:

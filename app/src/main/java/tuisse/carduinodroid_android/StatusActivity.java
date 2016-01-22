@@ -10,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -158,11 +159,18 @@ public class StatusActivity extends AppCompatActivity {
 
             }
         });
+        imageViewSettingsBluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(StatusActivity.this,ChooseBluetoothDeviceActivity.class));
+                Log.d(TAG, "onClickSettingsBluetooth");
+            }
+        });
 
         imageViewSwitchModePrev.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                carduino.setSharedPrefsInt("controlMode",carduino.dataContainer.preferences.setControlModePrev());
+                Utils.setIntPref(getString(R.string.pref_key_control_mode),carduino.dataContainer.preferences.setControlModePrev());
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModePrev");
             }
@@ -171,7 +179,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModeNext.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                carduino.setSharedPrefsInt("controlMode",carduino.dataContainer.preferences.setControlModeNext());
+                Utils.setIntPref(getString(R.string.pref_key_control_mode), carduino.dataContainer.preferences.setControlModeNext());
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModeNext");
             }
@@ -192,7 +200,7 @@ public class StatusActivity extends AppCompatActivity {
         super.onResume();
         //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        updateStatus();
+        updateControlMode();
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -250,7 +258,7 @@ public class StatusActivity extends AppCompatActivity {
 
     private void updateControlMode(){
         //stop services
-        stopService(new Intent(StatusActivity.this, SerialService.class));
+        //stopService(new Intent(StatusActivity.this, SerialService.class));
 
         imageViewSettingsTransceiver.setVisibility(View.INVISIBLE);
         imageViewSettingsBluetooth.setVisibility(View.INVISIBLE);

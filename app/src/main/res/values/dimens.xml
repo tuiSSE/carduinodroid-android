@@ -15,4 +15,7 @@
 
     <dimen name="imageMargin">5dp</dimen>
     <dimen name="imageSize">60dp</dimen>
+
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="driveActivityPadding">60dp</dimen>
 </resources>

@@ -28,7 +28,6 @@ public class SerialBluetooth extends SerialConnection {
     private BluetoothSocket mmSocket = null;
     private OutputStream mmOutputStream = null;
     private InputStream mmInputStream = null;
-    //private FindBluetoothBroadcastReceiver mReceiver = null;
 
     public SerialBluetooth(SerialService s) {
         super(s);
@@ -237,20 +236,4 @@ public class SerialBluetooth extends SerialConnection {
         }
         return acceptedFrame;
     }
-/*
-    private class FindBluetoothBroadcastReceiver extends BroadcastReceiver {
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction(); //may need to chain this to a recognizing function
-            if (BluetoothDevice.ACTION_FOUND.equals(action)){
-                Log.i(TAG, "bluetooth device found");
-                // Get the BluetoothDevice object from the Intent
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // Add the name and address to an array adapter to show in a Toast
-                String derp = device.getName() + " - " + device.getAddress();
-                Toast.makeText(context, derp, Toast.LENGTH_LONG);
-            }
-        }
-    }
-    */
 }
