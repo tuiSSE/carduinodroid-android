@@ -65,23 +65,30 @@
     <string name="connectionStateDefaultError">Unknown error</string>
 
     <!-- serial data display strings -->
-    <string name="speed">Speed %1$d</string>
-    <string name="steer">Steering %1$d</string>
-    <string name="status">Status LED</string>
-    <string name="frontLight">Front Light</string>
-    <string name="failsafeStop">Failsafe Stop</string>
-    <string name="resetAccCurrent">Reset Accumulated Current</string>
-    <string name="back">Back</string>
-    <string name="reset">Reset</string>
+    <string name="driveSpeed">Speed %1$d</string>
+    <string name="driveSteer">Steering %1$d</string>
+    <string name="driveStatus">Status LED</string>
+    <string name="driveFrontLight">Front light</string>
+    <string name="driveFailsafeStop">Failsafe Stop</string>
+    <string name="driveDebug">Show debug screen</string>
+    <string name="driveOrientation">Orientation %1$s</string>
+    <string name="orientationPortrait">Portrait</string>
+    <string name="orientationLandscape">Landscape</string>
 
-    <string name="notAvailable">"N/A"</string>
-    <string name="distanceFront">%1$s\u0009 Distance Front [cm]</string>
-    <string name="distanceBack">%1$s\u0009 Distance Back [cm]</string>
-    <string name="current">%1$s\u0009 Current [mA]</string>
-    <string name="voltage">%1$s\u0009 Voltage [V]</string>
-    <string name="relativeBattery">%1$s\u0009 Relative Battery [%%]</string>
-    <string name="absoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
-    <string name="temperature">%1$s\u0009 Temperature [°C]</string>
+    <string name="driveNotAvailable">"N/A"</string>
+    <string name="driveDistanceFront">%1$s\u0009 Distance Front [cm]</string>
+    <string name="driveDistanceBack">%1$s\u0009 Distance Back [cm]</string>
+    <string name="driveCurrent">%1$s\u0009 Current [mA]</string>
+    <string name="driveVoltage">%1$s\u0009 Voltage [V]</string>
+    <string name="driveRelativeBattery">%1$s\u0009 Relative Battery [%%]</string>
+    <string name="driveAbsoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
+    <string name="driveTemperature">%1$s\u0009 Temperature [°C]</string>
+
+    <string name="driveAngle0">rel Azimut: %1$d°</string>
+    <string name="driveAngle1">rel Pitch: %1$d°</string>
+    <string name="driveAngle2">rel Roll: %1$d°</string>
+
+
 
     <!-- preference strings -->
     <string name="defaultIp">141.24.11.1</string>

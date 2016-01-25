@@ -3,6 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fabMargin">16dp</dimen>
+    <dimen name="seekBarHeight">24dp</dimen>
 
     <dimen name="textMargin">8dp</dimen>
 
@@ -16,6 +17,5 @@
     <dimen name="imageMargin">5dp</dimen>
     <dimen name="imageSize">60dp</dimen>
 
-    <dimen name="fab_margin">16dp</dimen>
     <dimen name="driveActivityPadding">60dp</dimen>
 </resources>

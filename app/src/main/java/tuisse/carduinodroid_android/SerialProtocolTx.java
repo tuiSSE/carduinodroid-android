@@ -19,11 +19,11 @@ public class SerialProtocolTx extends SerialProtocol {
     private final int LENGTH = 3;
     private final int BUFFER_LENGTH = LENGTH + BUFFER_LENGTH_PROTOCOL_OFFSET;
     //byte 2 Speed
-    private final int VAL_SPEED_MAX = 127;//forwards
-    private final int VAL_SPEED_MIN = -127;//backwards
+    public  final int VAL_SPEED_MAX = 127;//forwards
+    public  final int VAL_SPEED_MIN = -127;//backwards
     //byte 3 Steer
-    private final int VAL_STEER_MAX = 127;//right
-    private final int VAL_STEER_MIN = -127;//left
+    public  final int VAL_STEER_MAX = 127;//right
+    public  final int VAL_STEER_MIN = -127;//left
     //byte 4
     private final int STATUS_LED_SHF = 0;
     private final int STATUS_LED_MSK = 1 << STATUS_LED_SHF;
