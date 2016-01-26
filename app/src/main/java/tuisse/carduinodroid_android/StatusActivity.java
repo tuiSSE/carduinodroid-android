@@ -1,6 +1,7 @@
 package tuisse.carduinodroid_android;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -126,7 +127,6 @@ public class StatusActivity extends AppCompatActivity {
 
         updateControlMode();
 
-
         imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +162,9 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettingsBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(StatusActivity.this,ChooseBluetoothDeviceActivity.class));
+                Intent intentOpenBluetoothSettings = new Intent();
+                intentOpenBluetoothSettings.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                startActivity(intentOpenBluetoothSettings);
                 Log.d(TAG, "onClickSettingsBluetooth");
             }
         });
@@ -192,7 +194,6 @@ public class StatusActivity extends AppCompatActivity {
                 Log.d(TAG, "onClickDrive");
             }
         });
-
     }
 
     @Override
@@ -209,24 +210,6 @@ public class StatusActivity extends AppCompatActivity {
         super.onPause();
         unregisterReceiver(serialConnectionStatusChangeReceiver);
         Log.d(TAG, "onStatusActivityPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStatusActivityStop");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "onStatusActivityRestart");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStatusActivityStart");
     }
 
     @Override

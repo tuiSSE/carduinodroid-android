@@ -59,10 +59,16 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
             case "pref_key_bluetooth_device_name":
                 dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString(key, getString(R.string.serialDefaultBluetoothDeviceName)));
                 Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothDeviceName());
+                break;
+            case "pref_key_bluetooth_handling":
+                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothHandling());
             default:
                 dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref("pref_key_serial_type", SerialType.toInteger(SerialType.BLUETOOTH))));
                 dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref("pref_key_control_mode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
                 dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString("pref_key_bluetooth_device_name", getString(R.string.serialDefaultBluetoothDeviceName)));
+                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                Log.d(TAG, "pref_key_bluetooth_handling: "      + dataContainer.preferences.getBluetoothHandling());
                 Log.d(TAG, "pref_key_serial_type: "             + dataContainer.preferences.getSerialPref().toString());
                 Log.d(TAG, "pref_key_control_mode: "            + dataContainer.preferences.getControlMode());
                 Log.d(TAG, "pref_key_bluetooth_device_name: "   + dataContainer.preferences.getBluetoothDeviceName());

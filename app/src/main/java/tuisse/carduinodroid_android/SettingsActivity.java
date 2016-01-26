@@ -35,6 +35,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static CarduinodroidApplication carduino = null;
 
+    private static Integer tryStringToInt(String value, Integer defaultValue){
+        Integer intValue;
+        try {
+            intValue = Integer.valueOf(value);
+        }
+        catch (NumberFormatException e){
+            Log.e(TAG, "NumberFormatExeption: "+ e.toString());
+            intValue = defaultValue;
+        }
+        return intValue;
+    }
+
+    /**
+     * Helper method to determine if the device has an extra-large screen. For
+     * example, 10" tablets are extra-large.
+     */
+    private static boolean isXLargeTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -42,40 +63,48 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-
             String stringValue = value.toString();
-
-
-            switch (preference.getKey()){
-                case "pref_key_control_mode":
-                    if(carduino != null) {
-                        Integer intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
+            if (carduino != null) {
+                Integer intValue;
+                switch (preference.getKey()) {
+                    case "pref_key_control_mode":
+                        intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
                         carduino.dataContainer.preferences.setControlMode(ControlMode.fromInteger(intValue));
                         Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getControlMode().toString());
-                    }
-                    break;
-                case "pref_key_reset_battery":
-                    if(carduino != null){
+                        break;
+                    case "pref_key_reset_battery":
                         //carduino.dataContainer.serialData.serialTx.setResetAccCur(val);
                         Log.d(TAG, preference.getKey() + ": " + stringValue);
-                    }
-                case "pref_key_serial_type":
-                    if(carduino != null) {
-                        Integer intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
+                        break;
+                    case "pref_key_serial_type":
+                        intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
                         carduino.dataContainer.preferences.setSerialPref(SerialType.fromInteger(intValue));
                         Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getSerialPref().toString());
-                        /*
-                        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-                            findPreference("pref_key_bluetooth_device_name").setEnabled(true);
-                        }
-                        else{
-                            findPreference("pref_key_bluetooth_device_name").setEnabled(false);
-                        }
-                        */
-                    }
-                default:
+                            /*
+                            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+                                findPreference("pref_key_bluetooth_device_name").setEnabled(true);
+                            }
+                            else{
+                                findPreference("pref_key_bluetooth_device_name").setEnabled(false);
+                            }
+                            */
+                        break;
+                    case "pref_key_bluetooth_device_name":
+                        carduino.dataContainer.preferences.setBluetoothDeviceName(stringValue);
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothDeviceName());
+                        break;
+                    case "pref_key_bluetooth_handling":
+                        intValue = tryStringToInt(stringValue, BluetoothHandling.toInteger(BluetoothHandling.AUTO));
+                        carduino.dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothHandling());
+                        break;
+                    default:
                         Log.d(TAG, "key not known: " + preference.getKey());
-                    break;
+                        break;
+                }
+            }
+            else{
+                Log.e(TAG,"no pointer to resource carduino");
             }
 
             if (preference instanceof ListPreference) {
@@ -98,27 +127,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
     };
-
-    private static Integer tryStringToInt(String value, Integer defaultValue){
-        Integer intValue;
-        try {
-            intValue = Integer.valueOf(value);
-        }
-        catch (NumberFormatException e){
-            Log.e(TAG, "NumberFormatExeption: "+ e.toString());
-            intValue = defaultValue;
-        }
-        return intValue;
-    }
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the
@@ -219,7 +227,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("pref_key_control_mode"));
-            //bindPreferenceSummaryToValue(findPreference("example_list"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_reset_battery"));
         }
 
         @Override
@@ -251,6 +259,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("pref_key_serial_type"));
             bindPreferenceSummaryToValue(findPreference("pref_key_bluetooth_device_name"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_bluetooth_handling"));
         }
 
         @Override

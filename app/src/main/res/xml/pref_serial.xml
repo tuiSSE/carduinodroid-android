@@ -1,4 +1,6 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@style/PreferencesTheme">
 
     <ListPreference
         android:defaultValue="1"
@@ -10,12 +12,20 @@
         android:title="@string/pref_title_serial_type"
         android:icon="@drawable/ic_sync_black_24dp"/>
 
-    <Preference
+    <EditTextPreference
         android:title="@string/pref_title_bluetooth_device_name"
         android:key="@string/pref_key_bluetooth_device_name"
         android:defaultValue="@string/serialDefaultBluetoothDeviceName"
-        android:icon="@drawable/device_arduino"
-        android:enabled="true">
-        <intent android:action="tuisse.carduinodroid_android.ChooseBluetoothDeviceActivity"/>
-    </Preference>
+        android:summary="@string/serialDefaultBluetoothDeviceName"
+        android:icon="@drawable/serial_type_bt"/>
+
+    <ListPreference
+        android:title="@string/pref_title_bluetooth_handling"
+        android:key="@string/pref_key_bluetooth_handling"
+        android:defaultValue="0"
+        android:entries="@array/pref_bluetooth_handling"
+        android:entryValues="@array/pref_bluetooth_handling_values"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:icon="@drawable/serial_type_bt" />
 </PreferenceScreen>

@@ -38,7 +38,6 @@
     <string name="ipDummyRemote">141.24.11.100</string>
     <string name="ipDummyTransceiver">141.24.11.199</string>
     <string name="ipDummyLocal">127.0.0.1</string>
-
     <string name="ipConnection">IP Status:</string>
     <string name="ipConnectionStatus">%1$s</string>
     <string name="ipConnectionError">%1$s</string>
@@ -65,28 +64,27 @@
     <string name="connectionStateDefaultError">Unknown error</string>
 
     <!-- serial data display strings -->
-    <string name="driveSpeed">Speed %1$d</string>
-    <string name="driveSteer">Steering %1$d</string>
+    <string name="driveSpeed">%1$04d Speed</string>
+    <string name="driveSteer">%1$04d Steering</string>
     <string name="driveStatus">Status LED</string>
     <string name="driveFrontLight">Front light</string>
-    <string name="driveFailsafeStop">Failsafe Stop</string>
+    <string name="driveFailsafeStop">Soft break</string>
     <string name="driveDebug">Show debug screen</string>
     <string name="driveOrientation">Orientation %1$s</string>
     <string name="orientationPortrait">Portrait</string>
     <string name="orientationLandscape">Landscape</string>
 
-    <string name="driveNotAvailable">"N/A"</string>
-    <string name="driveDistanceFront">%1$s\u0009 Distance Front [cm]</string>
-    <string name="driveDistanceBack">%1$s\u0009 Distance Back [cm]</string>
-    <string name="driveCurrent">%1$s\u0009 Current [mA]</string>
-    <string name="driveVoltage">%1$s\u0009 Voltage [V]</string>
-    <string name="driveRelativeBattery">%1$s\u0009 Relative Battery [%%]</string>
-    <string name="driveAbsoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
-    <string name="driveTemperature">%1$s\u0009 Temperature [°C]</string>
+    <string name="driveDistanceFront">%1$04d Distance Front [cm]</string>
+    <string name="driveDistanceBack">%1$04d Distance Back [cm]</string>
+    <string name="driveCurrent">%1$04d Current [mA]</string>
+    <string name="driveVoltage">%1$04d Voltage [V]</string>
+    <string name="driveRelativeBattery">%1$04d Relative Battery [%%]</string>
+    <string name="driveAbsoluteBattery">%1$04d Absolute Battery [mAh]</string>
+    <string name="driveTemperature">%1$04d Temperature [°C]</string>
 
-    <string name="driveAngle0">rel Azimut: %1$d°</string>
-    <string name="driveAngle1">rel Pitch: %1$d°</string>
-    <string name="driveAngle2">rel Roll: %1$d°</string>
+    <string name="driveAngle0">%1$04d\trel Azimut [°]</string>
+    <string name="driveAngle1">%1$04d\trel Pitch [°]</string>
+    <string name="driveAngle2">%1$04d\trel Roll [°]</string>
 
 
 
@@ -105,7 +103,8 @@
     <string name="serialBluetoothEnable">enabled Bluetooth</string>
     <string name="serialErrorNoBluetoothDevicePaired">no bluetooth paired</string>
     <string name="serialErrorNoBluetoothDeviceChosen">choose bluetooth device</string>
-    <string name="serialErrorNoCarduinoBluetoothDeviceFound">no device found</string>
+    <string name="serialErrorNoCarduinoBluetoothDeviceFound">%1$d paired, "%2$s" not found</string>
+    <string name="serialErrorTooMuchCarduinoBluetoothDeviceFound">%1$d paired containing "%2$s" found</string>
     <string name="serialErrorNoBluetoothAdapter">no bluetooth on mobile available</string>
     <string name="serialErrorNotIdle">find: was not idle</string>
     <string name="serialErrorReceiveTimeout">receive time out</string>
@@ -162,10 +161,10 @@
 
     <!-- Strings related to Settings -->
     <!-- header settings -->
-    <string name="pref_header_general">Control Mode</string>
-    <string name="pref_header_serial">Serial Connection</string>
+    <string name="pref_header_general">Control mode</string>
+    <string name="pref_header_serial">Serial connection</string>
     <!-- general settings -->
-    <string name="pref_title_control_mode">Control Mode</string>
+    <string name="pref_title_control_mode">Control mode</string>
     <string name="pref_key_control_mode">pref_key_control_mode</string>
     <!-- ControlMode -->
     <string name="controlModeTransceiver">Mode: Transceiver</string>
@@ -186,7 +185,7 @@
     <string name="pref_title_reset_battery">Reset battery accumulation</string>
     <string name="pref_summary_reset_battery">Will switch back off if message is delivered</string>
     <!-- serial settings -->
-    <string name="pref_title_serial_type">Serial Connection Type</string>
+    <string name="pref_title_serial_type">Serial connection type</string>
     <string name="pref_key_serial_type">pref_key_serial_type</string>
     <string name="serialBluetooth">Bluetooth</string>
     <string name="serialUsb">USB</string>
@@ -201,11 +200,22 @@
         <item>2</item>
         <!--<item>3</item>-->
     </string-array>
-    <string name="pref_title_bluetooth_device_name">Bluetooth Device</string>
+    <string name="pref_title_bluetooth_device_name">Bluetooth device name</string>
     <string name="pref_key_bluetooth_device_name">pref_key_bluetooth_device_name</string>
-
-    <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="pref_title_bluetooth_handling">Bluetooth connection handling</string>
+    <string name="pref_key_bluetooth_handling">pref_key_bluetooth_handling</string>
+    <string-array name="pref_bluetooth_handling">
+        <item>@string/pref_bluetooth_handling_auto</item>
+        <item>@string/pref_bluetooth_handling_off</item>
+        <item>@string/pref_bluetooth_handling_on</item>
+    </string-array>
+    <string name="pref_bluetooth_handling_auto">Auto: Set to initial state</string>
+    <string name="pref_bluetooth_handling_off">Off: Turn  off anyhow</string>
+    <string name="pref_bluetooth_handling_on">On: Let on anyhow</string>
+    <string-array name="pref_bluetooth_handling_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 
 </resources>

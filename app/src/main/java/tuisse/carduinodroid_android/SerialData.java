@@ -16,6 +16,8 @@ public class SerialData {
     private SerialType serialType;
     private String serialName;
 
+    private boolean bluetoothEnabled;
+
     public SerialData(){
         serialRx = new SerialProtocolRx();
         serialTx = new SerialProtocolTx();
@@ -23,6 +25,14 @@ public class SerialData {
         serialState = new ConnectionState(ConnectionEnum.IDLE,"");
         setSerialName(CarduinodroidApplication.getAppContext().getString(R.string.serialDeviceNone));
         setSerialType(SerialType.NONE);
+        setBluetoothEnabled(false);
+    }
+
+    public synchronized void setBluetoothEnabled(boolean bte){
+        bluetoothEnabled = bte;
+    }
+    public synchronized boolean getBluetoothEnabled(){
+        return bluetoothEnabled;
     }
 
     public synchronized void setSerialState(ConnectionState state){

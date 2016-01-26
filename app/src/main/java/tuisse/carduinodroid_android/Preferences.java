@@ -7,8 +7,16 @@ import android.util.Log;
  */
 public class Preferences {
     private SerialType serialPref = SerialType.NONE;
-    private String bluetoothDeviceName = "HC-06";
+    private String bluetoothDeviceName = "";
+    private BluetoothHandling bluetoothHandling = BluetoothHandling.AUTO;
     private ControlMode controlMode = ControlMode.TRANSCEIVER;
+
+    public synchronized final BluetoothHandling getBluetoothHandling(){
+        return bluetoothHandling;
+    }
+    public synchronized void setBluetoothHandling(BluetoothHandling bth){
+        bluetoothHandling = bth;
+    }
 
     public synchronized final SerialType getSerialPref(){
         return serialPref;

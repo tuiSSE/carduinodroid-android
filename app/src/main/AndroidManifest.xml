@@ -77,19 +77,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tuisse.carduinodroid_android.StatusActivity" />
         </activity>
-        <activity
-            android:name=".ChooseBluetoothDeviceActivity"
-            android:label="@string/titleChooseBtActivity"
-            android:parentActivityName=".StatusActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="tuisse.carduinodroid_android.StatusActivity" />
-
-            <intent-filter>
-                <action android:name="tuisse.carduinodroid_android.ChooseBluetoothDeviceActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

@@ -24,7 +24,6 @@ public enum SerialType {
     }
 
     public static Integer toInteger(SerialType st){
-        int x;
         switch (st){
             case BLUETOOTH:
                 return 1;
