@@ -56,7 +56,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/titleDriveActivity"
             android:parentActivityName=".StatusActivity"
-            android:theme="@style/FullscreenTheme"/>
+            android:theme="@style/FullscreenTheme" />
 
         <service
             android:name=".SerialService"
@@ -77,6 +77,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="tuisse.carduinodroid_android.StatusActivity" />
         </activity>
+
+        <service
+            android:name=".WatchdogService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
