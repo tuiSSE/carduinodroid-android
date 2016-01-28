@@ -23,8 +23,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="@dimen/fabMargin">
+        android:layout_height="match_parent">
 
         <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
             android:id="@+id/seekBarSpeedWrapper"
@@ -33,7 +32,8 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_above="@+id/buttonDrive"
-            android:layout_below="@+id/seekBarSteer">
+            android:layout_below="@+id/seekBarSteer"
+            android:layout_margin="@dimen/fabMargin">
             <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
                 android:id="@+id/seekBarSpeed"
                 android:layout_width="0dp"
@@ -45,7 +45,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/seekBarSteer"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/fabMargin"/>
+
+        <RelativeLayout
+            android:id="@+id/fullscreen_content_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/seekBarSteer"
+            android:layout_toRightOf="@+id/buttonHorn"
+            android:layout_toEndOf="@+id/buttonHorn"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="@dimen/fabMargin"
+            android:layout_marginEnd="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:layout_marginBottom="@dimen/fabMargin">
+
+            <ProgressBar
+                android:id="@+id/progressbarDistanceFront"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/distanceBarHeight"
+                android:layout_alignParentTop="true"
+                android:max="254"
+                android:progress="200"
+                android:progressDrawable="@drawable/vertical_progress_bar_top"/>
+            <ProgressBar
+                android:id="@+id/progressbarDistanceBack"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/distanceBarHeight"
+                android:layout_alignParentBottom="true"
+                android:max="254"
+                android:progress="200"
+                android:progressDrawable="@drawable/vertical_progress_bar_bottom"/>
+        </RelativeLayout>
+
 
         <LinearLayout
             android:id="@+id/fullscreen_content_stop"
@@ -56,12 +92,11 @@
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/buttonDrive"
             android:layout_toStartOf="@+id/buttonDrive"
-            android:layout_toRightOf="@+id/buttonHorn"
-            android:layout_toEndOf="@+id/buttonHorn"
-            android:layout_marginLeft="@dimen/fabMargin"
-            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_toRightOf="@+id/fullscreen_content_distance"
+            android:layout_toEndOf="@+id/fullscreen_content_distance"
             android:layout_marginRight="@dimen/fabMargin"
-            android:layout_marginEnd="@dimen/fabMargin">
+            android:layout_marginEnd="@dimen/fabMargin"
+            android:layout_marginBottom="@dimen/fabMargin">
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -147,10 +182,9 @@
             android:background="@color/colorBlackOverlay"
             android:layout_toLeftOf="@+id/buttonDrive"
             android:layout_toStartOf="@+id/buttonDrive"
-            android:layout_toRightOf="@+id/buttonHorn"
-            android:layout_toEndOf="@+id/buttonHorn"
-            android:layout_marginLeft="@dimen/fabMargin"
-            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_toRightOf="@+id/fullscreen_content_distance"
+            android:layout_toEndOf="@+id/fullscreen_content_distance"
+            android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginRight="@dimen/fabMargin"
             android:layout_marginEnd="@dimen/fabMargin">
             <TextView
@@ -198,7 +232,10 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:src="@drawable/icon_drive"/>
+            android:src="@drawable/icon_drive"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginRight="@dimen/fabMargin"
+            android:layout_marginEnd="@dimen/fabMargin"/>
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/buttonHorn"
             android:layout_width="wrap_content"
@@ -206,7 +243,10 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/icon_horn"/>
+            android:src="@drawable/icon_horn"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/buttonFrontLight"
             android:layout_width="wrap_content"
@@ -215,7 +255,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/icon_front_light"
-            android:layout_marginBottom="@dimen/fabMargin"/>
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/buttonStatusLed"
             android:layout_width="wrap_content"
@@ -224,7 +266,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/icon_status_led"
-            android:layout_marginBottom="@dimen/fabMargin"/>
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
 
     </RelativeLayout>
 

@@ -35,7 +35,7 @@ public class Utils {
     public static synchronized int getIntPref(String key, int defaultVal) {
         String value = PreferenceManager.getDefaultSharedPreferences(CarduinodroidApplication.getAppContext()).getString(key, null);
         if(value == null){
-            Log.d(TAG, "getIntPref error, take defaultVal");
+            Log.d(TAG, key + " getIntPref error, take defaultVal: " + defaultVal);
         }
         return value == null ? defaultVal : Integer.valueOf(value);
     }

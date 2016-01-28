@@ -218,4 +218,30 @@
         <item>2</item>
     </string-array>
 
+    <string name="pref_title_debug_view">Debug view</string>
+    <string name="pref_key_debug_view">pref_key_debug_view</string>
+    <string-array name="pref_debug_view">
+        <item>@string/pref_debug_view_on</item>
+        <item>@string/pref_debug_view_off</item>
+    </string-array>
+    <string name="pref_debug_view_on">Enabled</string>
+    <string name="pref_debug_view_off">Disabled</string>
+    <string-array name="pref_debug_view_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string name="pref_title_failsafe_stop">@string/driveFailsafeStop</string>
+    <string name="pref_key_failsafe_stop">pref_key_failsafe_stop</string>
+    <string-array name="pref_failsafe_stop">
+        <item>@string/pref_failsafe_stop_on</item>
+        <item>@string/pref_failsafe_stop_off</item>
+    </string-array>
+    <string name="pref_failsafe_stop_on">Enabled</string>
+    <string name="pref_failsafe_stop_off">Disabled</string>
+    <string-array name="pref_failsafe_stop_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
 </resources>

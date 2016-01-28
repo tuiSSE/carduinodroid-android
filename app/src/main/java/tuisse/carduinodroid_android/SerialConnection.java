@@ -119,6 +119,8 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
+            setSerialState(serialService.getCarduino().dataContainer.serialData.getSerialState().getState());
+            serialService.stopSelf();
         }
     }//SerialReceiveThread
 
@@ -151,6 +153,8 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
+            setSerialState(serialService.getCarduino().dataContainer.serialData.getSerialState().getState());
+            serialService.stopSelf();
         }
     }//SerialSendThread
 

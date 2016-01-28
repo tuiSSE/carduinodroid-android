@@ -63,11 +63,44 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
             case "pref_key_bluetooth_handling":
                 dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
                 Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothHandling());
+                break;
+            case "pref_key_failsafe_stop":
+                if(Utils.getIntPref(key,1) == 1){
+                    dataContainer.preferences.setFailSafeStopPref(true);
+                }
+                else {
+                    dataContainer.preferences.setFailSafeStopPref(false);
+                }
+                Log.d(TAG, key + ": " + dataContainer.preferences.getFailSafeStopPref());
+                break;
+            case "pref_key_debug_view":
+                if(Utils.getIntPref(key,0) == 1){
+                    dataContainer.preferences.setDebugView(true);
+                }
+                else {
+                    dataContainer.preferences.setDebugView(false);
+                }
+                Log.d(TAG, key + ": " + dataContainer.preferences.getDebugView());
+                break;
             default:
                 dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref("pref_key_serial_type", SerialType.toInteger(SerialType.BLUETOOTH))));
                 dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref("pref_key_control_mode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
                 dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString("pref_key_bluetooth_device_name", getString(R.string.serialDefaultBluetoothDeviceName)));
-                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref("pref_key_bluetooth_handling", BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                if(Utils.getIntPref("pref_key_failsafe_stop",1) == 1){
+                    dataContainer.preferences.setFailSafeStopPref(true);
+                }
+                else {
+                    dataContainer.preferences.setFailSafeStopPref(false);
+                }
+                Log.d(TAG, "pref_key_failsafe_stop: " + dataContainer.preferences.getFailSafeStopPref());
+                if(Utils.getIntPref("pref_key_debug_view",0) == 1){
+                    dataContainer.preferences.setDebugView(true);
+                }
+                else {
+                    dataContainer.preferences.setDebugView(false);
+                }
+                Log.d(TAG, "pref_key_debug_view: " + dataContainer.preferences.getDebugView());
                 Log.d(TAG, "pref_key_bluetooth_handling: "      + dataContainer.preferences.getBluetoothHandling());
                 Log.d(TAG, "pref_key_serial_type: "             + dataContainer.preferences.getSerialPref().toString());
                 Log.d(TAG, "pref_key_control_mode: "            + dataContainer.preferences.getControlMode());

@@ -205,6 +205,7 @@ public class SerialUsb extends SerialConnection {
     @Override
     protected boolean close() {
         //getSerialData().setSerialName(serialService.getString(R.string.serialDeviceNone));
+        Log.d(TAG,"Closing serial connection");
         if(isRunning()){
             setSerialState(ConnectionEnum.IDLE);
         }

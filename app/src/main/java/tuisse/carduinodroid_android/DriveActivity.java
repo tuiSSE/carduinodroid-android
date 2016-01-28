@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -81,6 +82,7 @@ public class DriveActivity extends AppCompatActivity {
     private final Handler mHideHandler = new Handler();
     private View viewVideo;
     private View viewStop;
+    private View viewDistance;
     private View viewDebug;
 
     private CheckBox checkBoxFailsafeStop;
@@ -89,6 +91,9 @@ public class DriveActivity extends AppCompatActivity {
 
     private VerticalSeekBar seekBarSpeed;
     private SeekBar         seekBarSteer;
+
+    private ProgressBar     progressbarDistanceFront;
+    private ProgressBar     progressbarDistanceBack;
 
     private TextView textViewSpeed;
     private TextView textViewSteer;
@@ -110,6 +115,17 @@ public class DriveActivity extends AppCompatActivity {
     private FloatingActionButton buttonStatusLed;
 
 
+    private void setDistance(ProgressBar pb, int distance){
+        if((distance < 254) && (distance >= 0)){
+            pb.setProgress(254-distance);
+            pb.setAlpha(1.0f);
+        }
+        else{
+            pb.setProgress(254);
+            pb.setAlpha(0.6f);
+        }
+    }
+
     private void reset(){
         try {
             carduino.dataContainer.serialData.serialTx.reset();
@@ -119,12 +135,11 @@ public class DriveActivity extends AppCompatActivity {
             seekBarSteer.setProgress(127);
             seekBarSpeed.setSecondaryProgress(127);
             seekBarSteer.setSecondaryProgress(127);
-
-            checkBoxFailsafeStop.setChecked(true);
+            setDistance(progressbarDistanceFront, -1);
+            setDistance(progressbarDistanceBack, -1);
 
             textViewSpeed.setText(String.format(getString(R.string.driveSpeed), 0));
             textViewSteer.setText(String.format(getString(R.string.driveSteer), 0));
-
             textViewDistanceFront.setText(String.format(getString(R.string.driveDistanceFront), -1));
             textViewDistanceBack.setText(String.format(getString(R.string.driveDistanceBack), -1));
             textViewAbsBattery.setText(String.format(getString(R.string.driveAbsoluteBattery), -1));
@@ -143,6 +158,8 @@ public class DriveActivity extends AppCompatActivity {
                     carduino.dataContainer.serialData.serialRx.getUltrasoundFront()));
             textViewDistanceBack.setText(String.format(getString(R.string.driveDistanceBack),
                     carduino.dataContainer.serialData.serialRx.getUltrasoundBack()));
+            setDistance(progressbarDistanceFront, carduino.dataContainer.serialData.serialRx.getUltrasoundFront());
+            setDistance(progressbarDistanceBack, carduino.dataContainer.serialData.serialRx.getUltrasoundBack());
             textViewAbsBattery.setText(String.format(getString(R.string.driveAbsoluteBattery),
                     carduino.dataContainer.serialData.serialRx.getAbsoluteBatteryCapacity()));
             textViewRelBattery.setText(String.format(getString(R.string.driveRelativeBattery),
@@ -158,258 +175,246 @@ public class DriveActivity extends AppCompatActivity {
         }
     }
 
+    private void initView(){
+        checkBoxFailsafeStop = (CheckBox) findViewById(R.id.checkBoxFailsafeStop);
+        checkBoxOrientation = (CheckBox) findViewById(R.id.checkBoxOrientation);
+        checkBoxDebug = (CheckBox) findViewById(R.id.checkBoxDebug);
+        seekBarSpeed = (VerticalSeekBar) findViewById(R.id.seekBarSpeed);
+        seekBarSteer = (SeekBar) findViewById(R.id.seekBarSteer);
+        progressbarDistanceFront    = (ProgressBar) (findViewById(R.id.progressbarDistanceFront));
+        progressbarDistanceBack     = (ProgressBar) (findViewById(R.id.progressbarDistanceBack));
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        try {
-            carduino = (CarduinodroidApplication) getApplication();
-            setContentView(R.layout.activity_drive);
+        textViewSpeed = (TextView) findViewById(R.id.textViewSpeed);
+        textViewSteer = (TextView) findViewById(R.id.textViewSteer);
+        textViewAngle0 = (TextView) findViewById(R.id.textViewAngle0);
+        textViewAngle1 = (TextView) findViewById(R.id.textViewAngle1);
+        textViewAngle2 = (TextView) findViewById(R.id.textViewAngle2);
 
-            sound = new Sound();
+        textViewDistanceFront = (TextView) findViewById(R.id.textViewDistanceFront);
+        textViewDistanceBack = (TextView) findViewById(R.id.textViewDistanceBack);
+        textViewAbsBattery = (TextView) findViewById(R.id.textViewAbsBattery);
+        textViewRelBattery = (TextView) findViewById(R.id.textViewRelBattery);
+        textViewCurrent = (TextView) findViewById(R.id.textViewCurrent);
+        textViewVoltage = (TextView) findViewById(R.id.textViewVoltage);
+        textViewTemperature = (TextView) findViewById(R.id.textViewTemperature);
 
-            serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
-            serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-            //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+        buttonDrive = (FloatingActionButton) findViewById(R.id.buttonDrive);
+        buttonHorn = (FloatingActionButton) findViewById(R.id.buttonHorn);
+        buttonFrontLight = (FloatingActionButton) findViewById(R.id.buttonFrontLight);
+        buttonStatusLed = (FloatingActionButton) findViewById(R.id.buttonStatusLed);
 
-            serialDataRxReceiver = new SerialDataRxReceiver();
-            serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
+        if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
+            //if Remote or Direct mode
+            buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
+            buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
+            buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
+            buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
+        } else {
+            //if Transceiver mode
+            buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
+            buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
+            buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
+            buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
+        }
 
-            checkBoxFailsafeStop = (CheckBox) findViewById(R.id.checkBoxFailsafeStop);
-            checkBoxOrientation = (CheckBox) findViewById(R.id.checkBoxOrientation);
-            checkBoxDebug = (CheckBox) findViewById(R.id.checkBoxDebug);
-            seekBarSpeed = (VerticalSeekBar) findViewById(R.id.seekBarSpeed);
-            seekBarSteer = (SeekBar) findViewById(R.id.seekBarSteer);
-
-            textViewSpeed = (TextView) findViewById(R.id.textViewSpeed);
-            textViewSteer = (TextView) findViewById(R.id.textViewSteer);
-            textViewAngle0 = (TextView) findViewById(R.id.textViewAngle0);
-            textViewAngle1 = (TextView) findViewById(R.id.textViewAngle1);
-            textViewAngle2 = (TextView) findViewById(R.id.textViewAngle2);
-
-            textViewDistanceFront = (TextView) findViewById(R.id.textViewDistanceFront);
-            textViewDistanceBack = (TextView) findViewById(R.id.textViewDistanceBack);
-            textViewAbsBattery = (TextView) findViewById(R.id.textViewAbsBattery);
-            textViewRelBattery = (TextView) findViewById(R.id.textViewRelBattery);
-            textViewCurrent = (TextView) findViewById(R.id.textViewCurrent);
-            textViewVoltage = (TextView) findViewById(R.id.textViewVoltage);
-            textViewTemperature = (TextView) findViewById(R.id.textViewTemperature);
-
-            buttonDrive = (FloatingActionButton) findViewById(R.id.buttonDrive);
-            buttonHorn = (FloatingActionButton) findViewById(R.id.buttonHorn);
-            buttonFrontLight = (FloatingActionButton) findViewById(R.id.buttonFrontLight);
-            buttonStatusLed = (FloatingActionButton) findViewById(R.id.buttonStatusLed);
-
-            if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
-                //if Remote or Direct mode
-                buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-                buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-                buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-                buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-            } else {
-                //if Transceiver mode
-                buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-                buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-                buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-                buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-            }
-
-            buttonDrive.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            buttonHorn.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            buttonFrontLight.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-            buttonStatusLed.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        buttonDrive.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        buttonHorn.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        buttonFrontLight.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        buttonStatusLed.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
 
 
-            viewDebug = findViewById(R.id.fullscreen_content_debug);
-            viewVideo = findViewById(R.id.fullscreen_content_video);
-            viewStop = findViewById(R.id.fullscreen_content_stop);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDebug.getLayoutParams();
-            if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
-                //if Remote or Direct mode
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                textViewAngle0.setVisibility(View.VISIBLE);
-                textViewAngle1.setVisibility(View.VISIBLE);
-                textViewAngle2.setVisibility(View.VISIBLE);
-            } else {
-                //if Transceiver mode
-                params.addRule(RelativeLayout.ABOVE, R.id.fullscreen_content_stop);
-                textViewAngle0.setVisibility(View.GONE);
-                textViewAngle1.setVisibility(View.GONE);
-                textViewAngle2.setVisibility(View.GONE);
-            }
-            viewDebug.setLayoutParams(params);
+        viewDebug = findViewById(R.id.fullscreen_content_debug);
+        viewVideo = findViewById(R.id.fullscreen_content_video);
+        viewDistance = findViewById(R.id.fullscreen_content_distance);
+        viewStop = findViewById(R.id.fullscreen_content_stop);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDebug.getLayoutParams();
+        if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
+            //if Remote or Direct mode
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            textViewAngle0.setVisibility(View.VISIBLE);
+            textViewAngle1.setVisibility(View.VISIBLE);
+            textViewAngle2.setVisibility(View.VISIBLE);
+        } else {
+            //if Transceiver mode
+            params.addRule(RelativeLayout.ABOVE, R.id.fullscreen_content_stop);
+            textViewAngle0.setVisibility(View.GONE);
+            textViewAngle1.setVisibility(View.GONE);
+            textViewAngle2.setVisibility(View.GONE);
+        }
+        viewDebug.setLayoutParams(params);
 
-            rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationLandscape)));
-
-            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
-            buttonDrive.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
-                        //if Remote or Direct mode
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                goDrive();
-                                // register this class as a listener for the orientation and
-                                // accelerometer sensors
-                                sensorManager.registerListener(accelerometerListener,
-                                        accelerationSensor,
-                                        SensorManager.SENSOR_DELAY_GAME);
-                                sensorManager.registerListener(magnetometerListener,
-                                        magnetSensor,
-                                        SensorManager.SENSOR_DELAY_GAME);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive_press));
-                                }
-                                return true;
-                            case MotionEvent.ACTION_UP:
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive));
-                                }
-                                sensorManager.unregisterListener(magnetometerListener);
-                                sensorManager.unregisterListener(accelerometerListener);
-                                sensorMeasureStart = true;
-                                goStop();
-                                reset();
-                                return true;
-                            default:
-                                return false;
-                        }
-                    }
-                    return false;
-                }
-            });
-
-            buttonStatusLed.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
+        buttonDrive.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
+                    //if Remote or Direct mode
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            statusLedState = !statusLedState;
-                            if (statusLedState) {
-                                carduino.dataContainer.setStatusLed(1);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led_press));
-                                }
-                            } else {
-                                carduino.dataContainer.setStatusLed(0);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led));
-                                }
+                            goDrive();
+                            // register this class as a listener for the orientation and
+                            // accelerometer sensors
+                            sensorManager.registerListener(accelerometerListener,
+                                    accelerationSensor,
+                                    SensorManager.SENSOR_DELAY_GAME);
+                            sensorManager.registerListener(magnetometerListener,
+                                    magnetSensor,
+                                    SensorManager.SENSOR_DELAY_GAME);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive_press));
+                            }
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive));
+                            }
+                            sensorManager.unregisterListener(magnetometerListener);
+                            sensorManager.unregisterListener(accelerometerListener);
+                            sensorMeasureStart = true;
+                            goStop();
+                            reset();
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+                return false;
+            }
+        });
+
+        buttonStatusLed.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        statusLedState = !statusLedState;
+                        if (statusLedState) {
+                            carduino.dataContainer.setStatusLed(1);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led_press));
+                            }
+                        } else {
+                            carduino.dataContainer.setStatusLed(0);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led));
+                            }
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        buttonFrontLight.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        frontLightState = !frontLightState;
+                        if (frontLightState) {
+                            carduino.dataContainer.serialData.serialTx.setFrontLight(1);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light_press));
+                            }
+
+                        } else {
+                            carduino.dataContainer.serialData.serialTx.setFrontLight(0);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light));
+                            }
+                        }
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
+        buttonHorn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
+                    //if Remote or Direct mode
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn_press));
+                            }
+                            switch (carduino.dataContainer.preferences.getControlMode()) {
+                                case DIRECT:
+                                    sound.horn();
+                                    break;
+                                case REMOTE:
+                                    //// TODO: 26.01.2016 implement
+                                    break;
+                                default:
+                                    sound.horn();
+                                    break;
+                            }
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn));
+                            }
+                            switch (carduino.dataContainer.preferences.getControlMode()) {
+                                case DIRECT:
+                                    sound.stop();
+                                    break;
+                                case REMOTE:
+                                    //// TODO: 26.01.2016 implement
+                                    break;
+                                default:
+                                    sound.stop();
+                                    break;
                             }
                             return true;
                         default:
                             return false;
                     }
                 }
-            });
-
-            buttonFrontLight.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            frontLightState = !frontLightState;
-                            if (frontLightState) {
-                                carduino.dataContainer.serialData.serialTx.setFrontLight(1);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light_press));
-                                }
-
-                            } else {
-                                carduino.dataContainer.serialData.serialTx.setFrontLight(0);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light));
-                                }
-                            }
-                            return true;
-                        default:
-                            return false;
-                    }
-                }
-            });
-
-            buttonHorn.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
-                        //if Remote or Direct mode
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn_press));
-                                }
-                                switch (carduino.dataContainer.preferences.getControlMode()) {
-                                    case DIRECT:
-                                        sound.horn();
-                                        break;
-                                    case REMOTE:
-                                        //// TODO: 26.01.2016 implement
-                                        break;
-                                    default:
-                                        sound.horn();
-                                        break;
-                                }
-                                return true;
-                            case MotionEvent.ACTION_UP:
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                    buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn));
-                                }
-                                switch (carduino.dataContainer.preferences.getControlMode()) {
-                                    case DIRECT:
-                                        sound.stop();
-                                        break;
-                                    case REMOTE:
-                                        //// TODO: 26.01.2016 implement
-                                        break;
-                                    default:
-                                        sound.stop();
-                                        break;
-                                }
-                                return true;
-                            default:
-                                return false;
-                        }
-                    }
-                    return false;
-                }
-            });
-
-            if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
-                //if Remote or Direct mode
-                checkBoxFailsafeStop.setEnabled(true);
-                checkBoxFailsafeStop.setOnClickListener(new CheckBox.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int val = 0;
-                        if (checkBoxFailsafeStop.isChecked()) {
-                            val = 1;
-                        }
-                        carduino.dataContainer.setFailSafeStop(val);
-                    }
-                });
-            } else {
-                checkBoxFailsafeStop.setEnabled(false);
+                return false;
             }
-            checkBoxOrientation.setOnClickListener(new CheckBox.OnClickListener() {
+        });
+
+        checkBoxDebug.setChecked(carduino.dataContainer.preferences.getDebugView());
+        checkBoxDebug.setOnClickListener(new CheckBox.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                int val = carduino.dataContainer.preferences.toggleDebugView();
+                Utils.setIntPref(getString(R.string.pref_key_debug_view), val);
+            }
+        });
+        checkBoxFailsafeStop.setChecked(carduino.dataContainer.preferences.getFailSafeStopPref());
+        if (!carduino.dataContainer.preferences.getControlMode().isTransceiver()) {
+            //if Remote or Direct mode
+            checkBoxFailsafeStop.setEnabled(true);
+            checkBoxFailsafeStop.setOnClickListener(new CheckBox.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String rs = getString(R.string.orientationLandscape);
-                    if (checkBoxOrientation.isChecked()) {
-                        rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    } else {
-                        rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    }
-                    if (rotation == Surface.ROTATION_0) {
-                        rs = getString(R.string.orientationPortrait);
-                    }
-                    checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), rs));
+                    int val = carduino.dataContainer.preferences.toggleFailSafeStopPref();
+                    Utils.setIntPref(getString(R.string.pref_key_failsafe_stop), val);
+                    carduino.dataContainer.setFailSafeStop(val);
                 }
             });
+        } else {
+            checkBoxFailsafeStop.setEnabled(false);
+        }
+        checkBoxOrientation.setOnClickListener(new CheckBox.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String rs = getString(R.string.orientationLandscape);
+                if (checkBoxOrientation.isChecked()) {
+                    driveLandscape();
+                } else {
+                    drivePortrait();
+                }
+                if (rotation == Surface.ROTATION_0) {
+                    rs = getString(R.string.orientationPortrait);
+                }
+                checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), rs));
+            }
+        });
 /*
         seekBarSpeed.setEnabled(false);
         seekBarSteer.setEnabled(false);
@@ -453,9 +458,50 @@ public class DriveActivity extends AppCompatActivity {
             });
         }
 */
-            initUI();
-            goStop();
-            reset();
+    }
+
+    private void driveLandscape(){
+        setContentView(R.layout.activity_drive_landscape);
+        initView();
+        rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationLandscape)));
+
+        initUI();
+        goStop();
+        reset();
+    }
+
+    private void drivePortrait(){
+        setContentView(R.layout.activity_drive_portrait);
+        initView();
+        rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationPortrait)));
+
+        initUI();
+        goStop();
+        reset();
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            carduino = (CarduinodroidApplication) getApplication();
+            driveLandscape();
+
+            sound = new Sound();
+
+            serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
+            serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+            //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+
+            serialDataRxReceiver = new SerialDataRxReceiver();
+            serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
+
+            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         }catch (Exception e){
             Log.e(TAG,"onCreate()"+e.toString());
         }
@@ -466,7 +512,9 @@ public class DriveActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
         registerReceiver(serialDataRxReceiver, serialDataRxFilter);
-        refresh();
+        if(carduino.dataContainer.serialData.getSerialState().isRunning()) {
+            refresh();
+        }
     }
 
     @Override
@@ -496,18 +544,20 @@ public class DriveActivity extends AppCompatActivity {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
-        // Delayed removal of status and navigation bar
-        // Note that some of these constants are new as of API 16 (Jelly Bean)// and API 19 (KitKat). It is safe to use them, as they are inlined
-        // at compile-time and do nothing on earlier devices.
-        viewVideo.setSystemUiVisibility(
+            // Delayed removal of status and navigation bar
+            // Note that some of these constants are new as of API 16 (Jelly Bean)
+            // and API 19 (KitKat).
+            // It is safe to use them, as they are inlined
+            // at compile-time and do nothing on earlier devices.
+            viewVideo.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                        //View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                        View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
-                        View.SYSTEM_UI_FLAG_FULLSCREEN |
-                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | //API 19
-                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
+                //View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                //View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | //API 19
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
         );
         }
     };

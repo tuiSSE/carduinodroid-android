@@ -205,6 +205,7 @@ public class SerialBluetooth extends SerialConnection {
     public boolean close() {
         try {
             //getSerialData().setSerialName(serialService.getString(R.string.serialDeviceNone));
+            Log.d(TAG,"Closing serial connection");
             if(isRunning()){
                 setSerialState(ConnectionEnum.IDLE);
             }
@@ -233,14 +234,14 @@ public class SerialBluetooth extends SerialConnection {
             if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
-            switch (serialService.getCarduino().dataContainer.preferences.getBluetoothHandling()){
+            switch (serialService.getCarduino().dataContainer.preferences.getBluetoothHandling()) {
                 case ON:
                     break;
                 case OFF:
                     mBluetoothAdapter.disable();
                     break;
                 default://AUTO
-                    if(!serialService.getCarduino().dataContainer.serialData.getBluetoothEnabled()){
+                    if (!serialService.getCarduino().dataContainer.serialData.getBluetoothEnabled()) {
                         mBluetoothAdapter.disable();
                     }
                     break;

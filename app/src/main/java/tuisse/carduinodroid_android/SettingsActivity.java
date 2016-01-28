@@ -98,6 +98,26 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         carduino.dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
                         Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothHandling());
                         break;
+                    case "pref_key_failsafe_stop":
+                        intValue = tryStringToInt(stringValue,1);
+                        if(intValue == 1){
+                            carduino.dataContainer.preferences.setFailSafeStopPref(true);
+                        }
+                        else {
+                            carduino.dataContainer.preferences.setFailSafeStopPref(false);
+                        }
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getFailSafeStopPref());
+                        break;
+                    case "pref_key_debug_view":
+                        intValue = tryStringToInt(stringValue,1);
+                        if(intValue == 1){
+                            carduino.dataContainer.preferences.setDebugView(true);
+                        }
+                        else {
+                            carduino.dataContainer.preferences.setDebugView(false);
+                        }
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothDeviceName());
+                        break;
                     default:
                         Log.d(TAG, "key not known: " + preference.getKey());
                         break;
@@ -228,6 +248,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("pref_key_control_mode"));
             bindPreferenceSummaryToValue(findPreference("pref_key_reset_battery"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_debug_view"));
         }
 
         @Override
@@ -260,6 +281,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("pref_key_serial_type"));
             bindPreferenceSummaryToValue(findPreference("pref_key_bluetooth_device_name"));
             bindPreferenceSummaryToValue(findPreference("pref_key_bluetooth_handling"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_failsafe_stop"));
         }
 
         @Override

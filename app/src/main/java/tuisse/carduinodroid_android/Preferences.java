@@ -10,6 +10,35 @@ public class Preferences {
     private String bluetoothDeviceName = "";
     private BluetoothHandling bluetoothHandling = BluetoothHandling.AUTO;
     private ControlMode controlMode = ControlMode.TRANSCEIVER;
+    private boolean failSafeStopPref = true;
+    private boolean debugView = true;
+
+    public synchronized void setFailSafeStopPref(boolean fss){
+        failSafeStopPref = fss;
+    }
+    public synchronized final boolean getFailSafeStopPref(){
+        return failSafeStopPref;
+    }
+    public synchronized int toggleFailSafeStopPref(){
+        failSafeStopPref = !failSafeStopPref;
+        if(failSafeStopPref){
+            return 1;
+        }
+        return 0;
+    }
+    public synchronized void setDebugView(boolean dv){
+        debugView = dv;
+    }
+    public synchronized final boolean getDebugView(){
+        return debugView;
+    }
+    public synchronized int toggleDebugView(){
+        debugView = !debugView;
+        if(debugView){
+            return 1;
+        }
+        return 0;
+    }
 
     public synchronized final BluetoothHandling getBluetoothHandling(){
         return bluetoothHandling;
