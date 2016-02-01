@@ -6,10 +6,16 @@ import android.graphics.drawable.LayerDrawable;
  * Created by keX on 04.01.2016.
  */
 public class IpData {
+    public IpProtocolRx IpRx;
+    public IpProtocolTx IpTx;
+
     private ConnectionState ipState;
     private IpType ipType;
 
     public IpData(){
+        IpRx = new IpProtocolRx();
+        IpTx = new IpProtocolTx();
+
         ipState = new ConnectionState(ConnectionEnum.IDLE);
         ipType = IpType.WLAN;
     }
