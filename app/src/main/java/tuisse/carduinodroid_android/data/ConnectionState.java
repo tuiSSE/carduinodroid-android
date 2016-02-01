@@ -1,4 +1,7 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
+
+import tuisse.carduinodroid_android.CarduinodroidApplication;
+import tuisse.carduinodroid_android.R;
 
 /**
  * Created by keX on 21.12.2015.
@@ -8,7 +11,7 @@ public class ConnectionState {
     private ConnectionEnum state;
     private String error;
 
-    ConnectionState(ConnectionEnum s) {
+    public ConnectionState(ConnectionEnum s) {
         state = s;
         if(isError()) {
             error = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateDefaultError);
@@ -17,7 +20,7 @@ public class ConnectionState {
             error = "";
         }
     }
-    ConnectionState(ConnectionEnum s,String e) {
+    public ConnectionState(ConnectionEnum s, String e) {
         state = s;
         if(isError()) {
             error = e;

@@ -1,4 +1,4 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
 
 /**
  * Created by keX on 04.01.2016.

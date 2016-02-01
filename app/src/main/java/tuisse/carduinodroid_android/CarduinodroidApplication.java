@@ -2,10 +2,15 @@ package tuisse.carduinodroid_android;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import tuisse.carduinodroid_android.data.BluetoothHandling;
+import tuisse.carduinodroid_android.data.DataContainer;
+import tuisse.carduinodroid_android.data.ControlMode;
+import tuisse.carduinodroid_android.data.Preferences;
+import tuisse.carduinodroid_android.data.SerialType;
 
 /**
  * Created by keX on 04.12.2015.

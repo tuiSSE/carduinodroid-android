@@ -4,8 +4,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -13,6 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.ConnectionState;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
@@ -61,8 +62,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(carduino.dataContainer.serialData.getSerialState().getStateName())
-                .setContentText(carduino.dataContainer.serialData.getSerialState().getStateName());
+                .setTicker(carduino.dataContainer.getSerialState().getStateName())
+                .setContentText(carduino.dataContainer.getSerialState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -91,22 +92,22 @@ public class SerialService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
-        if(carduino.dataContainer.serialData.getSerialState().isUnknown()){
+        if(carduino.dataContainer.getSerialState().isUnknown()){
             Log.e(TAG,"FATAL: this device should not start serial service!");
             serial = null;
             stopSelf();
             return START_STICKY;
         }
-        if(carduino.dataContainer.serialData.getSerialState().isError()) {
+        if(carduino.dataContainer.getSerialState().isError()) {
             Log.i(TAG, "resetting serial");
             if(serial != null){
                 serial.reset();
             }
             else{
-                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                carduino.dataContainer.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
             }
         }
-        if (!carduino.dataContainer.serialData.getSerialState().isIdle()) {
+        if (!carduino.dataContainer.getSerialState().isIdle()) {
             Log.d(TAG, "serial already started");
             return START_STICKY;
         }

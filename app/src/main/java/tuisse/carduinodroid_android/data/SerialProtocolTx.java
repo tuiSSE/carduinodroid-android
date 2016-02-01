@@ -1,12 +1,11 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
 
-import android.app.Application;
 import android.util.Log;
 
 /**
  * Created by keX on 07.12.2015.
  */
-public class SerialProtocolTx extends SerialProtocol {
+public class SerialProtocolTx extends SerialProtocol implements SerialTx {
     private final String TAG = "CarduinoSerialTx";
 
     private final int NUM_SPEED = 2;
@@ -19,11 +18,11 @@ public class SerialProtocolTx extends SerialProtocol {
     private final int LENGTH = 3;
     private final int BUFFER_LENGTH = LENGTH + BUFFER_LENGTH_PROTOCOL_OFFSET;
     //byte 2 Speed
-    public  final int VAL_SPEED_MAX = 127;//forwards
-    public  final int VAL_SPEED_MIN = -127;//backwards
+    private final int VAL_SPEED_MAX = SPEED_MAX;//forwards
+    private final int VAL_SPEED_MIN = -SPEED_MAX;//backwards
     //byte 3 Steer
-    public  final int VAL_STEER_MAX = 127;//right
-    public  final int VAL_STEER_MIN = -127;//left
+    private final int VAL_STEER_MAX = STEER_MAX;//right
+    private final int VAL_STEER_MIN = -STEER_MAX;//left
     //byte 4
     private final int STATUS_LED_SHF = 0;
     private final int STATUS_LED_MSK = 1 << STATUS_LED_SHF;
@@ -42,16 +41,16 @@ public class SerialProtocolTx extends SerialProtocol {
     private int resetAccCur;
 
     public SerialProtocolTx(){
-        reset();
-    }
-
-    public synchronized void reset(){
-        speed = 0;
-        steer = 0;
+        resetMotors();
         statusLed = 0;
         frontLight = 0;
         resetAccCur = 0;
         failSafeStop = 1;
+    }
+
+    public synchronized void resetMotors(){
+        speed = 0;
+        steer = 0;
     }
 
     public synchronized String print(){
@@ -65,7 +64,7 @@ public class SerialProtocolTx extends SerialProtocol {
                 " resetAccCur  "+ resetAccCur;
     }
 
-    public synchronized byte[] get() {
+    public synchronized byte[] serialGet() {
         byte[] command = new byte[BUFFER_LENGTH];
         command[0] = START_BYTE;
         command[1] = getVersionLength(LENGTH);
@@ -92,7 +91,23 @@ public class SerialProtocolTx extends SerialProtocol {
         return (byte) steer;
     }
 
-    public synchronized byte getStatus(){
+    public synchronized int getStatusLed() {
+        return statusLed;
+    }
+
+    public synchronized int getFrontLight() {
+        return frontLight;
+    }
+
+    public synchronized int getResetAccCur() {
+        return resetAccCur;
+    }
+
+    public synchronized int getFailSafeStop() {
+        return failSafeStop;
+    }
+
+    private synchronized byte getStatus(){
         return (byte) (0x00
                 | ((statusLed << STATUS_LED_SHF) & STATUS_LED_MSK)
                 | ((frontLight << FRONT_LIGHT_SHF) & FRONT_LIGHT_MSK)

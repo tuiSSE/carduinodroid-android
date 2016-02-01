@@ -128,25 +128,19 @@ public class DriveActivity extends AppCompatActivity {
 
     private void reset(){
         try {
-            carduino.dataContainer.serialData.serialTx.reset();
-            seekBarSpeed.setMax(254);
-            seekBarSteer.setMax(254);
-            seekBarSpeed.setProgress(127);
-            seekBarSteer.setProgress(127);
-            seekBarSpeed.setSecondaryProgress(127);
-            seekBarSteer.setSecondaryProgress(127);
+            carduino.dataContainer.resetMotors();
             setDistance(progressbarDistanceFront, -1);
             setDistance(progressbarDistanceBack, -1);
 
-            textViewSpeed.setText(String.format(getString(R.string.driveSpeed), 0));
-            textViewSteer.setText(String.format(getString(R.string.driveSteer), 0));
-            textViewDistanceFront.setText(String.format(getString(R.string.driveDistanceFront), -1));
-            textViewDistanceBack.setText(String.format(getString(R.string.driveDistanceBack), -1));
-            textViewAbsBattery.setText(String.format(getString(R.string.driveAbsoluteBattery), -1));
-            textViewRelBattery.setText(String.format(getString(R.string.driveRelativeBattery), -1));
-            textViewCurrent.setText(String.format(getString(R.string.driveCurrent), -1));
-            textViewVoltage.setText(String.format(getString(R.string.driveVoltage), -1));
-            textViewTemperature.setText(String.format(getString(R.string.driveTemperature), -1));
+            textViewSpeed.setText(String.format(getString(R.string.driveSpeed), carduino.dataContainer.getSpeed()));
+            textViewSteer.setText(String.format(getString(R.string.driveSteer), carduino.dataContainer.getSteer()));
+            textViewDistanceFront.setText(String.format(getString(R.string.driveDistanceFront), -1.0f));
+            textViewDistanceBack.setText(String.format(getString(R.string.driveDistanceBack), -1.0f));
+            textViewAbsBattery.setText(String.format(getString(R.string.driveAbsoluteBattery), -1.0f));
+            textViewRelBattery.setText(String.format(getString(R.string.driveRelativeBattery), -1.0f));
+            textViewCurrent.setText(String.format(getString(R.string.driveCurrent), -1.0f));
+            textViewVoltage.setText(String.format(getString(R.string.driveVoltage), -1.0f));
+            textViewTemperature.setText(String.format(getString(R.string.driveTemperature), -1.0f));
         }catch (Exception e){
             Log.e(TAG,"reset()"+e.toString());
         }
@@ -155,21 +149,21 @@ public class DriveActivity extends AppCompatActivity {
     private void refresh(){
         try {
             textViewDistanceFront.setText(String.format(getString(R.string.driveDistanceFront),
-                    carduino.dataContainer.serialData.serialRx.getUltrasoundFront()));
+                    carduino.dataContainer.getUltrasoundFront()));
             textViewDistanceBack.setText(String.format(getString(R.string.driveDistanceBack),
-                    carduino.dataContainer.serialData.serialRx.getUltrasoundBack()));
-            setDistance(progressbarDistanceFront, carduino.dataContainer.serialData.serialRx.getUltrasoundFront());
-            setDistance(progressbarDistanceBack, carduino.dataContainer.serialData.serialRx.getUltrasoundBack());
+                    carduino.dataContainer.getUltrasoundBack()));
+            setDistance(progressbarDistanceFront, Math.round(carduino.dataContainer.getUltrasoundFront()));
+            setDistance(progressbarDistanceBack, Math.round(carduino.dataContainer.getUltrasoundBack()));
             textViewAbsBattery.setText(String.format(getString(R.string.driveAbsoluteBattery),
-                    carduino.dataContainer.serialData.serialRx.getAbsoluteBatteryCapacity()));
+                    carduino.dataContainer.getAbsoluteBatteryCapacity()));
             textViewRelBattery.setText(String.format(getString(R.string.driveRelativeBattery),
-                    carduino.dataContainer.serialData.serialRx.getPercentBatteryCapacity()));
+                    carduino.dataContainer.getPercentBatteryCapacity()));
             textViewCurrent.setText(String.format(getString(R.string.driveCurrent),
-                    carduino.dataContainer.serialData.serialRx.getCurrent()));
+                    carduino.dataContainer.getCurrent()));
             textViewVoltage.setText(String.format(getString(R.string.driveVoltage),
-                    carduino.dataContainer.serialData.serialRx.getVoltage()));
+                    carduino.dataContainer.getVoltage()));
             textViewTemperature.setText(String.format(getString(R.string.driveTemperature),
-                    carduino.dataContainer.serialData.serialRx.getDs2745Temperature()));
+                    carduino.dataContainer.getDs2745Temperature()));
         }catch (Exception e){
             Log.e(TAG,"refresh()"+e.toString());
         }
@@ -312,13 +306,13 @@ public class DriveActivity extends AppCompatActivity {
                     case MotionEvent.ACTION_DOWN:
                         frontLightState = !frontLightState;
                         if (frontLightState) {
-                            carduino.dataContainer.serialData.serialTx.setFrontLight(1);
+                            carduino.dataContainer.setFrontLight(1);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light_press));
                             }
 
                         } else {
-                            carduino.dataContainer.serialData.serialTx.setFrontLight(0);
+                            carduino.dataContainer.setFrontLight(0);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light));
                             }
@@ -458,6 +452,14 @@ public class DriveActivity extends AppCompatActivity {
             });
         }
 */
+
+
+        seekBarSpeed.setMax(254);
+        seekBarSteer.setMax(254);
+        seekBarSpeed.setProgress(127);
+        seekBarSteer.setProgress(127);
+        seekBarSpeed.setSecondaryProgress(127);
+        seekBarSteer.setSecondaryProgress(127);
     }
 
     private void driveLandscape(){
@@ -512,7 +514,7 @@ public class DriveActivity extends AppCompatActivity {
         super.onResume();
         registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
         registerReceiver(serialDataRxReceiver, serialDataRxFilter);
-        if(carduino.dataContainer.serialData.getSerialState().isRunning()) {
+        if(carduino.dataContainer.getSerialState().isRunning()) {
             refresh();
         }
     }
@@ -744,21 +746,21 @@ public class DriveActivity extends AppCompatActivity {
         int speed;
         switch (rotation) {
             case Surface.ROTATION_0:
-                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_SPEED_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_SPEED_DEGREE)*carduino.dataContainer.SPEED_MAX);
                 break;
             case Surface.ROTATION_90:
-                speed = (int) (scale(mAngle2FilteredRoll,MAX_SPEED_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_SPEED_MAX);
+                speed = (int) (scale(mAngle2FilteredRoll,MAX_SPEED_DEGREE)*carduino.dataContainer.SPEED_MAX);
                 break;
             case Surface.ROTATION_180:
-                speed = (int) (scale(mAngle1FilteredPitch,MAX_SPEED_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_SPEED_MAX);
+                speed = (int) (scale(mAngle1FilteredPitch,MAX_SPEED_DEGREE)*carduino.dataContainer.SPEED_MAX);
                 break;
             default:
-                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_SPEED_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_SPEED_DEGREE)*carduino.dataContainer.SPEED_MAX);
                 break;
         }
 
         textViewSpeed.setText(String.format(getString(R.string.driveSpeed), speed));
-        seekBarSpeed.setProgress(speed + carduino.dataContainer.serialData.serialTx.VAL_SPEED_MAX);
+        seekBarSpeed.setProgress(speed + carduino.dataContainer.SPEED_MAX);
         carduino.dataContainer.setSpeed(speed);
     }
 
@@ -766,20 +768,20 @@ public class DriveActivity extends AppCompatActivity {
         int steering;
         switch (rotation) {
             case Surface.ROTATION_0:
-                steering = (int) (scale(mAngle2FilteredRoll,MAX_STEER_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_STEER_MAX);
+                steering = (int) (scale(mAngle2FilteredRoll,MAX_STEER_DEGREE)*carduino.dataContainer.STEER_MAX);
                 break;
             case Surface.ROTATION_90:
-                steering = (int) (scale(mAngle1FilteredPitch,MAX_STEER_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_STEER_MAX);
+                steering = (int) (scale(mAngle1FilteredPitch,MAX_STEER_DEGREE)*carduino.dataContainer.STEER_MAX);
                 break;
             case Surface.ROTATION_180:
-                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_STEER_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_STEER_DEGREE)*carduino.dataContainer.STEER_MAX);
                 break;
             default:
-                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_STEER_DEGREE)*carduino.dataContainer.serialData.serialTx.VAL_STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_STEER_DEGREE)*carduino.dataContainer.STEER_MAX);
                 break;
         }
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
-        seekBarSteer.setProgress(steering+carduino.dataContainer.serialData.serialTx.VAL_STEER_MAX);
+        seekBarSteer.setProgress(steering+carduino.dataContainer.STEER_MAX);
         carduino.dataContainer.setSteer(steering);
     }
 }

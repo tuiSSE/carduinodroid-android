@@ -1,10 +1,8 @@
 package tuisse.carduinodroid_android;
 
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -16,6 +14,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.SerialType;
 
 /**
  * Created by keX on 04.01.2016.
@@ -39,8 +40,8 @@ public class SerialUsb extends SerialConnection {
 
     public SerialUsb(SerialService s) {
         super(s);
-        if(getSerialData() != null) {
-            getSerialData().setSerialType(SerialType.USB);
+        if(getData() != null) {
+            getData().setSerialType(SerialType.USB);
         }
         else{
             setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
@@ -77,27 +78,27 @@ public class SerialUsb extends SerialConnection {
                         if (tempUsbDevice.getVendorId() == ARDUINO_USB_VENDOR_ID) {
                             switch (tempUsbDevice.getProductId()) {
                                 case ARDUINO_UNO_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_uno));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_uno));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 case ARDUINO_UNO_R3_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_uno_r3));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_uno_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 case ARDUINO_MEGA_2560_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_mega));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 case ARDUINO_MEGA_2560_R3_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_r3));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_mega_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 case ARDUINO_MEGA_2560_ADK_R3_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_mega_adk));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 case ARDUINO_MEGA_2560_ADK_USB_PRODUCT_ID:
-                                    getSerialData().setSerialName(serialService.getString(R.string.arduino_mega_adk_r3));
+                                    getData().setSerialName(serialService.getString(R.string.arduino_mega_adk_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
                                 default:
@@ -239,8 +240,8 @@ public class SerialUsb extends SerialConnection {
     @Override
     protected void send() throws IOException {
         byte[] buffer = null;
-        if(getSerialData() != null) {
-            buffer = getSerialData().serialTx.get();
+        if(getData() != null) {
+            buffer = getData().serialGet();
         }
         if(buffer != null) {
             if((buffer.length > 0) && (usbConnection != null) && (usbEndpointTx != null)) {
@@ -259,12 +260,12 @@ public class SerialUsb extends SerialConnection {
         final int BUFFER_LENGTH = RECEIVE_BUFFER_LENGTH;
         int acceptedFrame = 0;
         byte[] buffer = new byte[BUFFER_LENGTH];
-        if ((buffer != null) && (usbConnection != null) && (usbEndpointRx != null) && (getSerialData() != null)) {
+        if ((buffer != null) && (usbConnection != null) && (usbEndpointRx != null) && (getData() != null)) {
             int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, 100);
             //int len = 6;
             if (len > 0) {
                 for (int i = 0; i < len; i++) {
-                    if (getSerialData().serialRx.append(buffer[i])) {
+                    if (getData().serialAppend(buffer[i])) {
                         acceptedFrame++;
                     }
                 }

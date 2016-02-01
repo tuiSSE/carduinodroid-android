@@ -1,4 +1,4 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
 
 import android.app.Application;
 import android.util.Log;

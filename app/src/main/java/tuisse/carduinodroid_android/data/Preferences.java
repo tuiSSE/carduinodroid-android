@@ -1,6 +1,4 @@
-package tuisse.carduinodroid_android;
-
-import android.util.Log;
+package tuisse.carduinodroid_android.data;
 
 /**
  * Created by keX on 07.12.2015.

@@ -1,26 +1,23 @@
 package tuisse.carduinodroid_android;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.ConnectionState;
 
 public class StatusActivity extends AppCompatActivity {
 
@@ -257,8 +254,8 @@ public class StatusActivity extends AppCompatActivity {
                 if(carduino.dataContainer.preferences.getSerialPref().isAutoBluetooth() || carduino.dataContainer.preferences.getSerialPref().isNone()){
                     imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
                 }
-                if(carduino.dataContainer.serialData.getSerialState().isUnknown()) {
-                    carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                if(carduino.dataContainer.getSerialState().isUnknown()) {
+                    carduino.dataContainer.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
                 }
                 updateIp();
                 break;
@@ -269,7 +266,7 @@ public class StatusActivity extends AppCompatActivity {
                 textViewDeviceRemoteIpName.setText(R.string.labelIpLocal);
                 textViewDeviceTransceiverIpName.setText(R.string.labelIpTransceiver);
                 imageViewDeviceTransceiver.setImageResource(R.drawable.device_mobile_na);
-                carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.UNKNOWN, ""));
+                carduino.dataContainer.setSerialState(new ConnectionState(ConnectionEnum.UNKNOWN, ""));
                 updateIp();
                 break;
             default://DIRECT
@@ -282,8 +279,8 @@ public class StatusActivity extends AppCompatActivity {
                 textViewDeviceTransceiverIpName.setText("");
                 textViewDeviceTransceiverIp.setText("");
                 textViewDeviceRemoteIp.setText("");
-                if(carduino.dataContainer.serialData.getSerialState().isUnknown()) {
-                    carduino.dataContainer.serialData.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                if(carduino.dataContainer.getSerialState().isUnknown()) {
+                    carduino.dataContainer.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
                 }
                 break;
         }
@@ -294,19 +291,19 @@ public class StatusActivity extends AppCompatActivity {
     }
 
     private void updateStatus(){
-        textViewDeviceArduino.setText(carduino.dataContainer.serialData.getSerialName());
-        if(carduino.dataContainer.serialData.getSerialType().isBluetooth()){
+        textViewDeviceArduino.setText(carduino.dataContainer.getSerialName());
+        if(carduino.dataContainer.getSerialType().isBluetooth()){
             textViewDeviceArduinoName.setText(R.string.serialDeviceBluetooth);
         }
         else{
             textViewDeviceArduinoName.setText(R.string.serialDeviceArduino);
         }
         //serial connection
-        imageViewSerialConnection.setImageDrawable(carduino.dataContainer.serialData.getSerialConnLogoId(carduino.dataContainer.preferences.getSerialPref()));
+        imageViewSerialConnection.setImageDrawable(carduino.dataContainer.getSerialConnLogoId(carduino.dataContainer.preferences.getSerialPref()));
         textViewSerialConnection.setText(R.string.serialConnection);
-        textViewSerialConnectionStatus.setText(carduino.dataContainer.serialData.getSerialState().getStateName());
-        textViewSerialConnectionError.setText(carduino.dataContainer.serialData.getSerialState().getError());
-        if(!carduino.dataContainer.serialData.getSerialState().getError().equals("")){
+        textViewSerialConnectionStatus.setText(carduino.dataContainer.getSerialState().getStateName());
+        textViewSerialConnectionError.setText(carduino.dataContainer.getSerialState().getError());
+        if(!carduino.dataContainer.getSerialState().getError().equals("")){
             //set focus for marquee
             textViewSerialConnectionError.setSelected(true);
         }
@@ -321,11 +318,11 @@ public class StatusActivity extends AppCompatActivity {
                 break;
             default:
                 //ip connection
-                imageViewIpConnection.setImageDrawable(carduino.dataContainer.ipData.getSerialConnLogoId());
+                imageViewIpConnection.setImageDrawable(carduino.dataContainer.getIpConnLogoId());
                 textViewIpConnection.setText(R.string.ipConnection);
-                textViewIpConnectionStatus.setText(carduino.dataContainer.ipData.getIpState().getStateName());
-                textViewIpConnectionError.setText(carduino.dataContainer.ipData.getIpState().getError());
-                if(!carduino.dataContainer.ipData.getIpState().getError().equals("")){
+                textViewIpConnectionStatus.setText(carduino.dataContainer.getIpState().getStateName());
+                textViewIpConnectionError.setText(carduino.dataContainer.getIpState().getError());
+                if(!carduino.dataContainer.getIpState().getError().equals("")){
                     //set focus for marquee
                     textViewIpConnectionError.setSelected(true);
                 }
@@ -336,14 +333,14 @@ public class StatusActivity extends AppCompatActivity {
 
     private void updateIp(){
         //// TODO: 12.01.201 implement
-        textViewDeviceRemoteIp.setText(carduino.dataContainer.ipData.getRemoteIp());
-        textViewDeviceTransceiverIp.setText(carduino.dataContainer.ipData.getTransceiverIp());
+        textViewDeviceRemoteIp.setText(carduino.dataContainer.getRemoteIp());
+        textViewDeviceTransceiverIp.setText(carduino.dataContainer.getTransceiverIp());
     }
 
     private class SerialConnectionStatusActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,"onReceive status change event: " + carduino.dataContainer.serialData.getSerialState().getStateName());
+            Log.d(TAG,"onReceive status change event: " + carduino.dataContainer.getSerialState().getStateName());
             updateStatus();
         }
     }

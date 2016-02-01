@@ -1,4 +1,7 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
+
+import tuisse.carduinodroid_android.CarduinodroidApplication;
+import tuisse.carduinodroid_android.R;
 
 /**
  * Created by keX on 11.01.2016.

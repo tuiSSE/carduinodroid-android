@@ -1,11 +1,15 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
 
 import android.graphics.drawable.LayerDrawable;
+
+import tuisse.carduinodroid_android.CarduinodroidApplication;
+import tuisse.carduinodroid_android.R;
+import tuisse.carduinodroid_android.Utils;
 
 /**
  * Created by keX on 04.01.2016.
  */
-public class IpData {
+public class IpData implements Ip{
     private ConnectionState ipState;
     private IpType ipType;
 
@@ -14,7 +18,7 @@ public class IpData {
         ipType = IpType.WLAN;
     }
 
-    public synchronized LayerDrawable getSerialConnLogoId(){
+    public synchronized LayerDrawable getIpConnLogoId(){
         int status;
         int type;
         switch (ipState.getState()){
@@ -55,7 +59,7 @@ public class IpData {
                     break;
             }
         }
-        return Utils.assembleDrawables(status,type);
+        return Utils.assembleDrawables(status, type);
     }
 
     public synchronized String getRemoteIp(){

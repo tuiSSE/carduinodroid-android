@@ -1,22 +1,24 @@
-package tuisse.carduinodroid_android;
+package tuisse.carduinodroid_android.data;
 
 import android.graphics.drawable.LayerDrawable;
 import android.util.Log;
 
+import tuisse.carduinodroid_android.CarduinodroidApplication;
+import tuisse.carduinodroid_android.R;
+import tuisse.carduinodroid_android.Utils;
+
 /**
  * Created by keX on 04.01.2016.
  */
-public class SerialData {
+public class SerialData implements Serial{
     private final String TAG = "CarduinoSerialData";
 
-    public SerialProtocolRx serialRx;
-    public SerialProtocolTx serialTx;
+    protected SerialProtocolRx serialRx;
+    protected SerialProtocolTx serialTx;
 
     private ConnectionState serialState;
     private SerialType serialType;
     private String serialName;
-
-    private boolean bluetoothEnabled;
 
     public SerialData(){
         serialRx = new SerialProtocolRx();
@@ -25,14 +27,6 @@ public class SerialData {
         serialState = new ConnectionState(ConnectionEnum.IDLE,"");
         setSerialName(CarduinodroidApplication.getAppContext().getString(R.string.serialDeviceNone));
         setSerialType(SerialType.NONE);
-        setBluetoothEnabled(false);
-    }
-
-    public synchronized void setBluetoothEnabled(boolean bte){
-        bluetoothEnabled = bte;
-    }
-    public synchronized boolean getBluetoothEnabled(){
-        return bluetoothEnabled;
     }
 
     public synchronized void setSerialState(ConnectionState state){
@@ -129,6 +123,6 @@ public class SerialData {
                     }
             }
         }
-        return Utils.assembleDrawables(state,type);
+        return Utils.assembleDrawables(state, type);
     }
 }

@@ -2,9 +2,13 @@ package tuisse.carduinodroid_android;
 
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
+
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.ConnectionState;
+import tuisse.carduinodroid_android.data.DataContainer;
+import tuisse.carduinodroid_android.data.SerialData;
 
 /**
  * Created by keX on 09.12.2015.
@@ -56,11 +60,11 @@ abstract public class SerialConnection {
     }
 
     protected synchronized void setSerialState(ConnectionEnum state, String error){
-        if(getSerialData().getSerialState() != null) {
+        if(getData().getSerialState() != null) {
             //if (!state.equals(getSerialData().getSerialState().getState())) {//if not equal
-                getSerialData().setSerialState(new ConnectionState(state, error));
-                Log.d(TAG, "serial State changed: " + getSerialData().getSerialState().getStateName());
-                if(getSerialData().getSerialState().isError()){
+            getData().setSerialState(new ConnectionState(state, error));
+                Log.d(TAG, "serial State changed: " + getData().getSerialState().getStateName());
+                if(getData().getSerialState().isError()){
                     Log.e(TAG, error);
                 }
                 else if(!error.equals("")){
@@ -119,7 +123,7 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
-            setSerialState(serialService.getCarduino().dataContainer.serialData.getSerialState().getState());
+            setSerialState(serialService.getCarduino().dataContainer.getSerialState().getState());
             serialService.stopSelf();
         }
     }//SerialReceiveThread
@@ -153,38 +157,38 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
-            setSerialState(serialService.getCarduino().dataContainer.serialData.getSerialState().getState());
+            setSerialState(serialService.getCarduino().dataContainer.getSerialState().getState());
             serialService.stopSelf();
         }
     }//SerialSendThread
 
     protected synchronized boolean isIdle() {
-        return getSerialData().getSerialState().isIdle();
+        return getData().getSerialState().isIdle();
     }
     protected synchronized boolean isFound() {
-        return getSerialData().getSerialState().isFound();
+        return getData().getSerialState().isFound();
     }
     protected synchronized boolean isConnected() {
-        return getSerialData().getSerialState().isConnected();
+        return getData().getSerialState().isConnected();
     }
     protected synchronized boolean isError() {
-        return getSerialData().getSerialState().isError();
+        return getData().getSerialState().isError();
     }
     protected synchronized boolean isTryConnect() {
-        return getSerialData().getSerialState().isTryConnect();
+        return getData().getSerialState().isTryConnect();
     }
     protected synchronized boolean isRunning() {
-        return getSerialData().getSerialState().isRunning();
+        return getData().getSerialState().isRunning();
     }
     protected synchronized boolean isUnknown() {
-        return getSerialData().getSerialState().isUnknown();
+        return getData().getSerialState().isUnknown();
     }
     protected synchronized boolean isStarted(){
-        return getSerialData().getSerialState().isStarted();
+        return getData().getSerialState().isStarted();
     }
 
-    protected synchronized SerialData getSerialData(){
-        return serialService.getCarduino().dataContainer.serialData;
+    protected synchronized DataContainer getData(){
+        return serialService.getCarduino().dataContainer;
     }
 
 }

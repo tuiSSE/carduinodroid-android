@@ -74,13 +74,13 @@
     <string name="orientationPortrait">Portrait</string>
     <string name="orientationLandscape">Landscape</string>
 
-    <string name="driveDistanceFront">%1$04d Distance Front [cm]</string>
-    <string name="driveDistanceBack">%1$04d Distance Back [cm]</string>
-    <string name="driveCurrent">%1$04d Current [mA]</string>
-    <string name="driveVoltage">%1$04d Voltage [V]</string>
-    <string name="driveRelativeBattery">%1$04d Relative Battery [%%]</string>
-    <string name="driveAbsoluteBattery">%1$04d Absolute Battery [mAh]</string>
-    <string name="driveTemperature">%1$04d Temperature [°C]</string>
+    <string name="driveDistanceFront">%1$4.1f Distance Front [cm]</string>
+    <string name="driveDistanceBack">%1$4.1f Distance Back [cm]</string>
+    <string name="driveCurrent">%1$4.1f Current [mA]</string>
+    <string name="driveVoltage">%1$4.1f Voltage [V]</string>
+    <string name="driveRelativeBattery">%1$4.1f Relative Battery [%%]</string>
+    <string name="driveAbsoluteBattery">%1$4.1f Absolute Battery [mAh]</string>
+    <string name="driveTemperature">%1$4.1f Temperature [°C]</string>
 
     <string name="driveAngle0">%1$04d\trel Azimut [°]</string>
     <string name="driveAngle1">%1$04d\trel Pitch [°]</string>

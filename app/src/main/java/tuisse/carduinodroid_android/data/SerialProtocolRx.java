@@ -1,11 +1,10 @@
-package tuisse.carduinodroid_android;
-import android.content.Intent;
+package tuisse.carduinodroid_android.data;
 import android.util.Log;
 
 /**
  * Created by keX on 07.12.2015.
  */
-public class SerialProtocolRx extends SerialProtocol {
+public class SerialProtocolRx extends SerialProtocol implements SerialRx {
     private final String TAG = "CarduinoSerialRx";
 
     private final int NUM_CURRENT = 2;
@@ -55,32 +54,32 @@ public class SerialProtocolRx extends SerialProtocol {
         ultrasoundBack = 0;
     }
 
-    public synchronized int getCurrent() {
-        return current;
+    public synchronized float getCurrent() {
+        return current / CURRENT_DEVIDER;
     }
 
-    public synchronized int getAbsoluteBatteryCapacity() {
-        return absoluteBatteryCapacity;
+    public synchronized float getAbsoluteBatteryCapacity() {
+        return absoluteBatteryCapacity / ABS_BATT_DEVIDER;
     }
 
-    public synchronized int getPercentBatteryCapacity() {
-        return percentBatteryCapacity;
+    public synchronized float getPercentBatteryCapacity() {
+        return percentBatteryCapacity / PER_BATT_DEVIDER;
     }
 
-    public synchronized int getVoltage() {
-        return voltage;
+    public synchronized float getVoltage() {
+        return voltage / VOLTAGE_DEVIDER;
     }
 
-    public synchronized int getDs2745Temperature() {
-        return ds2745temperature;
+    public synchronized float getDs2745Temperature() {
+        return ds2745temperature / TEMPERATURE_DEVIDER;
     }
 
-    public synchronized int getUltrasoundFront() {
-        return ultrasoundFront;
+    public synchronized float getUltrasoundFront() {
+        return ultrasoundFront / ULTRASOUND_FRONT_DEVIDER;
     }
 
-    public synchronized int getUltrasoundBack() {
-        return ultrasoundBack;
+    public synchronized float getUltrasoundBack() {
+        return ultrasoundBack / ULTRASOUND_BACK_DEVIDER;
     }
 
     public synchronized String print(){
@@ -93,7 +92,7 @@ public class SerialProtocolRx extends SerialProtocol {
                 " ultrasoundBack  " + ultrasoundBack;
     }
 
-    public synchronized boolean append(byte inChar){
+    public synchronized boolean serialAppend(byte inChar){
         if(inChar == START_BYTE){
             rxBufferLength = 0;
         }
