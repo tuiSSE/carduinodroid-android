@@ -33,11 +33,16 @@ public class Utils {
     }
 
     public static synchronized int getIntPref(String key, int defaultVal) {
-        String value = PreferenceManager.getDefaultSharedPreferences(CarduinodroidApplication.getAppContext()).getString(key, null);
-        if(value == null){
-            Log.d(TAG, key + " getIntPref error, take defaultVal: " + defaultVal);
+        try {
+            String value = PreferenceManager.getDefaultSharedPreferences(CarduinodroidApplication.getAppContext()).getString(key, null);
+            if (value == null) {
+                Log.d(TAG, key + " getIntPref error, take defaultVal: " + defaultVal);
+            }
+            return value == null ? defaultVal : Integer.valueOf(value);
+        }catch (Exception e){
+            Log.e(TAG,e.toString());
         }
-        return value == null ? defaultVal : Integer.valueOf(value);
+        return 0;
     }
 
     public static synchronized void setIntPref(String key, Integer val){

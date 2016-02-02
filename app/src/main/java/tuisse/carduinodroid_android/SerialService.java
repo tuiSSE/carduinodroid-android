@@ -12,8 +12,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
+import tuisse.carduinodroid_android.data.DataHandler;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
@@ -25,6 +27,13 @@ public class SerialService extends Service {
 
     private static final int NOTIFICATION = 1337;
     public static final String EXIT_ACTION = "tuisse.carduinodroid_android.EXIT";
+
+    private CarduinoData getData(){
+        return carduino.dataHandler.data;
+    }
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
+    }
 
     @Nullable
     private NotificationManager mNotificationManager = null;
@@ -62,8 +71,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(carduino.dataContainer.getSerialState().getStateName())
-                .setContentText(carduino.dataContainer.getSerialState().getStateName());
+                .setTicker(getData().getSerialState().getStateName())
+                .setContentText(getData().getSerialState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -92,30 +101,30 @@ public class SerialService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
-        if(carduino.dataContainer.getSerialState().isUnknown()){
+        if(getData().getSerialState().isUnknown()){
             Log.e(TAG,"FATAL: this device should not start serial service!");
             serial = null;
             stopSelf();
             return START_STICKY;
         }
-        if(carduino.dataContainer.getSerialState().isError()) {
+        if(getData().getSerialState().isError()) {
             Log.i(TAG, "resetting serial");
             if(serial != null){
                 serial.reset();
             }
             else{
-                carduino.dataContainer.setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
+                getData().setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
             }
         }
-        if (!carduino.dataContainer.getSerialState().isIdle()) {
+        if (!getData().getSerialState().isIdle()) {
             Log.d(TAG, "serial already started");
             return START_STICKY;
         }
-        if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-                serial = new SerialBluetooth(this);
+        if(getDataHandler().getSerialPref().isBluetooth()){
+            serial = new SerialBluetooth(this);
                 Log.d(TAG, "onCreated SerialBluetooth");
         }
-        else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
+        else if(getDataHandler().getSerialPref().isUsb()){
                 serial = new SerialUsb(this);
                 Log.d(TAG, "onCreated SerialUsb");
         }

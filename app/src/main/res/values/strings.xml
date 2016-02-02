@@ -51,9 +51,9 @@
 
     <!-- ConnectionState -->
     <string name="connectionStateIdle">Idle</string>
-    <string name="connectionStateTryFind">Try to find ...</string>
+    <string name="connectionStateTryFind">Try to find …</string>
     <string name="connectionStateFound">Found</string>
-    <string name="connectionStateTryConnect">Try to connect ...</string>
+    <string name="connectionStateTryConnect">Try to connect …</string>
     <string name="connectionStateConnected">Connected</string>
     <string name="connectionStateRunning">Running</string>
     <!-- ConnectionStateErrors -->
@@ -99,7 +99,7 @@
     <string name="openBluetoothSettingsText">Pair your Carduinodroid with this mobile</string>
 
     <!-- serial connection -->
-    <string name="serialDefaultBluetoothDeviceName">HC-06</string>
+    <string name="serialDefaultBluetoothDeviceName">HC</string>
     <string name="serialBluetoothEnable">enabled Bluetooth</string>
     <string name="serialErrorNoBluetoothDevicePaired">no bluetooth paired</string>
     <string name="serialErrorNoBluetoothDeviceChosen">choose bluetooth device</string>

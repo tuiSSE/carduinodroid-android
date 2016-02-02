@@ -18,6 +18,8 @@ import java.util.Iterator;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.SerialType;
 
+import static tuisse.carduinodroid_android.data.Utils.byteArrayToHexString;
+
 /**
  * Created by keX on 04.01.2016.
  */
@@ -59,11 +61,8 @@ public class SerialUsb extends SerialConnection {
             if (usbManager != null){
                 HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
                 if (deviceList != null) {
-                    Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
                     //usbDevice = null;
-                    while (deviceIterator.hasNext()) {
-                        UsbDevice tempUsbDevice = deviceIterator.next();
-
+                    for (UsbDevice tempUsbDevice : deviceList.values()) {
                         // Print device information. If you think your device should be able
                         // to communicate with this app, add it to accepted products below.
                         Log.d(TAG, "VendorId: " + tempUsbDevice.getVendorId());
@@ -241,7 +240,7 @@ public class SerialUsb extends SerialConnection {
     protected void send() throws IOException {
         byte[] buffer = null;
         if(getData() != null) {
-            buffer = getData().serialGet();
+            buffer = getDataHandler().serialFrameAssembleTx();
         }
         if(buffer != null) {
             if((buffer.length > 0) && (usbConnection != null) && (usbEndpointTx != null)) {
@@ -260,16 +259,16 @@ public class SerialUsb extends SerialConnection {
         final int BUFFER_LENGTH = RECEIVE_BUFFER_LENGTH;
         int acceptedFrame = 0;
         byte[] buffer = new byte[BUFFER_LENGTH];
-        if ((buffer != null) && (usbConnection != null) && (usbEndpointRx != null) && (getData() != null)) {
+        if ((usbConnection != null) && (usbEndpointRx != null) && (getData() != null)) {
             int len = usbConnection.bulkTransfer(usbEndpointRx, buffer, buffer.length, 100);
             //int len = 6;
             if (len > 0) {
                 for (int i = 0; i < len; i++) {
-                    if (getData().serialAppend(buffer[i])) {
+                    if (getDataHandler().serialFrameAppendRx(buffer[i])) {
                         acceptedFrame++;
                     }
                 }
-                //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
+                //Log.d(TAG, byteArrayToHexString(buffer));
             }
         }
         else{

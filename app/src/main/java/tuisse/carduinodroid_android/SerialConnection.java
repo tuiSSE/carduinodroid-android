@@ -5,10 +5,10 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
-import tuisse.carduinodroid_android.data.DataContainer;
-import tuisse.carduinodroid_android.data.SerialData;
+import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
  * Created by keX on 09.12.2015.
@@ -35,6 +35,10 @@ abstract public class SerialConnection {
     abstract protected boolean close();
     abstract protected void send() throws IOException;
     abstract protected int receive() throws IOException;
+
+    protected DataHandler getDataHandler(){
+        return serialService.getCarduino().dataHandler;
+    }
 
     protected boolean reset() {
         setSerialState(ConnectionEnum.IDLE);
@@ -123,7 +127,7 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
-            setSerialState(serialService.getCarduino().dataContainer.getSerialState().getState());
+            setSerialState(getData().getSerialState().getState());
             serialService.stopSelf();
         }
     }//SerialReceiveThread
@@ -157,7 +161,7 @@ abstract public class SerialConnection {
                     serialService.stopSelf();
                 }
             }
-            setSerialState(serialService.getCarduino().dataContainer.getSerialState().getState());
+            setSerialState(getData().getSerialState().getState());
             serialService.stopSelf();
         }
     }//SerialSendThread
@@ -187,8 +191,8 @@ abstract public class SerialConnection {
         return getData().getSerialState().isStarted();
     }
 
-    protected synchronized DataContainer getData(){
-        return serialService.getCarduino().dataContainer;
+    protected synchronized CarduinoData getData(){
+        return serialService.getCarduino().dataHandler.data;
     }
 
 }

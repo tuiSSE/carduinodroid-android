@@ -14,6 +14,8 @@ import java.util.UUID;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.SerialType;
 
+import static tuisse.carduinodroid_android.data.Utils.byteArrayToHexString;
+
 /**
  * Created by keX on 08.12.2015.
  */
@@ -48,7 +50,7 @@ public class SerialBluetooth extends SerialConnection {
             } else {
                 Log.d(TAG, "Bluetooth adapter is ready");
             }
-            getData().setBluetoothEnabled(mBluetoothAdapter.isEnabled());
+            getDataHandler().setBluetoothEnabled(mBluetoothAdapter.isEnabled());
             if (!mBluetoothAdapter.isEnabled()) {
                 Log.d(TAG, serialService.getString(R.string.serialBluetoothEnable));
                 serialService.sendToast(serialService.getString(R.string.serialBluetoothEnable));
@@ -70,13 +72,13 @@ public class SerialBluetooth extends SerialConnection {
                 mBluetoothAdapter.cancelDiscovery();
             }
             //if no bluetooth device is registered add it
-            Log.d(TAG, "+" + serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName() + "+");
+            Log.d(TAG, "+" + getDataHandler().getBluetoothDeviceName() + "+");
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             if (pairedDevices != null) {
                 if (pairedDevices.size() > 0) {
 
-                    if (serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName().equals("")) {
+                    if (getDataHandler().getBluetoothDeviceName().equals("")) {
                         //start preferences
                         Log.d(TAG, serialService.getString(R.string.serialErrorNoBluetoothDeviceChosen));
                         serialService.sendToast(R.string.serialErrorNoBluetoothDeviceChosen);
@@ -87,7 +89,7 @@ public class SerialBluetooth extends SerialConnection {
                     int foundDevices = 0;
                     for (BluetoothDevice device : pairedDevices) {
                         Log.d(TAG, "bluetooth device found: " + device.getName());
-                        if (device.getName().contains(serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName())) {
+                        if (device.getName().contains(getDataHandler().getBluetoothDeviceName())) {
                             mmDevice = device;
                             Log.d(TAG, "carduinodroid device found: " + mmDevice.getName());
                             Log.d(TAG, mmDevice.getAddress());
@@ -101,18 +103,18 @@ public class SerialBluetooth extends SerialConnection {
                     else if(foundDevices > 1){
                         mmDevice = null;
                         setSerialState(ConnectionEnum.TRYCONNECTERROR,String.format(
-                            serialService.getString(R.string.serialErrorTooMuchCarduinoBluetoothDeviceFound),
-                            foundDevices,
-                            serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName()
+                                serialService.getString(R.string.serialErrorTooMuchCarduinoBluetoothDeviceFound),
+                                foundDevices,
+                                getDataHandler().getBluetoothDeviceName()
                         ));
                         return false;
                     }
                     else {
                         //foundDevice == 0
                         setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(
-                            serialService.getString(R.string.serialErrorNoCarduinoBluetoothDeviceFound),
-                            pairedDevices.size(),
-                            serialService.getCarduino().dataContainer.preferences.getBluetoothDeviceName()
+                                serialService.getString(R.string.serialErrorNoCarduinoBluetoothDeviceFound),
+                                pairedDevices.size(),
+                                getDataHandler().getBluetoothDeviceName()
                         ));
                         return false;
                     }
@@ -230,14 +232,14 @@ public class SerialBluetooth extends SerialConnection {
             if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
-            switch (serialService.getCarduino().dataContainer.preferences.getBluetoothHandling()) {
+            switch (getDataHandler().getBluetoothHandling()) {
                 case ON:
                     break;
                 case OFF:
                     mBluetoothAdapter.disable();
                     break;
                 default://AUTO
-                    if (!serialService.getCarduino().dataContainer.getBluetoothEnabled()) {
+                    if (!getDataHandler().getBluetoothEnabled()) {
                         mBluetoothAdapter.disable();
                     }
                     break;
@@ -253,8 +255,8 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     protected void send() throws IOException {
-        //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(getSerialData().serialTx.get()));
-        mmOutputStream.write(getData().serialGet());
+        //Log.d(TAG, byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
+        mmOutputStream.write(getDataHandler().serialFrameAssembleTx());
     }
 
     @Override
@@ -265,11 +267,11 @@ public class SerialBluetooth extends SerialConnection {
             byte[] buffer = new byte[BUFFER_LENGTH];
             int len = mmInputStream.read(buffer,0,BUFFER_LENGTH);
             for(int i = 0; i < len; i++){
-                if(getData().serialAppend(buffer[i])){
+                if(getDataHandler().serialFrameAppendRx(buffer[i])){
                     acceptedFrame++;
-                };
+                }
             }
-            //Log.d(TAG, getSerialData().serialTx.byteArrayToHexString(buffer));
+            //Log.d(TAG, byteArrayToHexString(buffer));
         }
         return acceptedFrame;
     }

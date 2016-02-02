@@ -73,19 +73,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 switch (preference.getKey()) {
                     case "pref_key_control_mode":
                         intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
-                        carduino.dataContainer.preferences.setControlMode(ControlMode.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getControlMode().toString());
+                        carduino.dataHandler.setControlMode(ControlMode.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getControlMode().toString());
                         break;
                     case "pref_key_reset_battery":
-                        //carduino.dataContainer.serialData.serialTx.setResetAccCur(val);
+                        //carduino.dataHandler.serialData.serialTx.setResetAccCur(val);
                         Log.d(TAG, preference.getKey() + ": " + stringValue);
                         break;
                     case "pref_key_serial_type":
                         intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
-                        carduino.dataContainer.preferences.setSerialPref(SerialType.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getSerialPref().toString());
+                        carduino.dataHandler.setSerialPref(SerialType.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getSerialPref().toString());
                             /*
-                            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
+                            if(carduino.dataHandler.getSerialPref().isBluetooth()){
                                 findPreference("pref_key_bluetooth_device_name").setEnabled(true);
                             }
                             else{
@@ -94,33 +94,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             */
                         break;
                     case "pref_key_bluetooth_device_name":
-                        carduino.dataContainer.preferences.setBluetoothDeviceName(stringValue);
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothDeviceName());
+                        carduino.dataHandler.setBluetoothDeviceName(stringValue);
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothDeviceName());
                         break;
                     case "pref_key_bluetooth_handling":
                         intValue = tryStringToInt(stringValue, BluetoothHandling.toInteger(BluetoothHandling.AUTO));
-                        carduino.dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothHandling());
+                        carduino.dataHandler.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothHandling());
                         break;
                     case "pref_key_failsafe_stop":
                         intValue = tryStringToInt(stringValue,1);
                         if(intValue == 1){
-                            carduino.dataContainer.preferences.setFailSafeStopPref(true);
+                            carduino.dataHandler.setFailSafeStopPref(true);
                         }
                         else {
-                            carduino.dataContainer.preferences.setFailSafeStopPref(false);
+                            carduino.dataHandler.setFailSafeStopPref(false);
                         }
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getFailSafeStopPref());
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getFailSafeStopPref());
                         break;
                     case "pref_key_debug_view":
                         intValue = tryStringToInt(stringValue,1);
                         if(intValue == 1){
-                            carduino.dataContainer.preferences.setDebugView(true);
+                            carduino.dataHandler.setDebugView(true);
                         }
                         else {
-                            carduino.dataContainer.preferences.setDebugView(false);
+                            carduino.dataHandler.setDebugView(false);
                         }
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataContainer.preferences.getBluetoothDeviceName());
+                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothDeviceName());
                         break;
                     default:
                         Log.d(TAG, "key not known: " + preference.getKey());

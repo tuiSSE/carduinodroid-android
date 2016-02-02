@@ -7,9 +7,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import tuisse.carduinodroid_android.data.BluetoothHandling;
-import tuisse.carduinodroid_android.data.DataContainer;
+import tuisse.carduinodroid_android.data.DataHandler;
 import tuisse.carduinodroid_android.data.ControlMode;
-import tuisse.carduinodroid_android.data.Preferences;
 import tuisse.carduinodroid_android.data.SerialType;
 
 /**
@@ -18,10 +17,9 @@ import tuisse.carduinodroid_android.data.SerialType;
 public class CarduinodroidApplication extends Application /* implements SharedPreferences.OnSharedPreferenceChangeListener */{
     private static final String TAG = "CarduinoApplication";
 
-
     private SharedPreferences sharedPrefs;
 
-    protected DataContainer dataContainer = null;
+    protected DataHandler dataHandler = null;
     private static Context appContext = null;
 
 
@@ -29,7 +27,9 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
     public void onCreate() {
         super.onCreate();
         appContext = getApplicationContext();
-        dataContainer = new DataContainer();
+        dataHandler = new DataHandler();
+        Log.d(TAG, "dataHandler ready");
+
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         updateSharedPreferences(sharedPrefs, "initialize");
         Log.i(TAG, "onCreated");
@@ -38,78 +38,74 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
     @Override
     public void onTerminate() {
         super.onTerminate();
-        dataContainer = null;
+        dataHandler = null;
         appContext = null;
         Log.i(TAG, "onTerminated");
     }
 
     public synchronized void updateSharedPreferences(SharedPreferences sharedPreferences, String key) {
-        if(dataContainer == null){
-            Log.e(TAG,"no dataContainer initialized");
-        }
-        if (dataContainer.preferences == null){
-            Log.d(TAG, "no preferences initialized");
-            dataContainer.preferences = new Preferences();
+        if(dataHandler == null){
+            Log.e(TAG, "no dataHandler initialized");
         }
         Log.d(TAG, key + ": updating Prefs");
         switch(key){
             case "pref_key_serial_type":
-                dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref(key, SerialType.toInteger(SerialType.BLUETOOTH))));
-                Log.d(TAG, key + ": " + dataContainer.preferences.getSerialPref().toString());
+                dataHandler.setSerialPref(SerialType.fromInteger(Utils.getIntPref(key, SerialType.toInteger(SerialType.BLUETOOTH))));
+                Log.d(TAG, key + ": " + dataHandler.getSerialPref().toString());
                 break;
             case "pref_key_control_mode":
-                dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref(key, ControlMode.toInteger(ControlMode.TRANSCEIVER))));
-                Log.d(TAG, key + ": " + dataContainer.preferences.getControlMode());
+                dataHandler.setControlMode(ControlMode.fromInteger(Utils.getIntPref(key, ControlMode.toInteger(ControlMode.TRANSCEIVER))));
+                Log.d(TAG, key + ": " + dataHandler.getControlMode());
                 break;
             case "pref_key_bluetooth_device_name":
-                dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString(key, getString(R.string.serialDefaultBluetoothDeviceName)));
-                Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothDeviceName());
+                dataHandler.setBluetoothDeviceName(sharedPreferences.getString(key, getString(R.string.serialDefaultBluetoothDeviceName)));
+                Log.d(TAG, key + ": " + dataHandler.getBluetoothDeviceName());
                 break;
             case "pref_key_bluetooth_handling":
-                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
-                Log.d(TAG, key + ": " + dataContainer.preferences.getBluetoothHandling());
+                dataHandler.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref(key, BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                Log.d(TAG, key + ": " + dataHandler.getBluetoothHandling());
                 break;
             case "pref_key_failsafe_stop":
                 if(Utils.getIntPref(key,1) == 1){
-                    dataContainer.preferences.setFailSafeStopPref(true);
+                    dataHandler.setFailSafeStopPref(true);
                 }
                 else {
-                    dataContainer.preferences.setFailSafeStopPref(false);
+                    dataHandler.setFailSafeStopPref(false);
                 }
-                Log.d(TAG, key + ": " + dataContainer.preferences.getFailSafeStopPref());
+                Log.d(TAG, key + ": " + dataHandler.getFailSafeStopPref());
                 break;
             case "pref_key_debug_view":
                 if(Utils.getIntPref(key,0) == 1){
-                    dataContainer.preferences.setDebugView(true);
+                    dataHandler.setDebugView(true);
                 }
                 else {
-                    dataContainer.preferences.setDebugView(false);
+                    dataHandler.setDebugView(false);
                 }
-                Log.d(TAG, key + ": " + dataContainer.preferences.getDebugView());
+                Log.d(TAG, key + ": " + dataHandler.getDebugView());
                 break;
             default:
-                dataContainer.preferences.setSerialPref(SerialType.fromInteger(Utils.getIntPref("pref_key_serial_type", SerialType.toInteger(SerialType.BLUETOOTH))));
-                dataContainer.preferences.setControlMode(ControlMode.fromInteger(Utils.getIntPref("pref_key_control_mode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
-                dataContainer.preferences.setBluetoothDeviceName(sharedPreferences.getString("pref_key_bluetooth_device_name", getString(R.string.serialDefaultBluetoothDeviceName)));
-                dataContainer.preferences.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref("pref_key_bluetooth_handling", BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
+                dataHandler.setControlMode(ControlMode.fromInteger(Utils.getIntPref("pref_key_control_mode", ControlMode.toInteger(ControlMode.TRANSCEIVER))));
+                dataHandler.setSerialPref(SerialType.fromInteger(Utils.getIntPref("pref_key_serial_type", SerialType.toInteger(SerialType.BLUETOOTH))));
+                dataHandler.setBluetoothDeviceName(sharedPreferences.getString("pref_key_bluetooth_device_name", getString(R.string.serialDefaultBluetoothDeviceName)));
+                dataHandler.setBluetoothHandling(BluetoothHandling.fromInteger(Utils.getIntPref("pref_key_bluetooth_handling", BluetoothHandling.toInteger(BluetoothHandling.AUTO))));
                 if(Utils.getIntPref("pref_key_failsafe_stop",1) == 1){
-                    dataContainer.preferences.setFailSafeStopPref(true);
+                    dataHandler.setFailSafeStopPref(true);
                 }
                 else {
-                    dataContainer.preferences.setFailSafeStopPref(false);
+                    dataHandler.setFailSafeStopPref(false);
                 }
-                Log.d(TAG, "pref_key_failsafe_stop: " + dataContainer.preferences.getFailSafeStopPref());
                 if(Utils.getIntPref("pref_key_debug_view",0) == 1){
-                    dataContainer.preferences.setDebugView(true);
+                    dataHandler.setDebugView(true);
                 }
                 else {
-                    dataContainer.preferences.setDebugView(false);
+                    dataHandler.setDebugView(false);
                 }
-                Log.d(TAG, "pref_key_debug_view: " + dataContainer.preferences.getDebugView());
-                Log.d(TAG, "pref_key_bluetooth_handling: "      + dataContainer.preferences.getBluetoothHandling());
-                Log.d(TAG, "pref_key_serial_type: "             + dataContainer.preferences.getSerialPref().toString());
-                Log.d(TAG, "pref_key_control_mode: "            + dataContainer.preferences.getControlMode());
-                Log.d(TAG, "pref_key_bluetooth_device_name: "   + dataContainer.preferences.getBluetoothDeviceName());
+                Log.d(TAG, "pref_key_failsafe_stop: " + dataHandler.getFailSafeStopPref());
+                Log.d(TAG, "pref_key_debug_view: " + dataHandler.getDebugView());
+                Log.d(TAG, "pref_key_bluetooth_handling: " + dataHandler.getBluetoothHandling());
+                Log.d(TAG, "pref_key_serial_type: " + dataHandler.getSerialPref());
+                Log.d(TAG, "pref_key_control_mode: " + dataHandler.getControlMode());
+                Log.d(TAG, "pref_key_bluetooth_device_name: " + dataHandler.getBluetoothDeviceName());
                 break;
         }
     }
@@ -121,14 +117,5 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
         }
         return appContext;
     }
-/*
-    public static DataContainer getDataContainer(){
-        if(dataContainer == null){
-            //should never happen
-            Log.e(TAG,"undefined app state: no dataContainer");
-        }
-        return dataContainer;
-    }
-*/
 
 }

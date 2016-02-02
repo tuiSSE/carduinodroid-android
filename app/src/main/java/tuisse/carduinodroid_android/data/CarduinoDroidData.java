@@ -1,22 +1,44 @@
 package tuisse.carduinodroid_android.data;
 
 import android.graphics.drawable.LayerDrawable;
+import android.util.Log;
 
 import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
-import tuisse.carduinodroid_android.Utils;
 
 /**
- * Created by keX on 04.01.2016.
+ * Created by mate on 02.02.2016.
  */
-public class IpData implements Ip{
+public class CarduinoDroidData extends CarduinoData implements CarduinoDroidIF{
+    private final String TAG = "CarduinoDroidData";
+
     private ConnectionState ipState;
     private IpType ipType;
 
-    public IpData(){
-        ipState = new ConnectionState(ConnectionEnum.IDLE);
-        ipType = IpType.WLAN;
+
+    public CarduinoDroidData(){
+        super();
+        try{
+            init();
+        }catch (Exception e){
+            Log.e(TAG, e.toString());
+        }
     }
+
+    public CarduinoDroidData (CarduinoData cd){
+        super();
+        try{
+            init();
+        }catch (Exception e){
+            Log.e(TAG, e.toString());
+        }
+    }
+
+    private void init(){
+        setIpState(new ConnectionState(ConnectionEnum.IDLE));
+        setIpType(IpType.WLAN);
+    }
+
 
     public synchronized LayerDrawable getIpConnLogoId(){
         int status;
@@ -42,6 +64,7 @@ public class IpData implements Ip{
                 break;
             case UNKNOWN:
                 status = R.drawable.status_unknown;
+                break;
             default:
                 status = R.drawable.status_idle;
                 break;
