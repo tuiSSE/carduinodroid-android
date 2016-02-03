@@ -322,13 +322,14 @@ public class IpConnection {
     }
 
     protected synchronized CarduinoDroidData getDData(){
-        if(ipService.getCarduino().dataHandler.data instanceof CarduinoDroidData){
-            return (CarduinoDroidData) ipService.getCarduino().dataHandler.data;
+        if(ipService.getCarduino().dataHandler.getData() instanceof CarduinoDroidData){
+            return (CarduinoDroidData) ipService.getCarduino().dataHandler.getData();
         }
+        Log.e(TAG,"wrong Data");
         return null;
     }
 
     protected synchronized CarduinoData getData(){
-        return ipService.getCarduino().dataHandler.data;
+        return ipService.getCarduino().dataHandler.getData();
     }
 }

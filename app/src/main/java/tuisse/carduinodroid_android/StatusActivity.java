@@ -72,11 +72,11 @@ public class StatusActivity extends AppCompatActivity {
     private IntentFilter usbFilter;
 
     private CarduinoData getData(){
-        return carduino.dataHandler.data;
+        return carduino.dataHandler.getData();
     }
     private CarduinoDroidData getDData(){
-        if(carduino.dataHandler.data instanceof CarduinoDroidData) {
-            return (CarduinoDroidData)carduino.dataHandler.data;
+        if(carduino.dataHandler.getData() instanceof CarduinoDroidData) {
+            return (CarduinoDroidData)carduino.dataHandler.getData();
         }
         Log.e(TAG,"wrong Data");
         return null;

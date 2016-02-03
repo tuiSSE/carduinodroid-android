@@ -11,7 +11,7 @@ import org.json.JSONObject;
 public class DataHandler implements SerialFrameIF,IpFrameIF{
     private final String TAG = "CarduinoDataHandler";
 
-    public CarduinoData data;
+    protected CarduinoData data;
     protected SerialFrameHandler serialFrameHandler;
     protected IpFrameHandler ipFrameHandler;
 
@@ -25,6 +25,11 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
 
     public DataHandler() {
     }
+
+    public CarduinoData getData(){
+        return data;
+    }
+
 
     public synchronized void setBluetoothEnabled(boolean bte){
         bluetoothEnabled = bte;
@@ -218,7 +223,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return SerialType.toInteger(serialPref);
     }
 
-    public byte[] serialFrameAssembleTx() {
+    public synchronized byte[] serialFrameAssembleTx() {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAssembleTx: " + controlMode.toString());
             return new byte[0];
@@ -228,7 +233,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
-    public boolean serialFrameAppendRx(byte inChar) {
+    public synchronized boolean serialFrameAppendRx(byte inChar) {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAppendRx: " + controlMode.toString());
             return false;
@@ -238,21 +243,21 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
-    public boolean parseJson(JSONObject jsonObjectRxData) {
+    public synchronized boolean parseJson(JSONObject jsonObjectRxData) {
         if(controlMode.isDirect()){
             return false;
         }
         return ipFrameHandler.parseJson(jsonObjectRxData);
     }
 
-    public boolean createJsonObject(String dataTypeMask, String transmitData) {
+    public synchronized boolean createJsonObject(String dataTypeMask, String transmitData) {
         if(controlMode.isDirect()){
             return false;
         }
         return ipFrameHandler.createJsonObject(dataTypeMask,transmitData);
     }
 
-    public JSONObject getTransmitData() {
+    public synchronized JSONObject getTransmitData() {
         if(controlMode.isDirect()){
             return null;
         }

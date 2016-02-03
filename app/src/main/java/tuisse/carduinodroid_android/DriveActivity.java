@@ -118,9 +118,8 @@ public class DriveActivity extends AppCompatActivity {
     private FloatingActionButton buttonStatusLed;
 
     private CarduinoData getData(){
-        return carduino.dataHandler.data;
+        return carduino.dataHandler.getData();
     }
-
 
     private void setDistance(ProgressBar pb, int distance){
         if((distance < 254) && (distance >= 0)){
