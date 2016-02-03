@@ -5,7 +5,7 @@ import android.graphics.drawable.LayerDrawable;
 /**
  * Created by mate on 02.02.2016.
  */
-public interface CarduinoDroidIF extends CarduinoIF {
+public interface CarduinoDroidIF{
 
     LayerDrawable getIpConnLogoId();
     String getRemoteIp();
