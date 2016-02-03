@@ -12,16 +12,28 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.ConnectionState;
+import tuisse.carduinodroid_android.data.DataHandler;
+
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
     static private boolean isDestroyed = false;
     private CarduinodroidApplication carduino;
-    private SerialConnection serial;
+    private SerialConnection serial = null;
     private Handler handler;
     private PowerManager.WakeLock mWakeLock;
 
     private static final int NOTIFICATION = 1337;
     public static final String EXIT_ACTION = "tuisse.carduinodroid_android.EXIT";
+
+    private CarduinoData getData(){
+        return carduino.dataHandler.data;
+    }
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
+    }
 
     @Nullable
     private NotificationManager mNotificationManager = null;
@@ -59,8 +71,8 @@ public class SerialService extends Service {
     protected void showNotification() {
         mNotificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(carduino.dataContainer.serialData.getSerialState().getStateName())
-                .setContentText(carduino.dataContainer.serialData.getSerialState().getStateName());
+                .setTicker(getData().getSerialState().getStateName())
+                .setContentText(getData().getSerialState().getStateName());
         if (mNotificationManager != null) {
             mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
         }
@@ -89,41 +101,51 @@ public class SerialService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         isDestroyed = false;
-        if(serial == null){
-            //create new serial
-            if(carduino.dataContainer.preferences.getSerialPref().isBluetooth()){
-                serial = new SerialBluetooth(this);
-                Log.d(TAG, "onCreated SerialBluetooth");
-            }
-            else if(carduino.dataContainer.preferences.getSerialPref().isUsb()){
-                serial = new SerialUsb(this);
-                Log.d(TAG, "onCreated SerialUsb");
-            }
+        if(getData().getSerialState().isUnknown()){
+            Log.e(TAG,"FATAL: this device should not start serial service!");
+            serial = null;
+            stopSelf();
+            return START_STICKY;
         }
-        if(serial != null){
-            if(serial.isUnknown()){
-                Log.e(TAG,"FATAL: this device should not start serial service!");
-                stopSelf();
-                return START_NOT_STICKY;
-            }
-            if(serial.isError()) {
-                Log.i(TAG, "resetting serial");
+        if(getData().getSerialState().isError()) {
+            Log.i(TAG, "resetting serial");
+            if(serial != null){
                 serial.reset();
             }
-            if (!serial.isIdle()) {
-                Log.d(TAG, "serial already started");
-                return START_STICKY;
+            else{
+                getData().setSerialState(new ConnectionState(ConnectionEnum.IDLE, ""));
             }
+        }
+        if (!getData().getSerialState().isIdle()) {
+            Log.d(TAG, "serial already started");
+            return START_STICKY;
+        }
+        if(getDataHandler().getSerialPref().isBluetooth()){
+            serial = new SerialBluetooth(this);
+                Log.d(TAG, "onCreated SerialBluetooth");
+        }
+        else if(getDataHandler().getSerialPref().isUsb()){
+                serial = new SerialUsb(this);
+                Log.d(TAG, "onCreated SerialUsb");
+        }
+        else{
+            Log.e(TAG, "FATAL on start: serial permission is not either bluetooth or usb");
+            sendToast("FATAL on start: serial permission is not either bluetooth or usb");
+            stopSelf();
+            return START_STICKY;
+        }
+
+        if(serial != null){
             new Thread(new Runnable() {
                 public void run() {
                     if(!serial.find()){
                         stopSelf();
                     }
-                    else if(serial.connect()) {
-                        serial.start();
+                    else if(!serial.connect()) {
+                        stopSelf();
                     }
                     else{
-                        stopSelf();
+                        serial.start();
                     }
                     if(isDestroyed){
                         //if service should stop during connection, stop all threads
@@ -135,24 +157,23 @@ public class SerialService extends Service {
         }
         else{
             Log.e(TAG, "FATAL on start: serial is not created");
+            sendToast("FATAL on start: serial is not created");
             stopSelf();
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
-    public void onDestroy () {
+    public void onDestroy() {
         super.onDestroy();
         isDestroyed = true;
         //disconnect
         if(serial != null){
             serial.close();
-            serial = null;
+        } else {
+            Log.e(TAG, "FATAL on close: serial was not created");
         }
-        else{
-            Log.e(TAG, "FATAL on close: serial is not created");
-        }
-        if(mNotificationManager != null){
+        if(mNotificationManager != null) {
             mNotificationManager.cancel(NOTIFICATION);
         }
         //mWakeLock.release();

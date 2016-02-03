@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorBackground"
+    android:fitsSystemWindows="true"
+    tools:context=".DriveActivity">
+    <!-- The primary full-screen view. This can be replaced with whatever view
+             is needed to present your content, e.g. VideoView, SurfaceView,
+             TextureView, etc. -->
+    <TextView
+        android:id="@+id/fullscreen_content_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:keepScreenOn="true"
+        android:text="Video here..."
+        android:textColor="@color/colorBackgroundText"
+        android:textSize="50sp"
+        android:textStyle="bold"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+            android:id="@+id/seekBarSpeedWrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/buttonDrive"
+            android:layout_below="@+id/seekBarSteer"
+            android:layout_margin="@dimen/fabMargin">
+            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+                android:id="@+id/seekBarSpeed"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:seekBarRotation="CW270" /> <!-- Rotation: CW90 or CW270 -->
+        </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBarSteer"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="@dimen/fabMargin"/>
+
+        <RelativeLayout
+            android:id="@+id/fullscreen_content_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/seekBarSteer"
+            android:layout_above="@+id/buttonStatusLed"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin">
+
+            <ProgressBar
+                android:id="@+id/progressbarDistanceFront"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/fabSize"
+                android:layout_height="@dimen/distanceBarHeight"
+                android:layout_alignParentTop="true"
+                android:max="254"
+                android:progress="200"
+                android:progressDrawable="@drawable/vertical_progress_bar_top"/>
+            <ProgressBar
+                android:id="@+id/progressbarDistanceBack"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="@dimen/fabSize"
+                android:layout_height="@dimen/distanceBarHeight"
+                android:layout_alignParentBottom="true"
+                android:max="254"
+                android:progress="200"
+                android:progressDrawable="@drawable/vertical_progress_bar_bottom"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorBlackOverlay"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/buttonDrive"
+            android:layout_toStartOf="@+id/buttonDrive"
+            android:layout_toRightOf="@+id/buttonHorn"
+            android:layout_toEndOf="@+id/buttonHorn"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginRight="@dimen/fabMargin"
+            android:layout_marginEnd="@dimen/fabMargin">
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/driveOrientation"
+                android:id="@+id/checkBoxOrientation"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"
+                android:checked="false" />
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/driveFailsafeStop"
+                android:id="@+id/checkBoxFailsafeStop"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"
+                android:checked="true" />
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/driveDebug"
+                android:id="@+id/checkBoxDebug"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"
+                android:checked="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveDistanceFront"
+                android:id="@+id/textViewDistanceFront"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveDistanceBack"
+                android:id="@+id/textViewDistanceBack"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveAbsoluteBattery"
+                android:id="@+id/textViewAbsBattery"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveRelativeBattery"
+                android:id="@+id/textViewRelBattery"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveCurrent"
+                android:id="@+id/textViewCurrent"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveVoltage"
+                android:id="@+id/textViewVoltage"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveTemperature"
+                android:id="@+id/textViewTemperature"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_debug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorBlackOverlay"
+            android:layout_toLeftOf="@+id/buttonDrive"
+            android:layout_toStartOf="@+id/buttonDrive"
+            android:layout_toRightOf="@+id/buttonHorn"
+            android:layout_toEndOf="@+id/buttonHorn"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginRight="@dimen/fabMargin"
+            android:layout_marginEnd="@dimen/fabMargin">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveSpeed"
+                android:id="@+id/textViewSpeed"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveSteer"
+                android:id="@+id/textViewSteer"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveAngle0"
+                android:id="@+id/textViewAngle0"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveAngle1"
+                android:id="@+id/textViewAngle1"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveAngle2"
+                android:id="@+id/textViewAngle2"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/buttonDrive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/icon_drive"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginRight="@dimen/fabMargin"
+            android:layout_marginEnd="@dimen/fabMargin"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/buttonHorn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/icon_horn"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/buttonFrontLight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonHorn"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/icon_front_light"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/buttonStatusLed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/buttonFrontLight"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/icon_status_led"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New ToggleButton"
+            android:id="@+id/toggleButton"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/buttonHorn"
+            android:layout_alignStart="@+id/buttonHorn"
+            android:layout_alignRight="@+id/buttonHorn"
+            android:layout_alignEnd="@+id/buttonHorn" />
+
+    </RelativeLayout>
+
+</FrameLayout>

@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tuisse.carduinodroid_android">
 
-    <uses-sdk android:minSdkVersion="16" />
-
     <uses-feature android:name="android.hardware.usb.host" />
 
     <permission
@@ -35,28 +33,33 @@
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:label="@string/appNameShort"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme">
         <activity
             android:name=".StatusActivity"
-            android:label="@string/appName">
+            android:label="@string/appName"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
 
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <action android:name="android.hardware.usb.action.ACTION_USB_DEVICE_DETACHED" />
             </intent-filter>
 
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
+            <meta-data
+                android:name="android.hardware.usb.action.ACTION_USB_DEVICE_DETACHED"
+                android:resource="@xml/device_filter" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/titleActivitySettings" />
-        <activity
             android:name=".DriveActivity"
-            android:label="@string/titleDriveActivity" />
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/titleDriveActivity"
+            android:parentActivityName=".StatusActivity"
+            android:theme="@style/FullscreenTheme" />
 
         <service
             android:name=".SerialService"
@@ -67,8 +70,21 @@
             android:name=".IpService"
             android:enabled="true"
             android:exported="true"
-            android:permission="true"/>
+            android:permission="true" />
 
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".StatusActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="tuisse.carduinodroid_android.StatusActivity" />
+        </activity>
+
+        <service
+            android:name=".WatchdogService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

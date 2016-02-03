@@ -1,11 +1,12 @@
 <resources>
     <!-- application name -->
-    <string name="appName">Carduinodroid</string>
-    <string name="appNameShort">Cardudroid</string>
-    <string name="logoDescription">Carduinodroid logo</string>
+    <string name="appName">carduinodroid</string>
+    <string name="appNameShort">cardudroid</string>
+    <string name="logoDescription">carduinodroid logo</string>
 
     <!-- activity names and button labels -->
-    <string name="actionSettings">Settings</string>
+    <string name="titleSettings">Settings</string>
+    <string name="titleChooseBtActivity">Choose Bluetooth Device</string>
     <string name="titleDriveActivity">Drive</string>
     <string name="closeApp">Close</string>
     <string name="exitApp">Exit</string>
@@ -37,7 +38,6 @@
     <string name="ipDummyRemote">141.24.11.100</string>
     <string name="ipDummyTransceiver">141.24.11.199</string>
     <string name="ipDummyLocal">127.0.0.1</string>
-
     <string name="ipConnection">IP Status:</string>
     <string name="ipConnectionStatus">%1$s</string>
     <string name="ipConnectionError">%1$s</string>
@@ -48,18 +48,12 @@
     <string name="serialDeviceBluetooth">Bluetooth:</string>
     <string name="serialDeviceNone">N/A</string>
 
-    <!-- ControlMode -->
-    <string name="controlModeTransceiver">Mode: Transceiver</string>
-    <string name="controlModeRC">Mode: Remote Control</string>
-    <string name="controlModeDirect">Mode: Direct</string>
-
-
 
     <!-- ConnectionState -->
     <string name="connectionStateIdle">Idle</string>
-    <string name="connectionStateTryFind">Try to find ...</string>
+    <string name="connectionStateTryFind">Try to find …</string>
     <string name="connectionStateFound">Found</string>
-    <string name="connectionStateTryConnect">Try to connect ...</string>
+    <string name="connectionStateTryConnect">Try to connect …</string>
     <string name="connectionStateConnected">Connected</string>
     <string name="connectionStateRunning">Running</string>
     <!-- ConnectionStateErrors -->
@@ -70,47 +64,49 @@
     <string name="connectionStateDefaultError">Unknown error</string>
 
     <!-- serial data display strings -->
-    <string name="speed">Speed %1$d</string>
-    <string name="steer">Steering %1$d</string>
-    <string name="status">Status LED</string>
-    <string name="frontLight">Front Light</string>
-    <string name="failsafeStop">Failsafe Stop</string>
-    <string name="resetAccCurrent">Reset Accumulated Current</string>
-    <string name="back">Back</string>
-    <string name="reset">Reset</string>
+    <string name="driveSpeed">%1$04d Speed</string>
+    <string name="driveSteer">%1$04d Steering</string>
+    <string name="driveStatus">Status LED</string>
+    <string name="driveFrontLight">Front light</string>
+    <string name="driveFailsafeStop">Soft break</string>
+    <string name="driveDebug">Show debug screen</string>
+    <string name="driveOrientation">Orientation %1$s</string>
+    <string name="orientationPortrait">Portrait</string>
+    <string name="orientationLandscape">Landscape</string>
 
-    <string name="notAvailable">"N/A"</string>
-    <string name="distanceFront">%1$s\u0009 Distance Front [cm]</string>
-    <string name="distanceBack">%1$s\u0009 Distance Back [cm]</string>
-    <string name="current">%1$s\u0009 Current [mA]</string>
-    <string name="voltage">%1$s\u0009 Voltage [V]</string>
-    <string name="relativeBattery">%1$s\u0009 Relative Battery [%%]</string>
-    <string name="absoluteBattery">%1$s\u0009 Absolute Battery [mAh]</string>
-    <string name="temperature">%1$s\u0009 Temperature [°C]</string>
+    <string name="driveDistanceFront">%1$4.1f Distance Front [cm]</string>
+    <string name="driveDistanceBack">%1$4.1f Distance Back [cm]</string>
+    <string name="driveCurrent">%1$4.1f Current [mA]</string>
+    <string name="driveVoltage">%1$4.1f Voltage [V]</string>
+    <string name="driveRelativeBattery">%1$4.1f Relative Battery [%%]</string>
+    <string name="driveAbsoluteBattery">%1$4.1f Absolute Battery [mAh]</string>
+    <string name="driveTemperature">%1$4.1f Temperature [°C]</string>
+
+    <string name="driveAngle0">%1$04d\trel Azimut [°]</string>
+    <string name="driveAngle1">%1$04d\trel Pitch [°]</string>
+    <string name="driveAngle2">%1$04d\trel Roll [°]</string>
+
+
 
     <!-- preference strings -->
-    <string name="serialSelect">select Serial Connection</string>
-    <string name="serialBluetooth">serial: Bluetooth</string>
-    <string name="serialUsb">serial: USB</string>
-    <string name="serialAuto">serial: Auto</string>
-    <string name="isSlave">ServiceApplication</string>
-    <string name="isRemote">RemoteApplication</string>
     <string name="defaultIp">141.24.11.1</string>
     <string name="localIp">127.0.0.1</string>
 
     <!-- Promtdialog Buttontexts -->
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="openBluetoothSettingsTitle">Open bluetooth settings</string>
     <string name="openBluetoothSettingsText">Pair your Carduinodroid with this mobile</string>
 
     <!-- serial connection -->
-    <string name="serialDefaultBluetoothDeviceName"></string>
+    <string name="serialDefaultBluetoothDeviceName">HC</string>
     <string name="serialBluetoothEnable">enabled Bluetooth</string>
     <string name="serialErrorNoBluetoothDevicePaired">no bluetooth paired</string>
     <string name="serialErrorNoBluetoothDeviceChosen">choose bluetooth device</string>
-    <string name="serialErrorNoCarduinoBluetoothDeviceFound">no device found</string>
+    <string name="serialErrorNoCarduinoBluetoothDeviceFound">%1$d paired, "%2$s" not found</string>
+    <string name="serialErrorTooMuchCarduinoBluetoothDeviceFound">%1$d paired containing "%2$s" found</string>
     <string name="serialErrorNoBluetoothAdapter">no bluetooth on mobile available</string>
+    <string name="serialErrorNotIdle">find: was not idle</string>
     <string name="serialErrorReceiveTimeout">receive time out</string>
     <string name="serialErrorReceiveFail">receive failed: %1$s</string>
     <string name="serialErrorSendFail">send failed: %1$s</string>
@@ -119,17 +115,22 @@
     <string name="serialErrorSocketClose">Socket can not be closed: %1$s</string>
     <string name="serialErrorInputStream">Inputstream: %1$s</string>
     <string name="serialErrorOutputStream">OutputStream: %1$s</string>
-    <string name="serialErrorIsUnknown">Closing unused serial</string>
+    <string name="serialErrorUnused">Closing unused serial</string>
     <string name="serialErrorUnexpectedClose">unexpected closing</string>
     <string name="serialErrorClose">while closing: %1$s</string>
     <string name="serialErrorNoUsbManager">no usb manager available</string>
     <string name="serialErrorNoUsbManagerPermission">no usb manager permission</string>
     <string name="serialErrorNoArduino">no Arduino</string>
     <string name="serialUsbDeviceFound">%1$s found</string>
+    <string name="serialErrorNoUsbPermission">USB: needs permission</string>
     <string name="serialErrorUsbDeviceOpen">opening USB device failed</string>
     <string name="serialErrorUsbDeviceClaim">claiming USB device failed</string>
     <string name="serialErrorNoUsbRxEndpoint">no Rx endpoint found</string>
     <string name="serialErrorNoUsbTxEndpoint">no Tx endpoint found</string>
+    <string name="serialErrorNoDataPointer">no pointer to resource</string>
+    <string name="serialErrorUsbRelease">usb interface release failed</string>
+    <string name="serialUsbRelease">usb interface released</string>
+    <string name="serialErrorUsbNumInterface">usb too few interfaces</string>
 
     <!-- Arduino versions -->
     <string name="arduino_uno">Arduino Uno</string>
@@ -148,6 +149,7 @@
     <!--Intent strings -->
     <string name="SERIAL_CONNECTION_STATUS_PERMISSION">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION</string>
     <string name="SERIAL_CONNECTION_STATUS_CHANGED">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_CHANGED</string>
+    <string name="SERIAL_CONNECTION_STATUS_EXTRA">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA</string>
 
     <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
     <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
@@ -155,7 +157,91 @@
 
     <!-- preferences -->
     <string name="preference_main">tuisse.carduinodroid_android.PREFERENCE_MAIN</string>
-    <string name="title_activity_main">mainActivity</string>
+    <string name="title_activity_settings">Settings</string>
 
+    <!-- Strings related to Settings -->
+    <!-- header settings -->
+    <string name="pref_header_general">Control mode</string>
+    <string name="pref_header_serial">Serial connection</string>
+    <!-- general settings -->
+    <string name="pref_title_control_mode">Control mode</string>
+    <string name="pref_key_control_mode">pref_key_control_mode</string>
+    <!-- ControlMode -->
+    <string name="controlModeTransceiver">Mode: Transceiver</string>
+    <string name="controlModeRC">Mode: Remote Control</string>
+    <string name="controlModeDirect">Mode: Direct</string>
+    <string-array name="pref_control_mode">
+        <item>@string/controlModeTransceiver</item>
+        <item>@string/controlModeRC</item>
+        <item>@string/controlModeDirect</item>
+    </string-array>
+    <string-array name="pref_control_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <!-- battery reset -->
+    <string name="pref_key_reset_battery">pref_key_reset_battery</string>
+    <string name="pref_title_reset_battery">Reset battery accumulation</string>
+    <string name="pref_summary_reset_battery">Will switch back off if message is delivered</string>
+    <!-- serial settings -->
+    <string name="pref_title_serial_type">Serial connection type</string>
+    <string name="pref_key_serial_type">pref_key_serial_type</string>
+    <string name="serialBluetooth">Bluetooth</string>
+    <string name="serialUsb">USB</string>
+    <string name="serialAuto">Auto</string>
+    <string-array name="pref_serial_type">
+        <item>@string/serialBluetooth</item>
+        <item>@string/serialUsb</item>
+        <!--<item>@string/serialAuto</item>-->
+    </string-array>
+    <string-array name="pref_serial_type_values">
+        <item>1</item>
+        <item>2</item>
+        <!--<item>3</item>-->
+    </string-array>
+    <string name="pref_title_bluetooth_device_name">Bluetooth device name</string>
+    <string name="pref_key_bluetooth_device_name">pref_key_bluetooth_device_name</string>
+    <string name="pref_title_bluetooth_handling">Bluetooth connection handling</string>
+    <string name="pref_key_bluetooth_handling">pref_key_bluetooth_handling</string>
+    <string-array name="pref_bluetooth_handling">
+        <item>@string/pref_bluetooth_handling_auto</item>
+        <item>@string/pref_bluetooth_handling_off</item>
+        <item>@string/pref_bluetooth_handling_on</item>
+    </string-array>
+    <string name="pref_bluetooth_handling_auto">Auto: Set to initial state</string>
+    <string name="pref_bluetooth_handling_off">Off: Turn  off anyhow</string>
+    <string name="pref_bluetooth_handling_on">On: Let on anyhow</string>
+    <string-array name="pref_bluetooth_handling_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="pref_title_debug_view">Debug view</string>
+    <string name="pref_key_debug_view">pref_key_debug_view</string>
+    <string-array name="pref_debug_view">
+        <item>@string/pref_debug_view_on</item>
+        <item>@string/pref_debug_view_off</item>
+    </string-array>
+    <string name="pref_debug_view_on">Enabled</string>
+    <string name="pref_debug_view_off">Disabled</string>
+    <string-array name="pref_debug_view_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+    <string name="pref_title_failsafe_stop">@string/driveFailsafeStop</string>
+    <string name="pref_key_failsafe_stop">pref_key_failsafe_stop</string>
+    <string-array name="pref_failsafe_stop">
+        <item>@string/pref_failsafe_stop_on</item>
+        <item>@string/pref_failsafe_stop_off</item>
+    </string-array>
+    <string name="pref_failsafe_stop_on">Enabled</string>
+    <string name="pref_failsafe_stop_off">Disabled</string>
+    <string-array name="pref_failsafe_stop_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 
 </resources>

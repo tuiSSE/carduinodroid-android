@@ -13,6 +13,10 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.CarduinoDroidData;
+import tuisse.carduinodroid_android.data.IpType;
+
 /**
  * Created by keX on 04.01.2016.
  */
@@ -58,7 +62,7 @@ public class IpConnection {
 
         reset();
 
-        getIpData().setIpType(IpType.WLAN);
+        getDData().setIpType(IpType.WLAN);
     }
 
     protected void reset(){
@@ -296,28 +300,35 @@ public class IpConnection {
     }
 
     protected boolean isIdle() {
-        return getIpData().getIpState().isIdle();
+        return getDData().getIpState().isIdle();
     }
     protected boolean isFound() {
-        return getIpData().getIpState().isFound();
+        return getDData().getIpState().isFound();
     }
     protected boolean isConnected() {
-        return getIpData().getIpState().isConnected();
+        return getDData().getIpState().isConnected();
     }
     protected boolean isError() {
-        return getIpData().getIpState().isError();
+        return getDData().getIpState().isError();
     }
     protected boolean isTryConnect() {
-        return getIpData().getIpState().isTryConnect();
+        return getDData().getIpState().isTryConnect();
     }
     protected boolean isRunning() {
-        return getIpData().getIpState().isRunning();
+        return getDData().getIpState().isRunning();
     }
     protected boolean isUnknown() {
-        return getIpData().getIpState().isUnknown();
+        return getDData().getIpState().isUnknown();
     }
 
-    protected IpData getIpData(){
-        return ipService.getCarduino().dataContainer.ipData;
+    protected synchronized CarduinoDroidData getDData(){
+        if(ipService.getCarduino().dataHandler.data instanceof CarduinoDroidData){
+            return (CarduinoDroidData) ipService.getCarduino().dataHandler.data;
+        }
+        return null;
+    }
+
+    protected synchronized CarduinoData getData(){
+        return ipService.getCarduino().dataHandler.data;
     }
 }
