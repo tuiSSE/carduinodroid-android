@@ -138,7 +138,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewDeviceArduino.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startService(new Intent(StatusActivity.this, SerialService.class));
+                stopService(new Intent(StatusActivity.this, IpService.class));
                 Log.d(TAG, "onClickSerialStart");
             }
         });
@@ -146,7 +146,8 @@ public class StatusActivity extends AppCompatActivity {
         imageViewDeviceRemoteIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(new Intent(StatusActivity.this, SerialService.class));
+                startService(new Intent(StatusActivity.this, IpService.class));
+                //stopService(new Intent(StatusActivity.this, SerialService.class));
                 Log.d(TAG, "onClickSerialStop");
 
             }
@@ -324,7 +325,7 @@ public class StatusActivity extends AppCompatActivity {
                 break;
             default:
                 //ip connection
-                imageViewIpConnection.setImageDrawable(carduino.dataContainer.ipData.getSerialConnLogoId());
+                imageViewIpConnection.setImageDrawable(carduino.dataContainer.ipData.getIPConnLogoId());
                 textViewIpConnection.setText(R.string.ipConnection);
                 textViewIpConnectionStatus.setText(carduino.dataContainer.ipData.getIpState().getStateName());
                 textViewIpConnectionError.setText(carduino.dataContainer.ipData.getIpState().getError());

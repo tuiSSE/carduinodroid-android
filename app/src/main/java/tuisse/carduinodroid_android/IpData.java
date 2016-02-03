@@ -20,7 +20,7 @@ public class IpData {
         ipType = IpType.WLAN;
     }
 
-    public synchronized LayerDrawable getSerialConnLogoId(){
+    public synchronized LayerDrawable getIPConnLogoId(){
         int status;
         int type;
         switch (ipState.getState()){

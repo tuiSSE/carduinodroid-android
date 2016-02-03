@@ -5,24 +5,25 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 public class IpService extends Service {
 
-    static final String TAG = "CarduinoSerialService";
+    static final String TAG = "CarduinoIpService";
 
     private CarduinodroidApplication carduino;
-    private IpConnection ipConnection;
-
+    private IpConnection ip;
 
     protected CarduinodroidApplication getCarduino(){
-        return carduino;
-    }
 
-    public IpService() {
-        ipConnection = new IpConnection(this);
+        return carduino;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+
         return null;
     }
 
@@ -30,7 +31,7 @@ public class IpService extends Service {
     public void onCreate() {
         super.onCreate();
         carduino = (CarduinodroidApplication) getApplication();
-        Log.d(TAG, "onCreated");
+        Log.d(TAG, "onCreate");
     }
 
 
@@ -38,13 +39,48 @@ public class IpService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
+        if(ip == null){
+
+            ip = new IpConnection(this);
+            ip.init();
+        }
+
+        if (ip != null) {
+            new Thread(new Runnable() {
+                public void run() {
+
+                    if(ip != null) {
+
+                        ip.startThread("CtrlSocket");
+                        //ip.closeThreads();
+                        //Log.d(TAG, "New Init");
+                        //ip.init();
+                    }
+                }
+            }, "connectIpCtrlThread").start();
+
+            new Thread(new Runnable() {
+                public void run() {
+
+                    if(ip != null)
+
+                        ip.startThread("DataSocket");
+
+                }
+            }, "connectIpDataThread").start();
+        }
+
         return START_STICKY;
     }
 
     @Override
     public void onDestroy () {
         super.onDestroy();
+        if(ip != null){
 
+            ip.closeSocketServer();
+            //ip = null;
+        }
         Log.i(TAG, "onDestroyed");
     }
 }

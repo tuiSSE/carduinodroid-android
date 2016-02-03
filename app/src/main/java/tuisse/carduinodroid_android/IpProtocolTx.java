@@ -24,23 +24,23 @@ public class IpProtocolTx {
     private static final String TAG_CAR_ULTRASONIC_FRONT = "Ultra Sonic Front";
     private static final String TAG_CAR_ULTRASONIC_BACK = "Ultra Sonic Back";
     private static final String TAG_CAR = "Car Information";
-    private final int NUM_CAR = 0b0001;
+    private final String NUM_CAR = "Car";
 
     private static final String TAG_MOBILITY_GPS = "GPS Data";
     private static final String TAG_MOBILITY_VIBRATION = "Vibration Value";
     private static final String TAG_MOBILITY = "Mobilty Information";
-    private final int NUM_MOBILITY = 0b0010;
+    private final String NUM_MOBILITY = "Mobility";
 
     private static final String TAG_NETWORK_WLAN_AVAILABLE = "WLAN Available";
     private static final String TAG_NETWORK_WLAN_ACTIVE = "WLAN Active";
     private static final String TAG_NETWORK_MOBILE_AVAILABLE = "Mobile Available";
     private static final String TAG_NETWORK_MOBILE_ACTIVE = "Mobile Active";
     private static final String TAG_NETWORK = "Network Information";
-    private final int NUM_NETWORK = 0b0100;
+    private final String NUM_NETWORK = "Network";
 
     private static final String TAG_HARDWARE_CAMERA_RESOLUTION = "Camera Resolution";
     private static final String TAG_HARDWARE = "Hardware Information";
-    private final int NUM_HARDWARE = 0b1000;
+    private final String NUM_HARDWARE = "Hardware";
 
     //
     private int carCurrent;//in 0.1mA
@@ -67,7 +67,7 @@ public class IpProtocolTx {
 
         reset();
         //Testing Parameter for functions
-        //createJsonObject(0b1111,"Test");
+        //createJsonObject("Car,Mobility","Test");
     }
 
     public synchronized void reset(){
@@ -99,7 +99,7 @@ public class IpProtocolTx {
 
     // Standard Build of the transmitted JSON Object defined by Header, Hardware information,
     // Car information, vibration and camera resolution out of the available variables
-    public synchronized boolean createJsonObject(int dataTypeMask, String transmitData) {
+    public synchronized boolean createJsonObject(String dataTypeMask, String transmitData) {
 
         if(setTransmitInformation(transmitData))
         {
@@ -116,7 +116,7 @@ public class IpProtocolTx {
 
                 // often updated information base
                 // Collect all the Car information for the JSON Object to the remote side
-                if (NUM_CAR == (dataTypeMask & NUM_CAR)) {
+                if (checkDataTypeMask(dataTypeMask,NUM_CAR)) {
 
                     JSONObject JsonObjectCarInformation = new JSONObject();
 
@@ -132,7 +132,7 @@ public class IpProtocolTx {
                 }
                 // Collect all the mobility information (GPS,Vibration) for the JSON Object to the
                 // remote side
-                if (NUM_MOBILITY == (dataTypeMask & NUM_MOBILITY)) {
+                if (checkDataTypeMask(dataTypeMask,NUM_MOBILITY)) {
 
                     JSONObject JsonObjectMobilityInformation = new JSONObject();
 
@@ -144,7 +144,7 @@ public class IpProtocolTx {
 
                 // rarely updated information based on changed values like
                 // Collect all the network information for the JSON Object to the remote side
-                if (NUM_NETWORK == (dataTypeMask & NUM_NETWORK)) {
+                if (checkDataTypeMask(dataTypeMask,NUM_NETWORK)) {
 
                     JSONObject JsonObjectNetworkInformation = new JSONObject();
 
@@ -158,7 +158,7 @@ public class IpProtocolTx {
 
                 // once collected information based on a certain mobile phone setup
                 // Collect all the hardware feature based on the mobile phone for the JSON Object
-                if (NUM_HARDWARE == (dataTypeMask & NUM_HARDWARE)) {
+                if (checkDataTypeMask(dataTypeMask,NUM_HARDWARE)) {
 
                     JSONObject JsonObjectHardwareInformation = new JSONObject();
 
@@ -168,7 +168,7 @@ public class IpProtocolTx {
                 }
 
                 //Log.d(TAG, String.valueOf(BYTE_MASK & NUM_CAR));
-                Log.d(TAG, getTransmitData().toString());
+                //Log.d(TAG, getTransmitData().toString());
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -184,6 +184,13 @@ public class IpProtocolTx {
     public synchronized JSONObject getTransmitData(){
 
         return JsonObjectTxData;
+    }
+
+    private synchronized boolean checkDataTypeMask(String dataTypeMask, String Type){
+
+        if(dataTypeMask.contains(Type)){
+            return true;
+        }else{ return false;}
     }
 
     private synchronized int getVersion(){ return VERSION;}
@@ -205,6 +212,5 @@ public class IpProtocolTx {
     private synchronized int getWLANActive(){ return wlanActive;}
 
     private synchronized int getCameraResolution(){ return cameraResolution;}
-
 
 }
