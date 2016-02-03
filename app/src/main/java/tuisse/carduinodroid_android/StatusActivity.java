@@ -72,11 +72,11 @@ public class StatusActivity extends AppCompatActivity {
     private IntentFilter usbFilter;
 
     private CarduinoData getData(){
-        return carduino.dataHandler.data;
+        return carduino.dataHandler.getData();
     }
     private CarduinoDroidData getDData(){
-        if(carduino.dataHandler.data instanceof CarduinoDroidData) {
-            return (CarduinoDroidData)carduino.dataHandler.data;
+        if(carduino.dataHandler.getData() instanceof CarduinoDroidData) {
+            return (CarduinoDroidData)carduino.dataHandler.getData();
         }
         Log.e(TAG,"wrong Data");
         return null;
@@ -162,7 +162,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewDeviceArduino.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startService(new Intent(StatusActivity.this, SerialService.class));
+                stopService(new Intent(StatusActivity.this, IpService.class));
                 Log.d(TAG, "onClickSerialStart");
             }
         });
@@ -170,7 +170,8 @@ public class StatusActivity extends AppCompatActivity {
         imageViewDeviceRemoteIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopService(new Intent(StatusActivity.this, SerialService.class));
+                startService(new Intent(StatusActivity.this, IpService.class));
+                //stopService(new Intent(StatusActivity.this, SerialService.class));
                 Log.d(TAG, "onClickSerialStop");
 
             }

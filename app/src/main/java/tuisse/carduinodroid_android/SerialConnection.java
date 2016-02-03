@@ -192,7 +192,6 @@ abstract public class SerialConnection {
     }
 
     protected synchronized CarduinoData getData(){
-        return serialService.getCarduino().dataHandler.data;
+        return serialService.getCarduino().dataHandler.getData();
     }
-
 }

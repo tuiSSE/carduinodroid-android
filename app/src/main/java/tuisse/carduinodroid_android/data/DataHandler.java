@@ -3,13 +3,15 @@ package tuisse.carduinodroid_android.data;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 /**
  * Created by keX on 10.12.2015.
  */
 public class DataHandler implements SerialFrameIF,IpFrameIF{
     private final String TAG = "CarduinoDataHandler";
 
-    public CarduinoData data;
+    protected CarduinoData data;
     protected SerialFrameHandler serialFrameHandler;
     protected IpFrameHandler ipFrameHandler;
 
@@ -22,8 +24,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private boolean bluetoothEnabled = false;
 
     public DataHandler() {
-        //setControlMode(ControlMode.TRANSCEIVER);
     }
+
+    public CarduinoData getData(){
+        return data;
+    }
+
 
     public synchronized void setBluetoothEnabled(boolean bte){
         bluetoothEnabled = bte;
@@ -39,7 +45,6 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
 
     public synchronized void setControlMode(ControlMode cm){
         try {
-            Log.d(TAG, "cm: " + cm + " controlMode: " + controlMode);
             if (controlMode == null || data == null) {
                 if (cm.isDirect()) {
                     data = new CarduinoData();
@@ -218,7 +223,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return SerialType.toInteger(serialPref);
     }
 
-    public byte[] serialFrameAssembleTx() {
+    public synchronized byte[] serialFrameAssembleTx() {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAssembleTx: " + controlMode.toString());
             return new byte[0];
@@ -228,7 +233,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
-    public boolean serialFrameAppendRx(byte inChar) {
+    public synchronized boolean serialFrameAppendRx(byte inChar) {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAppendRx: " + controlMode.toString());
             return false;
@@ -236,5 +241,26 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         else{
             return serialFrameHandler.serialFrameAppendRx(inChar);
         }
+    }
+
+    public synchronized boolean parseJson(JSONObject jsonObjectRxData) {
+        if(controlMode.isDirect()){
+            return false;
+        }
+        return ipFrameHandler.parseJson(jsonObjectRxData);
+    }
+
+    public synchronized boolean createJsonObject(String dataTypeMask, String transmitData) {
+        if(controlMode.isDirect()){
+            return false;
+        }
+        return ipFrameHandler.createJsonObject(dataTypeMask,transmitData);
+    }
+
+    public synchronized JSONObject getTransmitData() {
+        if(controlMode.isDirect()){
+            return null;
+        }
+        return ipFrameHandler.getTransmitData();
     }
 }

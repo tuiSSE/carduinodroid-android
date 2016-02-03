@@ -29,7 +29,7 @@ public class SerialService extends Service {
     public static final String EXIT_ACTION = "tuisse.carduinodroid_android.EXIT";
 
     private CarduinoData getData(){
-        return carduino.dataHandler.data;
+        return carduino.dataHandler.getData();
     }
     private DataHandler getDataHandler(){
         return carduino.dataHandler;
