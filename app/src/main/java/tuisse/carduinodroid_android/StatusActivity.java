@@ -75,13 +75,8 @@ public class StatusActivity extends AppCompatActivity {
         return carduino.dataHandler.getData();
     }
     private CarduinoDroidData getDData(){
-        if(carduino.dataHandler.getData() instanceof CarduinoDroidData) {
-            return (CarduinoDroidData)carduino.dataHandler.getData();
-        }
-        Log.e(TAG,"wrong Data");
-        return null;
+            return carduino.dataHandler.getDData();
     }
-
     private DataHandler getDataHandler(){
         return carduino.dataHandler;
     }
@@ -340,7 +335,7 @@ public class StatusActivity extends AppCompatActivity {
                 //ip connection
                 try {
                     textViewIpConnection.setText(R.string.ipConnection);
-                    imageViewIpConnection.setImageDrawable(((CarduinoDroidData) getData()).getIpConnLogoId());
+                    imageViewIpConnection.setImageDrawable((getDData()).getIpConnLogoId());
                     textViewIpConnectionStatus.setText(getDData().getIpState().getStateName());
                     textViewIpConnectionError.setText(getDData().getIpState().getError());
                     if (!getDData().getIpState().getError().equals("")) {
@@ -404,6 +399,7 @@ public class StatusActivity extends AppCompatActivity {
                         Log.d(TAG, "EXTRA_DEVICE");
                         // call your method that cleans up and closes communication with the device
                         Log.d(TAG, "disconnecting from usb device");
+
                         stopService(new Intent(StatusActivity.this, SerialService.class));
                     }
                 }
@@ -416,6 +412,4 @@ public class StatusActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

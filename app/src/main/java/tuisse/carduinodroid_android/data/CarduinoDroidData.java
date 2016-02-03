@@ -9,7 +9,7 @@ import tuisse.carduinodroid_android.R;
 /**
  * Created by mate on 02.02.2016.
  */
-public class CarduinoDroidData extends CarduinoData implements CarduinoDroidIF{
+public class CarduinoDroidData implements CarduinoDroidIF{
     private final String TAG = "CarduinoDroidData";
 
     private ConnectionState ipState;
@@ -40,8 +40,8 @@ public class CarduinoDroidData extends CarduinoData implements CarduinoDroidIF{
             Log.e(TAG, e.toString());
         }
     }
-
-    public CarduinoDroidData (CarduinoData cd){
+/*
+    public CarduinoDroidData (CarduinoDroidData ccd){
         super();
         try{
             init();
@@ -49,7 +49,7 @@ public class CarduinoDroidData extends CarduinoData implements CarduinoDroidIF{
             Log.e(TAG, e.toString());
         }
     }
-
+*/
     private void init(){
         setIpState(new ConnectionState(ConnectionEnum.IDLE));
         setIpType(IpType.WLAN);
@@ -220,6 +220,4 @@ public class CarduinoDroidData extends CarduinoData implements CarduinoDroidIF{
     public synchronized void setVibration(int _vibration) {
         vibration = _vibration;
     }
-
-
 }

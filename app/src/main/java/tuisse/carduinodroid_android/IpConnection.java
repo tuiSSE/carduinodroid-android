@@ -294,8 +294,6 @@ public class IpConnection {
     }
 
     protected boolean closeBufferReaderWriter(){
-
-
         return true;
     }
 
@@ -322,11 +320,7 @@ public class IpConnection {
     }
 
     protected synchronized CarduinoDroidData getDData(){
-        if(ipService.getCarduino().dataHandler.getData() instanceof CarduinoDroidData){
-            return (CarduinoDroidData) ipService.getCarduino().dataHandler.getData();
-        }
-        Log.e(TAG,"wrong Data");
-        return null;
+        return ipService.getCarduino().dataHandler.getDData();
     }
 
     protected synchronized CarduinoData getData(){

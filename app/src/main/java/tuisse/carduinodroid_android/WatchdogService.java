@@ -33,8 +33,6 @@ public class WatchdogService extends Service {
         super.onDestroy();
         isDestroyed = true;
         //disconnect
-
-        //mWakeLock.release();
         Log.i(TAG, "onDestroyed");
     }
 }
