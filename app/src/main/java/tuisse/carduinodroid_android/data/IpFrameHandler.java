@@ -11,6 +11,7 @@ import org.json.JSONObject;
 public class IpFrameHandler implements IpFrameIF{
     private final String TAG = "CarduinoIpFrame";
     private CarduinoDroidData carduinoDroidData;
+    private CarduinoData carduinoData;
 
     private final int MY_VERSION = 2;
 
@@ -48,8 +49,9 @@ public class IpFrameHandler implements IpFrameIF{
     private JSONObject JsonObjectTxData;
     private int clientVersion;
 
-    public IpFrameHandler(CarduinoDroidData cdd){
+    public IpFrameHandler(CarduinoData cd, CarduinoDroidData cdd){
         carduinoDroidData = cdd;
+        carduinoData = cd;
         setClientVersion(0);
     }
 
@@ -103,13 +105,13 @@ public class IpFrameHandler implements IpFrameIF{
 
                     JSONObject JsonObjectCarInformation = new JSONObject();
 
-                    JsonObjectCarInformation.put(TAG_CAR_CURRENT, carduinoDroidData.getCurrent());
-                    JsonObjectCarInformation.put(TAG_CAR_BATTERY_ABSOLUTE, carduinoDroidData.getAbsBattCap());
-                    JsonObjectCarInformation.put(TAG_CAR_BATTERY_PERCENTAGE, carduinoDroidData.getRelBattCap());
-                    JsonObjectCarInformation.put(TAG_CAR_VOLTAGE, carduinoDroidData.getVoltage());
-                    JsonObjectCarInformation.put(TAG_CAR_TEMPERATURE, carduinoDroidData.getTemperature());
-                    JsonObjectCarInformation.put(TAG_CAR_ULTRASONIC_FRONT, carduinoDroidData.getUltrasoundFront());
-                    JsonObjectCarInformation.put(TAG_CAR_ULTRASONIC_BACK, carduinoDroidData.getUltrasoundBack());
+                    JsonObjectCarInformation.put(TAG_CAR_CURRENT, carduinoData.getCurrent());
+                    JsonObjectCarInformation.put(TAG_CAR_BATTERY_ABSOLUTE, carduinoData.getAbsBattCap());
+                    JsonObjectCarInformation.put(TAG_CAR_BATTERY_PERCENTAGE, carduinoData.getRelBattCap());
+                    JsonObjectCarInformation.put(TAG_CAR_VOLTAGE, carduinoData.getVoltage());
+                    JsonObjectCarInformation.put(TAG_CAR_TEMPERATURE, carduinoData.getTemperature());
+                    JsonObjectCarInformation.put(TAG_CAR_ULTRASONIC_FRONT, carduinoData.getUltrasoundFront());
+                    JsonObjectCarInformation.put(TAG_CAR_ULTRASONIC_BACK, carduinoData.getUltrasoundBack());
 
                     JsonObjectTxData.put(TAG_CAR, JsonObjectCarInformation);
                 }

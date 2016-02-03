@@ -11,7 +11,8 @@ import org.json.JSONObject;
 public class DataHandler implements SerialFrameIF,IpFrameIF{
     private final String TAG = "CarduinoDataHandler";
 
-    protected CarduinoData data;
+    protected CarduinoData cd;
+    protected CarduinoDroidData ccd;
     protected SerialFrameHandler serialFrameHandler;
     protected IpFrameHandler ipFrameHandler;
 
@@ -27,9 +28,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     }
 
     public CarduinoData getData(){
-        return data;
+        return cd;
     }
 
+    public CarduinoDroidData getDData(){
+        return ccd;
+    }
 
     public synchronized void setBluetoothEnabled(boolean bte){
         bluetoothEnabled = bte;
@@ -45,11 +49,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
 
     public synchronized void setControlMode(ControlMode cm){
         try {
-            if (controlMode == null || data == null) {
+            if (controlMode == null || cd == null) {
+                cd = new CarduinoData();
                 if (cm.isDirect()) {
-                    data = new CarduinoData();
+                    ccd = null;
                 } else {
-                    data = new CarduinoDroidData();
+                    ccd = new CarduinoDroidData();
                 }
             }
             else {
@@ -60,12 +65,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                                 //do nothing
                                 break;
                             case REMOTE:
-                                data = new CarduinoDroidData();
+                                cd = new CarduinoData();
+                                ccd = new CarduinoDroidData();
                                 break;
                             default://DIRECT
-                                if (data instanceof CarduinoDroidData) {
-                                    data = new CarduinoData((CarduinoData) data);
-                                }
+                                cd = new CarduinoData(cd);
+                                ccd = null;
                                 break;
                         }
                         break;
@@ -73,13 +78,15 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                     case REMOTE: {
                         switch (cm) {
                             case TRANSCEIVER:
-                                data = new CarduinoDroidData();
+                                cd = new CarduinoData();
+                                ccd = new CarduinoDroidData();
                                 break;
                             case REMOTE:
                                 //do nothing
                                 break;
                             default://DIRECT
-                                data = new CarduinoData();
+                                cd = new CarduinoData();
+                                ccd = null;
                                 break;
                         }
                         break;
@@ -87,10 +94,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                     default: {//Direct
                         switch (cm) {
                             case TRANSCEIVER:
-                                    data = new CarduinoDroidData(data);
+                                cd = new CarduinoData(cd);
+                                ccd = new CarduinoDroidData();
                                 break;
                             case REMOTE:
-                                data = new CarduinoDroidData();
+                                cd = new CarduinoData();
+                                ccd = new CarduinoDroidData();
                                 break;
                             default://DIRECT
                                 //do nothing
@@ -101,9 +110,15 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                 }
             }
             controlMode = cm;
-            serialFrameHandler = new SerialFrameHandler(data);
-            if(data instanceof CarduinoDroidData) {
-                ipFrameHandler = new IpFrameHandler((CarduinoDroidData)data);
+            if(cd == null){
+                Log.e(TAG, "no CarduinoData");
+            }
+            serialFrameHandler = new SerialFrameHandler(cd);
+            if(!controlMode.isDirect()){
+                if(ccd == null){
+                    Log.e(TAG, "no CarduinoDroidData");
+                }
+                ipFrameHandler = new IpFrameHandler(cd,ccd);
             }
             else{
                 ipFrameHandler = null;

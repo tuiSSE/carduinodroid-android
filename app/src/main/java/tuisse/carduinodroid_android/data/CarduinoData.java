@@ -42,18 +42,18 @@ public class CarduinoData implements CarduinoIF{
         serialState = new ConnectionState(ConnectionEnum.IDLE,"");
         setSerialName(CarduinodroidApplication.getAppContext().getString(R.string.serialDeviceNone));
         setSerialType(SerialType.NONE);
-        current = 0;
-        absBattCap = 0;
-        relBattCap = 0;
-        voltage = 0;
-        temperature = 0;
-        ultrasoundFront = 0;
-        ultrasoundBack = 0;
+        setCurrent(0);
+        setAbsBattCap(0);
+        setRelBattCap(0);
+        setVoltage(0);
+        setTemperature(0);
+        setUltrasoundBack(0);
+        setUltrasoundFront(0);
+        setStatusLed(0);
+        setFrontLight(0);
+        setResetAccCur(0);
+        setFailSafeStop(0);
         resetMotors();
-        statusLed = 0;
-        frontLight = 0;
-        resetAccCur = 0;
-        failSafeStop = 1;
     }
 
     public CarduinoData(CarduinoData cd){
