@@ -50,7 +50,6 @@ public class IpFrameHandler implements IpFrameIF{
 
     public IpFrameHandler(CarduinoDroidData cdd){
         carduinoDroidData = cdd;
-
         setClientVersion(0);
     }
 
@@ -58,9 +57,9 @@ public class IpFrameHandler implements IpFrameIF{
 
     // translate a received JSON object to get all the send information out of it and set it to
     // their variables
-    public synchronized boolean parseJson(JSONObject JsonObjectRxData) {
+    public synchronized boolean parseJson(JSONObject jsonObjectRxData) {
         try {
-            JSONObject JsonObjectHeader = JsonObjectRxData.getJSONObject("Header");
+            JSONObject JsonObjectHeader = jsonObjectRxData.getJSONObject("Header");
 
             setClientVersion(JsonObjectHeader.getInt("Version"));
             if(getClientVersion() != MY_VERSION) {
@@ -180,7 +179,6 @@ public class IpFrameHandler implements IpFrameIF{
     private synchronized int getClientVersion(){
         return clientVersion;
     }
-
     private synchronized void setClientVersion(int _clientVersion){
         clientVersion = _clientVersion;
     }

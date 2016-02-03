@@ -3,6 +3,8 @@ package tuisse.carduinodroid_android.data;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 /**
  * Created by keX on 10.12.2015.
  */
@@ -22,7 +24,6 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private boolean bluetoothEnabled = false;
 
     public DataHandler() {
-        //setControlMode(ControlMode.TRANSCEIVER);
     }
 
     public synchronized void setBluetoothEnabled(boolean bte){
@@ -39,7 +40,6 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
 
     public synchronized void setControlMode(ControlMode cm){
         try {
-            Log.d(TAG, "cm: " + cm + " controlMode: " + controlMode);
             if (controlMode == null || data == null) {
                 if (cm.isDirect()) {
                     data = new CarduinoData();
@@ -236,5 +236,26 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         else{
             return serialFrameHandler.serialFrameAppendRx(inChar);
         }
+    }
+
+    public boolean parseJson(JSONObject jsonObjectRxData) {
+        if(controlMode.isDirect()){
+            return false;
+        }
+        return ipFrameHandler.parseJson(jsonObjectRxData);
+    }
+
+    public boolean createJsonObject(String dataTypeMask, String transmitData) {
+        if(controlMode.isDirect()){
+            return false;
+        }
+        return ipFrameHandler.createJsonObject(dataTypeMask,transmitData);
+    }
+
+    public JSONObject getTransmitData() {
+        if(controlMode.isDirect()){
+            return null;
+        }
+        return ipFrameHandler.getTransmitData();
     }
 }
