@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tuisse.carduinodroid_android">
+    package="tuisse.carduinodroid_android"
+    android:versionCode="2.0"
+    android:versionName="2.0" >
 
     <uses-feature android:name="android.hardware.usb.host" />
 
-    <permission
-        android:name="tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION"
-        android:description="@string/serialConnectionStatusDescription"
-        android:label="@string/serialConnectionStatusLabel"
-        android:permissionGroup="android.perissionGroup.PERSONAL_INFO"
-        android:protectionLevel="normal" />
-    <permission
-        android:name="tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION"
-        android:description="@string/serialDataRxReceivedDescription"
-        android:label="@string/serialDataRxReceivedLabel"
-        android:permissionGroup="android.perissionGroup.PERSONAL_INFO"
-        android:protectionLevel="normal" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />

@@ -67,23 +67,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-            if (carduino != null) {
-                Integer intValue;
-                switch (preference.getKey()) {
-                    case "pref_key_control_mode":
-                        intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
-                        carduino.dataHandler.setControlMode(ControlMode.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getControlMode().toString());
-                        break;
-                    case "pref_key_reset_battery":
-                        //carduino.dataHandler.serialData.serialTx.setResetAccCur(val);
-                        Log.d(TAG, preference.getKey() + ": " + stringValue);
-                        break;
-                    case "pref_key_serial_type":
-                        intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
-                        carduino.dataHandler.setSerialPref(SerialType.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getSerialPref().toString());
+            try {
+                String stringValue = value.toString();
+                if (carduino != null) {
+                    Integer intValue;
+                    switch (preference.getKey()) {
+                        case "pref_key_control_mode":
+                            intValue = tryStringToInt(stringValue, ControlMode.toInteger(ControlMode.TRANSCEIVER));
+                            carduino.dataHandler.setControlMode(ControlMode.fromInteger(intValue));
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getControlMode().toString());
+                            break;
+                        case "pref_key_reset_battery":
+                            //carduino.dataHandler.serialData.serialTx.setResetAccCur(val);
+                            Log.d(TAG, preference.getKey() + ": " + stringValue);
+                            break;
+                        case "pref_key_serial_type":
+                            intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
+                            carduino.dataHandler.setSerialPref(SerialType.fromInteger(intValue));
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getSerialPref().toString());
                             /*
                             if(carduino.dataHandler.getSerialPref().isBluetooth()){
                                 findPreference("pref_key_bluetooth_device_name").setEnabled(true);
@@ -92,61 +93,63 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 findPreference("pref_key_bluetooth_device_name").setEnabled(false);
                             }
                             */
-                        break;
-                    case "pref_key_bluetooth_device_name":
-                        carduino.dataHandler.setBluetoothDeviceName(stringValue);
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothDeviceName());
-                        break;
-                    case "pref_key_bluetooth_handling":
-                        intValue = tryStringToInt(stringValue, BluetoothHandling.toInteger(BluetoothHandling.AUTO));
-                        carduino.dataHandler.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothHandling());
-                        break;
-                    case "pref_key_failsafe_stop":
-                        intValue = tryStringToInt(stringValue,1);
-                        if(intValue == 1){
-                            carduino.dataHandler.setFailSafeStopPref(true);
-                        }
-                        else {
-                            carduino.dataHandler.setFailSafeStopPref(false);
-                        }
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getFailSafeStopPref());
-                        break;
-                    case "pref_key_debug_view":
-                        intValue = tryStringToInt(stringValue,1);
-                        if(intValue == 1){
-                            carduino.dataHandler.setDebugView(true);
-                        }
-                        else {
-                            carduino.dataHandler.setDebugView(false);
-                        }
-                        Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothDeviceName());
-                        break;
-                    default:
-                        Log.d(TAG, "key not known: " + preference.getKey());
-                        break;
+
+                            break;
+                        case "pref_key_bluetooth_device_name":
+                            carduino.dataHandler.setBluetoothDeviceName(stringValue);
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothDeviceName());
+                            break;
+                        case "pref_key_bluetooth_handling":
+                            intValue = tryStringToInt(stringValue, BluetoothHandling.toInteger(BluetoothHandling.AUTO));
+                            carduino.dataHandler.setBluetoothHandling(BluetoothHandling.fromInteger(intValue));
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getBluetoothHandling());
+                            break;
+                        case "pref_key_failsafe_stop":
+                            intValue = tryStringToInt(stringValue, 1);
+                            if (intValue == 1) {
+                                carduino.dataHandler.setFailSafeStopPref(true);
+                            } else {
+                                carduino.dataHandler.setFailSafeStopPref(false);
+                            }
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getFailSafeStopPref());
+                            break;
+                        case "pref_key_debug_view":
+                            intValue = tryStringToInt(stringValue, 1);
+                            if (intValue == 1) {
+                                carduino.dataHandler.setDebugView(true);
+                            } else {
+                                carduino.dataHandler.setDebugView(false);
+                            }
+                            Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getDebugView());
+                            break;
+
+                        default:
+                            Log.d(TAG, "key not known: " + preference.getKey());
+                            break;
+
+                    }
+                } else {
+                    Log.e(TAG, "no pointer to resource carduino");
                 }
-            }
-            else{
-                Log.e(TAG,"no pointer to resource carduino");
-            }
+                if (preference instanceof ListPreference) {
+                    // For list preferences, look up the correct display value in
+                    // the preference's 'entries' list.
+                    ListPreference listPreference = (ListPreference) preference;
+                    int index = listPreference.findIndexOfValue(stringValue);
 
-            if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
+                    // Set the summary to reflect the new value.
+                    preference.setSummary(
+                            index >= 0
+                                    ? listPreference.getEntries()[index]
+                                    : null);
 
-                // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
-
-            } else {
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
-                preference.setSummary(stringValue);
+                }else{
+                    // For all other preferences, set the summary to the value's
+                    // simple string representation.
+                    preference.setSummary(stringValue);
+                }
+            }catch (Exception e){
+                Log.e(TAG, e.toString());
             }
             return true;
         }
@@ -162,15 +165,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * @see #sBindPreferenceSummaryToValueListener
      */
     private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        try {
+            // Set the listener to watch for value changes.
+            preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+            // Trigger the listener immediately with the preference's
+            // current value.
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getString(preference.getKey(), ""));
+        }catch (Exception e){
+            Log.e(TAG,e.toString());
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -229,7 +237,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || ControlModePreferenceFragment.class.getName().equals(fragmentName)
+                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
          //       || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
                 || SerialPreferenceFragment.class.getName().equals(fragmentName);
     }
@@ -239,7 +247,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class ControlModePreferenceFragment extends PreferenceFragment {
+    public static class GeneralPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -250,6 +258,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
+
             bindPreferenceSummaryToValue(findPreference("pref_key_control_mode"));
             bindPreferenceSummaryToValue(findPreference("pref_key_reset_battery"));
             bindPreferenceSummaryToValue(findPreference("pref_key_debug_view"));

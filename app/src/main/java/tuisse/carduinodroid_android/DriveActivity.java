@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,15 +36,13 @@ import tuisse.carduinodroid_android.data.CarduinoIF;
 
 public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
-    private final float MAX_SPEED_DEGREE = 20;
-    private final float MAX_STEER_DEGREE = 20;
 
     private CarduinodroidApplication carduino;
 
     private SerialDataRxReceiver serialDataRxReceiver;
     private IntentFilter serialDataRxFilter;
-    private SerialConnectionDriveActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
-    private IntentFilter serialConnectionStatusChangeFilter;
+    private StatusChangeReceiver serialStatusChangeReceiver;
+    private IntentFilter serialStatusChangeFilter;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -456,12 +455,11 @@ public class DriveActivity extends AppCompatActivity {
 
             sound = new Sound();
 
-            serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
-            serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-            //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+            serialStatusChangeReceiver = new StatusChangeReceiver();
+            serialStatusChangeFilter = new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
 
             serialDataRxReceiver = new SerialDataRxReceiver();
-            serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
+            serialDataRxFilter = new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -474,8 +472,8 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
         if(getData().getSerialState().isRunning()) {
             refresh();
         }
@@ -484,8 +482,8 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        unregisterReceiver(serialConnectionStatusChangeReceiver);
-        unregisterReceiver(serialDataRxReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
     }
 
     private class SerialDataRxReceiver extends BroadcastReceiver {
@@ -496,7 +494,7 @@ public class DriveActivity extends AppCompatActivity {
         }
     }
 
-    private class SerialConnectionDriveActivityStatusChangeReceiver extends BroadcastReceiver {
+    private class StatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG,"onReceive status change event");
@@ -708,16 +706,16 @@ public class DriveActivity extends AppCompatActivity {
         int speed;
         switch (rotation) {
             case Surface.ROTATION_0:
-                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             case Surface.ROTATION_90:
-                speed = (int) (scale(mAngle2FilteredRoll,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale(mAngle2FilteredRoll,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             case Surface.ROTATION_180:
-                speed = (int) (scale(mAngle1FilteredPitch,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale(mAngle1FilteredPitch,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             default:
-                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
         }
 
@@ -730,16 +728,16 @@ public class DriveActivity extends AppCompatActivity {
         int steering;
         switch (rotation) {
             case Surface.ROTATION_0:
-                steering = (int) (scale(mAngle2FilteredRoll,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale(mAngle2FilteredRoll,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             case Surface.ROTATION_90:
-                steering = (int) (scale(mAngle1FilteredPitch,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale(mAngle1FilteredPitch,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             case Surface.ROTATION_180:
-                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             default:
-                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
         }
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));

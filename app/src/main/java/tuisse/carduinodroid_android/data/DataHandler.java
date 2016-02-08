@@ -23,6 +23,8 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private boolean failSafeStopPref = true;
     private boolean debugView = false;
     private boolean bluetoothEnabled = false;
+    private boolean watchdogStarted = false;
+    private CommunicationStatus communicationStatus = CommunicationStatus.IDLE;
 
     public DataHandler() {
     }
@@ -35,6 +37,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return ccd;
     }
 
+    public synchronized void setWatchdogStarted(boolean wds){
+        watchdogStarted = wds;
+    }
+    public synchronized boolean isWatchdogStarted(){
+        return watchdogStarted;
+    }
+
     public synchronized void setBluetoothEnabled(boolean bte){
         bluetoothEnabled = bte;
     }
@@ -43,9 +52,100 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     }
 
     public synchronized CommunicationStatus getCommunicationStatus() {
-        //TODO: implement
-        return CommunicationStatus.NONE;
+        return communicationStatus;
     }
+
+    private synchronized void calcCommunicationStatus(){
+        switch (controlMode){
+            case REMOTE:
+                if(getDData().getIpState().isRunning()){
+                    if(getData().getSerialState().isRunning()){
+                        communicationStatus = CommunicationStatus.OK;
+                        return;
+                    }
+                    if(getData().getSerialState().isError()){
+                        communicationStatus = CommunicationStatus.SERIAL_ERROR;
+                        return;
+                    }
+                    communicationStatus = CommunicationStatus.SERIAL_CONNECTING;
+                    return;
+                }
+                if(getDData().getIpState().isError()){
+                    if(getData().getSerialState().isError()){
+                        communicationStatus = CommunicationStatus.BOTH_ERROR;
+                        return;
+                    }
+                    communicationStatus = CommunicationStatus.IP_ERROR;
+                    return;
+                }
+                if(getDData().getIpState().isIdle()){
+                    communicationStatus = CommunicationStatus.IDLE;
+                    return;
+                }
+                //else{
+                    if(getData().getSerialState().isError()){
+                        communicationStatus = CommunicationStatus.SERIAL_ERROR;
+                        return;
+                    }
+                    communicationStatus = CommunicationStatus.IP_CONNECTING;
+                    return;
+                //}
+            case TRANSCEIVER:
+                if(getDData().getIpState().isRunning()){
+                    if(getData().getSerialState().isRunning()){
+                        communicationStatus = CommunicationStatus.OK;
+                        return;
+                    }
+                    if(getData().getSerialState().isError()){
+                        communicationStatus = CommunicationStatus.SERIAL_ERROR;
+                        return;
+                    }
+                    communicationStatus = CommunicationStatus.SERIAL_CONNECTING;
+                    return;
+                }
+                if(getDData().getIpState().isError()){
+                    if(getData().getSerialState().isError()){
+                        communicationStatus = CommunicationStatus.BOTH_ERROR;
+                        return;
+                    }
+                    communicationStatus = CommunicationStatus.IP_ERROR;
+                    return;
+                }
+                if(getDData().getIpState().isIdle() && getData().getSerialState().isIdle()){
+                    communicationStatus = CommunicationStatus.IDLE;
+                    return;
+                }
+                //else{
+                if(getData().getSerialState().isRunning()){
+                    communicationStatus = CommunicationStatus.IP_CONNECTING;
+                    return;
+                }
+                if(getData().getSerialState().isError()){
+                    communicationStatus = CommunicationStatus.SERIAL_ERROR;
+                    return;
+                }
+                communicationStatus = CommunicationStatus.BOTH_CONNECTING;
+                return;
+            //}
+            default://DIRECT
+                if(getData().getSerialState().isRunning()){
+                    communicationStatus = CommunicationStatus.OK;
+                    return;
+                }
+                if(getData().getSerialState().isError()){
+                    communicationStatus = CommunicationStatus.SERIAL_ERROR;
+                    return;
+                }
+                if( getData().getSerialState().isIdle()){
+                    communicationStatus = CommunicationStatus.IDLE;
+                    return;
+                }
+                //else
+                communicationStatus = CommunicationStatus.SERIAL_CONNECTING;
+                return;
+        }
+    }
+
 
     public synchronized void setControlMode(ControlMode cm){
         try {
@@ -69,7 +169,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                                 ccd = new CarduinoDroidData();
                                 break;
                             default://DIRECT
-                                cd = new CarduinoData(cd);
+                                //cd stays the same
                                 ccd = null;
                                 break;
                         }
@@ -94,7 +194,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                     default: {//Direct
                         switch (cm) {
                             case TRANSCEIVER:
-                                cd = new CarduinoData(cd);
+                                //cd stays the same
                                 ccd = new CarduinoDroidData();
                                 break;
                             case REMOTE:

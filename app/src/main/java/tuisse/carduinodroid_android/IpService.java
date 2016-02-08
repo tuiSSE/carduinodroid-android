@@ -15,15 +15,17 @@ public class IpService extends Service {
 
     private CarduinodroidApplication carduino;
     private IpConnection ip;
-
+    static private boolean isDestroyed = true;
     protected CarduinodroidApplication getCarduino(){
-
         return carduino;
+    }
+
+    static public boolean getIsDestroyed(){
+        return isDestroyed;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-
         return null;
     }
 
@@ -38,6 +40,7 @@ public class IpService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        isDestroyed = false;
 
         if(ip == null){
 
@@ -56,6 +59,10 @@ public class IpService extends Service {
                         //Log.d(TAG, "New Init");
                         //ip.init();
                     }
+
+                    if(isDestroyed){
+                        stopSelf();
+                    }
                 }
             }, "connectIpCtrlThread").start();
 
@@ -66,9 +73,15 @@ public class IpService extends Service {
 
                         ip.startThread("DataSocket");
 
+
+                    if(isDestroyed){
+                        stopSelf();
+                    }
                 }
             }, "connectIpDataThread").start();
+
         }
+
 
         return START_STICKY;
     }
@@ -81,6 +94,7 @@ public class IpService extends Service {
             ip.closeSocketServer();
             //ip = null;
         }
+        isDestroyed=true;
         Log.i(TAG, "onDestroyed");
     }
 }

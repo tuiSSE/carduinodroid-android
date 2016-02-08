@@ -140,23 +140,7 @@
     <string name="arduino_mega_adk">Arduino Mega 2560 ADK</string>
     <string name="arduino_mega_adk_r3">Arduino Mega 2560 ADK R3</string>
 
-    <!-- permissions -->
-    <string name="serialConnectionStatusLabel">Serial Connection Status Label</string>
-    <string name="serialConnectionStatusDescription">Serial Connection Status Description</string>
-    <string name="serialDataRxReceivedLabel">Serial Data Rx Received Label</string>
-    <string name="serialDataRxReceivedDescription">Serial Data Rx Received Description</string>
-
-    <!--Intent strings -->
-    <string name="SERIAL_CONNECTION_STATUS_PERMISSION">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION</string>
-    <string name="SERIAL_CONNECTION_STATUS_CHANGED">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_CHANGED</string>
-    <string name="SERIAL_CONNECTION_STATUS_EXTRA">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA</string>
-
-    <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
-    <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
-    <string name="USB_PERMISSION">tuisse.carduinodroid_android.USB_PERMISSION</string>
-
     <!-- preferences -->
-    <string name="preference_main">tuisse.carduinodroid_android.PREFERENCE_MAIN</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
@@ -221,8 +205,8 @@
     <string name="pref_title_debug_view">Debug view</string>
     <string name="pref_key_debug_view">pref_key_debug_view</string>
     <string-array name="pref_debug_view">
-        <item>@string/pref_debug_view_on</item>
         <item>@string/pref_debug_view_off</item>
+        <item>@string/pref_debug_view_on</item>
     </string-array>
     <string name="pref_debug_view_on">Enabled</string>
     <string name="pref_debug_view_off">Disabled</string>
@@ -234,8 +218,8 @@
     <string name="pref_title_failsafe_stop">@string/driveFailsafeStop</string>
     <string name="pref_key_failsafe_stop">pref_key_failsafe_stop</string>
     <string-array name="pref_failsafe_stop">
-        <item>@string/pref_failsafe_stop_on</item>
         <item>@string/pref_failsafe_stop_off</item>
+        <item>@string/pref_failsafe_stop_on</item>
     </string-array>
     <string name="pref_failsafe_stop_on">Enabled</string>
     <string name="pref_failsafe_stop_off">Disabled</string>
