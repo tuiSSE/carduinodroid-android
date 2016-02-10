@@ -51,7 +51,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     }
 */
     private void init(){
-        setIpState(new ConnectionState(ConnectionEnum.IDLE));
+        setIpState(new ConnectionState(ConnectionEnum.UNKNOWN));
         setIpType(IpType.WLAN);
 
         setCameraType(0);

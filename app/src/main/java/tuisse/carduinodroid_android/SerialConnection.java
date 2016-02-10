@@ -67,21 +67,21 @@ abstract public class SerialConnection {
         if(getData().getSerialState() != null) {
             //if (!state.equals(getSerialData().getSerialState().getState())) {//if not equal
             getData().setSerialState(new ConnectionState(state, error));
-                Log.d(TAG, "serial State changed: " + getData().getSerialState().getStateName());
-                if(getData().getSerialState().isError()){
-                    Log.e(TAG, error);
-                }
-                else if(!error.equals("")){
-                    Log.w(TAG, error);
-                }
-                Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-                //onSerialConnectionStatusChangeIntent.putExtra(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA), getSerialData().getSerialState().getState().ordinal());
-                //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
+            Log.d(TAG, "serial State changed: " + getData().getSerialState().getStateName());
+            if(getData().getSerialState().isError()){
+                Log.e(TAG, error);
+            }
+            else if(!error.equals("")){
+                Log.w(TAG, error);
+            }
+            Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+            //onSerialConnectionStatusChangeIntent.putExtra(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA), getSerialData().getSerialState().getState().ordinal());
+            //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
 
-                if (serialService != null) {
-                    serialService.sendBroadcast(onSerialConnectionStatusChangeIntent);
-                    serialService.showNotification();
-                }
+            if (serialService != null) {
+                serialService.sendBroadcast(onSerialConnectionStatusChangeIntent);
+                serialService.showNotification();
+            }
             //}
         }
         else{

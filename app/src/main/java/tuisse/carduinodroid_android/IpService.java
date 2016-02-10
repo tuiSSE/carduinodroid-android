@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.CarduinoDroidData;
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.DataHandler;
+
 public class IpService extends Service {
 
     static final String TAG = "CarduinoIpService";
@@ -16,10 +21,9 @@ public class IpService extends Service {
     private CarduinodroidApplication carduino;
     private IpConnection ip;
 
-    protected CarduinodroidApplication getCarduino(){
-
-        return carduino;
-    }
+    private CarduinoDroidData getDData(){return carduino.dataHandler.getDData();}
+    private DataHandler getDataHandler(){return carduino.dataHandler;}
+    protected CarduinodroidApplication getCarduino(){return carduino;}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -39,25 +43,23 @@ public class IpService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        if(ip == null){
-
+        if(getDData().getIpState().isUnknown()){
             ip = new IpConnection(this);
             ip.init();
         }
 
+        if(getDData().getIpState().isError()){
+            Log.i(TAG, "FATAL ERROR - IP Connection will be restarted");
+            if(ip !=null) ip.close();
+        }
+
         if (ip != null) {
-            ip.startThread("CtrlSocket");
-            ip.startThread("DataSocket");
+            if (ip.isIdle()) {
 
-            /*new Thread(new Runnable() {
-                public void run() {
-
-                    if(ip != null)
-
-                        ip.startThread("DataSocket");
-
-                }
-            }, "connectIpDataThread").start();*/
+                ip.startThread("CtrlSocket");
+                if(!ip.isUnknown())
+                    ip.startThread("DataSocket");
+            }
         }
 
         return START_STICKY;
@@ -68,8 +70,7 @@ public class IpService extends Service {
         super.onDestroy();
         if(ip != null){
 
-            ip.closeSocketServer();
-            //ip = null;
+            ip.close();
         }
         Log.i(TAG, "onDestroyed");
     }
