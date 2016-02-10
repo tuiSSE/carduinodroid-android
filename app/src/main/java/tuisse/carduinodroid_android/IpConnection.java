@@ -1,17 +1,16 @@
 package tuisse.carduinodroid_android;
 
 
-import android.content.Intent;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
@@ -23,7 +22,8 @@ import tuisse.carduinodroid_android.data.IpType;
 public class IpConnection {
     protected IpService ipService;
 
-    protected IpDataReceiveThread       ipDataReceiveThread;
+    protected IpDataConnectionThread ipDataConnectionThread;
+    protected IpDataReceiveThread    ipDataReceiveThread;
     protected IpDataSendThread       ipDataSendThread;
     protected IpCtrlSendThread       ipCtrlSendThread;
 
@@ -44,10 +44,8 @@ public class IpConnection {
 
     BufferedWriter outCtrl;
     BufferedWriter outData;
-    BufferedReader inCtrl;
     BufferedReader inData;
 
-    private String incomingCtrlMsg;
     private String outgoingCtrlMsg;
     private String incomingDataMsg;
     private String outgoingDataMsg;
@@ -56,6 +54,7 @@ public class IpConnection {
 
         ipService = s;
 
+        ipDataConnectionThread = new IpDataConnectionThread();
         ipDataReceiveThread = new IpDataReceiveThread();
         ipDataSendThread = new IpDataSendThread();
         ipCtrlSendThread = new IpCtrlSendThread();
@@ -74,20 +73,19 @@ public class IpConnection {
 
         outCtrl = null;
         outData = null;
-        inCtrl = null;
         inData = null;
 
         ctrlStatusSend = false;
     }
+
     //Initialization of both ServerSockets if a connection via another mobile phone or pc is wished
     protected boolean init(){
-
-        //reset();
 
         try {
             createSocketServer(TAG_CTRLPORT);
             createSocketServer(TAG_DATAPORT);
         } catch (IOException e) {
+            /* Hier SOCKET SERVER ERROR*/
             e.printStackTrace();
         }
         return true;
@@ -98,60 +96,19 @@ public class IpConnection {
 
         if(dataType.toLowerCase().equals(TAG_CTRLPORT.toLowerCase()))
         {
-            try {
-                ctrlClient = ctrlSocket.accept();
-                Log.d(TAG, "Ctrl ClientSocket Accepted");
-
-                outCtrl = new BufferedWriter(new OutputStreamWriter(ctrlClient.getOutputStream()));
-                inCtrl = new BufferedReader(new InputStreamReader(ctrlClient.getInputStream()));
-                Log.d(TAG, "Ctrl BufferedWriter/Reader Created");
-
-
-            } catch (IOException e) {
-                Log.d(TAG, "Fehler Ctrl ClientSocket Accept");
-                e.printStackTrace();
-            }
-
-            if(!ipCtrlSendThread.isAlive()){
-
-                Log.d(TAG, "Send Thread Started for Ctrl Income");
-                ipCtrlSendThread.start();
-            }
+            ipCtrlSendThread.start();
 
         }else if(dataType.toLowerCase().equals(TAG_DATAPORT.toLowerCase()))
         {
-            try {
-                dataClient = dataSocket.accept();
-                Log.d(TAG, "Data ClientSocket Accepted");
-
-                outData = new BufferedWriter(new OutputStreamWriter(dataClient.getOutputStream()));
-                inData = new BufferedReader(new InputStreamReader(dataClient.getInputStream()));
-                Log.d(TAG, "Data BufferedWriter/Reader Created");
-
-            } catch (IOException e) {
-                Log.d(TAG, "Fehler Data ClientSocket Accept");
-                e.printStackTrace();
-            }
-
-            if(!ipDataReceiveThread.isAlive()){
-
-                Log.d(TAG, "Receive Thread Started for Data Income");
-                ipDataReceiveThread.start();
-            }
-
-            if(!ipDataSendThread.isAlive()){
-
-                Log.d(TAG, "Sent Thread Started for Data Income");
-                ipDataSendThread.start();
-            }
-
+            ipDataConnectionThread.start();
         }
-        else Log.d(TAG, "Data/Ctrl Socket nicht da");
+        else Log.d(TAG, "Data/Ctrl Socket nicht da"); /*UNKOWN ERROR State*/
 
     }
 
-    protected void closeThreads(){
+    protected void resetThreads(){
         Log.d(TAG, "Reset Server Thread");
+        ipDataConnectionThread.interrupt();
         ipDataReceiveThread.interrupt();
         ipCtrlSendThread.interrupt();
         ipDataSendThread.interrupt();
@@ -164,13 +121,13 @@ public class IpConnection {
     }
 
     // Giving information over the Control Channel if the Data Channel is free
-    protected boolean request(){
+    protected boolean requestDataStatus(){
 
         return true;
     }
 
-    protected void sendCtrl() throws IOException{
-        //Anpassen dass der Status über JSON vom Data SocketServer gesendet wird
+    protected void sendDataStatus(BufferedWriter outCtrl) throws IOException{
+        //Anpassen dass der Status über JSON vom Data SocketServer gesendet wird mit richtigen Zustand
         outCtrl.write("Test");
         outCtrl.newLine();
         outCtrl.flush();
@@ -184,22 +141,60 @@ public class IpConnection {
 
     }
 
+    protected class IpDataConnectionThread extends Thread {
+        public IpDataConnectionThread() {
+            super("IpConnection-IpDataConnectionThread");
+        }
+
+        @Override
+        public void run() {
+
+            ipDataReceiveThread.start();
+            ipDataSendThread.start();
+
+            while(true){ /*!isStoppedData()*/
+                dataClient = null;
+                outData = null;
+                inData = null;
+
+                try {
+                    Log.d(TAG, "warte auf data verbindung");
+                    dataClient = dataSocket.accept();
+
+                    inData = new BufferedReader(new InputStreamReader(dataClient.getInputStream()));
+                    outData = new BufferedWriter(new OutputStreamWriter(dataClient.getOutputStream()));
+                } catch (IOException e) {
+                    /* Set DATA CONNECTION ERROR */
+                    e.printStackTrace();
+                }
+
+                String c;
+                try {
+                    while((c = inData.readLine())!=null){
+
+                        Log.d(TAG, c);
+                    } //END while
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     protected class IpDataReceiveThread extends Thread {
         public IpDataReceiveThread() {
             super("IpConnection-IpDataReceiveThread");
         }
         @Override
         public void run() {
-            Log.d(TAG, "IPDataReceiveThread started");
-            try {
 
-                    while ((incomingDataMsg = inData.readLine()) != null) {
-                        Log.d(TAG, incomingDataMsg);
+            while(true) /* !isStoppedData() */
+            {
+                //isConnected()
+                if(isConnected()){
 
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+            }
         }
     }//IpDataReceiveThread
 
@@ -209,27 +204,69 @@ public class IpConnection {
         }
         @Override
         public void run() {
-            Log.d(TAG, "IPDataSendThread started");
 
+            while(true) /* !isStoppedData() */
+            {
+                //isConnected()
+                if(isConnected()){
+
+                }
+            }
         }
     }//IpDataSendThread
 
+    // Handling of the Control Message for multiple Requests
     protected class IpCtrlSendThread extends Thread {
         public IpCtrlSendThread() {
             super("IpConnection-IpCtrlSendThread");
         }
         @Override
         public void run() {
-            Log.d(TAG, "IPCtrlSendThread started");
-            try {
 
-                sendCtrl();
+            // Stay Rdy for Request of Transmission over Control Server Socket - True zu ctrlIsConnected() ändern
+            while (true) { /* !isStoppedCtrl() als Abfrage hier*/
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+
+                    ctrlClient = ctrlSocket.accept();
+                } catch (IOException e) {
+                    /* Hier CTRL CLIENT CONNECTION ERROR - isStopped = true*/
+                    System.out.println("I/O error: " + e);
+                }
+                // new thread for each client request
+                new CtrlMsgEchoThread(ctrlClient).start();
             }
         }
     }//IpSendThread
+
+    public class CtrlMsgEchoThread extends Thread {
+        protected Socket socket;
+
+        public CtrlMsgEchoThread(Socket clientSocket) {
+            this.socket = clientSocket;
+        }
+
+        public void run() {
+
+            try {
+
+                BufferedWriter dataInfoOut = new BufferedWriter(new OutputStreamWriter(ctrlClient.getOutputStream()));
+                sendDataStatus(dataInfoOut);
+                //sendCloseCtrlClient();
+
+                //Test if it is necessary to close the connection (memory or other things ... programm will still run
+                Thread.sleep(100);
+                dataInfoOut.close();
+                socket.close();
+            } catch (IOException e) {
+                /* Hier CLIENT SENDING ERROR - Hier Einzel Fehler somit nicht für alle vorhanden ?*/
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 
     //Creates a SocketServer depending on the expected Type (Data,Ctrl)
     protected boolean createSocketServer(String socketType) throws IOException {
@@ -267,6 +304,7 @@ public class IpConnection {
 
         } catch (IOException e) {
             Log.d(TAG, "Failure Close Data Server Socket");
+            /* Hier SOCKET SERVER ERROR*/
             e.printStackTrace();
             return false;
         }
@@ -280,6 +318,7 @@ public class IpConnection {
                 ctrlSocket.close();
         } catch (IOException e) {
             Log.d(TAG, "Failure Close Ctrl Server Socket");
+            /* Hier SOCKET SERVER ERROR*/
             e.printStackTrace();
             return false;
         }
@@ -291,10 +330,6 @@ public class IpConnection {
         if(closeDataSocketServer() && closeCtrlSocketServer())
             return true;
         else return false;
-    }
-
-    protected boolean closeBufferReaderWriter(){
-        return true;
     }
 
     protected boolean isIdle() {

@@ -46,20 +46,10 @@ public class IpService extends Service {
         }
 
         if (ip != null) {
-            new Thread(new Runnable() {
-                public void run() {
+            ip.startThread("CtrlSocket");
+            ip.startThread("DataSocket");
 
-                    if(ip != null) {
-
-                        ip.startThread("CtrlSocket");
-                        //ip.closeThreads();
-                        //Log.d(TAG, "New Init");
-                        //ip.init();
-                    }
-                }
-            }, "connectIpCtrlThread").start();
-
-            new Thread(new Runnable() {
+            /*new Thread(new Runnable() {
                 public void run() {
 
                     if(ip != null)
@@ -67,7 +57,7 @@ public class IpService extends Service {
                         ip.startThread("DataSocket");
 
                 }
-            }, "connectIpDataThread").start();
+            }, "connectIpDataThread").start();*/
         }
 
         return START_STICKY;
