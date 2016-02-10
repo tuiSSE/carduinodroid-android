@@ -78,8 +78,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                             Log.d(TAG, preference.getKey() + ": " + carduino.dataHandler.getControlMode().toString());
                             break;
                         case "pref_key_reset_battery":
-                            //carduino.dataHandler.serialData.serialTx.setResetAccCur(val);
-                            Log.d(TAG, preference.getKey() + ": " + stringValue);
+                            intValue = tryStringToInt(stringValue, 0);
+                            carduino.dataHandler.getData().setResetAccCur(intValue);
+                            Log.d(TAG, preference.getKey() + ": " + intValue);
+                            break;
+                        case "pref_key_screensaver":
+                            intValue = tryStringToInt(stringValue, 0);
+                            carduino.dataHandler.setScreensaver(intValue);
+                            Log.d(TAG, preference.getKey() + ": " + intValue);
                             break;
                         case "pref_key_serial_type":
                             intValue = tryStringToInt(stringValue, SerialType.toInteger(SerialType.BLUETOOTH));
@@ -260,8 +266,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
 
             bindPreferenceSummaryToValue(findPreference("pref_key_control_mode"));
-            bindPreferenceSummaryToValue(findPreference("pref_key_reset_battery"));
             bindPreferenceSummaryToValue(findPreference("pref_key_debug_view"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_reset_battery"));
+            bindPreferenceSummaryToValue(findPreference("pref_key_screensaver"));
         }
 
         @Override

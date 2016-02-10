@@ -2,10 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="tuisse.carduinodroid_android"
     android:versionCode="2.0"
-    android:versionName="2.0" >
+    android:versionName="2.0">
 
     <uses-feature android:name="android.hardware.usb.host" />
-
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -74,7 +73,11 @@
         <service
             android:name=".WatchdogService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".ScreensaverActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

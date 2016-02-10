@@ -87,7 +87,6 @@
     <string name="driveAngle2">%1$04d\trel Roll [°]</string>
 
 
-
     <!-- preference strings -->
     <string name="defaultIp">141.24.11.1</string>
     <string name="localIp">127.0.0.1</string>
@@ -145,7 +144,7 @@
 
     <!-- Strings related to Settings -->
     <!-- header settings -->
-    <string name="pref_header_general">Control mode</string>
+    <string name="pref_header_general">General settings</string>
     <string name="pref_header_serial">Serial connection</string>
     <!-- general settings -->
     <string name="pref_title_control_mode">Control mode</string>
@@ -164,10 +163,42 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <!-- screensaver -->
+    <string name="pref_key_screensaver">pref_key_screensaver</string>
+    <string name="pref_title_screensaver">Screensaver</string>
+    <string name="pref_screensaver_off">Off</string>
+    <string name="pref_screensaver_5" >Turn on after  5s</string>
+    <string name="pref_screensaver_10">Turn on after 10s</string>
+    <string name="pref_screensaver_30">Turn on after 30s</string>
+    <string name="pref_screensaver_60">Turn on after 60s</string>
+    <string-array name="pref_screensaver">
+        <item>@string/pref_screensaver_off</item>
+        <item>@string/pref_screensaver_5</item>
+        <item>@string/pref_screensaver_10</item>
+        <item>@string/pref_screensaver_30</item>
+        <item>@string/pref_screensaver_60</item>
+    </string-array>
+    <string-array name="pref_screensaver_values">
+        <item>-1</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>30000</item>
+        <item>60000</item>
+    </string-array>
     <!-- battery reset -->
     <string name="pref_key_reset_battery">pref_key_reset_battery</string>
     <string name="pref_title_reset_battery">Reset battery accumulation</string>
-    <string name="pref_summary_reset_battery">Will switch back off if message is delivered</string>
+    <string name="pref_battery_idle">idle</string>
+    <string name="pref_battery_reset">resetting: will switch back to idle on successr</string>
+    <string-array name="pref_reset_battery">
+        <item>@string/pref_battery_idle</item>
+        <item>@string/pref_battery_reset</item>
+    </string-array>
+    <string-array name="pref_reset_battery_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
     <!-- serial settings -->
     <string name="pref_title_serial_type">Serial connection type</string>
     <string name="pref_key_serial_type">pref_key_serial_type</string>

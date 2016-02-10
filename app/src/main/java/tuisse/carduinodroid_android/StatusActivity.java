@@ -9,10 +9,12 @@ import android.graphics.drawable.LayerDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,7 +29,12 @@ public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
 
+    private final Handler screensaverHandler = new Handler();
+
+    private View      statusActivityView;
+
     //main toolbar
+    private Toolbar   topToolbar;
     private ImageView imageViewExit;
     private ImageView imageViewSettings;
 
@@ -101,7 +108,8 @@ public class StatusActivity extends AppCompatActivity {
         registerReceiver(usbReciever, usbFilter);
 
         //get the Views
-        Toolbar topToolbar =                (Toolbar  ) findViewById(R.id.topToolbar);
+        statusActivityView =                (View     ) findViewById(R.id.statusActivityView);
+        topToolbar =                        (Toolbar  ) findViewById(R.id.topToolbar);
         imageViewExit =                     (ImageView) findViewById(R.id.imageViewExit);
         imageViewSettings =                 (ImageView) findViewById(R.id.imageViewSettings);
 
@@ -132,6 +140,16 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModePrev =           (ImageView) findViewById(R.id.imageViewSwitchModePrev);
         imageViewSwitchModeNext =           (ImageView) findViewById(R.id.imageViewSwitchModeNext);
         textviewSwitchMode      =           (TextView ) findViewById(R.id.textviewSwitchMode);
+
+        statusActivityView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view,MotionEvent event) {
+                checkRestartScreensaver();
+                return true;
+
+            }
+        });
+
         //drive button toolbar
         driveButton =                       (Toolbar  ) findViewById(R.id.driveButton);
 
@@ -204,11 +222,11 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(ipStatusChangeReceiver, ipStatusChangeFilter);
         updateControlMode();
         startService(new Intent(StatusActivity.this, WatchdogService.class));
+        checkRestartScreensaver();
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -217,6 +235,7 @@ public class StatusActivity extends AppCompatActivity {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipStatusChangeReceiver);
+        abortScreensaver();
         Log.d(TAG, "onStatusActivityPause");
     }
 
@@ -421,6 +440,37 @@ public class StatusActivity extends AppCompatActivity {
                 stopService(new Intent(StatusActivity.this, SerialService.class));
                 Log.d(TAG, "usb cable: serialService stopped");
             }
+        }
+    }
+
+    private final Runnable triggerScreensaverRunnable = new Runnable() {
+        @Override
+        public void run() {
+            abortScreensaver();
+            startActivity(new Intent(StatusActivity.this,ScreensaverActivity.class));
+        }
+    };
+    private void abortScreensaver() {
+        screensaverHandler.removeCallbacks(triggerScreensaverRunnable);
+        //Log.d(TAG, "screensaverCounter stopped");
+    }
+    private void triggerScreensaver(){
+        if(getDataHandler().getScreensaver() >=0) {
+            screensaverHandler.postDelayed(triggerScreensaverRunnable, getDataHandler().getScreensaver());
+            //Log.d(TAG, "screensaverCounter started");
+        }
+    }
+    private void restartScreensaver(){
+        abortScreensaver();
+        triggerScreensaver();
+    }
+
+    private void checkRestartScreensaver(){
+        if(getDataHandler().getControlMode().isTransceiver()){
+            restartScreensaver();
+        }
+        else{
+            abortScreensaver();
         }
     }
 }

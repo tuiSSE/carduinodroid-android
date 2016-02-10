@@ -101,7 +101,7 @@ abstract public class SerialConnection {
                         if(receive() > 0){
                             lastReceiveTime = System.currentTimeMillis();
                             Intent onSerialDataRxIntent = new Intent(Constants.EVENT.SERIAL_DATA_RECEIVED);
-                            serialService.sendBroadcast(onSerialDataRxIntent);
+                            LocalBroadcastManager.getInstance(serialService).sendBroadcast(onSerialDataRxIntent);
                         }
                         if(lastReceiveTime + Constants.TIMEOUT.SERIAL < System.currentTimeMillis()){
                             Log.e(TAG, serialService.getString(R.string.serialErrorReceiveTimeout));
@@ -144,6 +144,11 @@ abstract public class SerialConnection {
                     //check actual connection
                     try {
                         send();
+                        //reset Accumulated Current
+                        if(getData().getResetAccCur() == 1){
+                            getData().setResetAccCur(0);
+                            Utils.setIntPref(serialService.getString(R.string.pref_key_reset_battery), 0);
+                        }
                     } catch (java.io.IOException e){
                         Log.e(TAG, String.format(serialService.getString(R.string.serialErrorSendFail),e.toString()));
                         setSerialState(ConnectionEnum.STREAMERROR,String.format(serialService.getString(R.string.serialErrorSendFail),e.toString()));

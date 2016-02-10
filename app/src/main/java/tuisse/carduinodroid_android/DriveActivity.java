@@ -33,6 +33,7 @@ import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoIF;
+import tuisse.carduinodroid_android.data.DataHandler;
 
 public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
@@ -41,8 +42,8 @@ public class DriveActivity extends AppCompatActivity {
 
     private SerialDataRxReceiver serialDataRxReceiver;
     private IntentFilter serialDataRxFilter;
-    private StatusChangeReceiver serialStatusChangeReceiver;
-    private IntentFilter serialStatusChangeFilter;
+    private IntentFilter communicationStatusChangeFilter;
+    private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -117,7 +118,10 @@ public class DriveActivity extends AppCompatActivity {
     private FloatingActionButton buttonStatusLed;
 
     private CarduinoData getData(){
-        return carduino.dataHandler.getData();
+        return getDataHandler().getData();
+    }
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
     }
 
     private void setDistance(ProgressBar pb, int distance){
@@ -455,8 +459,8 @@ public class DriveActivity extends AppCompatActivity {
 
             sound = new Sound();
 
-            serialStatusChangeReceiver = new StatusChangeReceiver();
-            serialStatusChangeFilter = new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
+            communicationStatusChangeReceiver = new CommunicationStatusChangeReceiver();
+            communicationStatusChangeFilter = new IntentFilter(Constants.EVENT.COMMUNICATION_STATUS_CHANGED);
 
             serialDataRxReceiver = new SerialDataRxReceiver();
             serialDataRxFilter = new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
@@ -472,8 +476,9 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
             refresh();
         }
@@ -482,7 +487,7 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(communicationStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
     }
 
@@ -743,5 +748,17 @@ public class DriveActivity extends AppCompatActivity {
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
         seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
         getData().setSteer(steering);
+    }
+
+    private class CommunicationStatusChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "communication status change event: " + getDataHandler().getCommunicationStatus());
+            setBackgroundColor();
+        }
+    }
+
+    private void setBackgroundColor(){
+        viewVideo.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
     }
 }

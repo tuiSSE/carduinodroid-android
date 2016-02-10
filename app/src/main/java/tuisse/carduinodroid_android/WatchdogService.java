@@ -7,14 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
+import tuisse.carduinodroid_android.data.CommunicationStatus;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 public class WatchdogService extends Service {
@@ -24,6 +27,7 @@ public class WatchdogService extends Service {
     static private boolean isInForeground = false;
     private CarduinodroidApplication carduino;
     private WatchdogThread watchdogThread;
+    private Handler handler;
 
     private SerialStatusChangeReceiver serialStatusChangeReceiver;
     private IntentFilter serialStatusChangeFilter;
@@ -57,12 +61,13 @@ public class WatchdogService extends Service {
     public void onCreate(){
         super.onCreate();
         carduino = (CarduinodroidApplication) getApplication();
+        handler = new Handler();
         watchdogThread = new WatchdogThread();
         setupNotifications();
         serialStatusChangeReceiver =  new SerialStatusChangeReceiver();
         serialStatusChangeFilter =    new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
         ipStatusChangeReceiver =  new IpStatusChangeReceiver();
-        ipStatusChangeFilter =    new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
+        ipStatusChangeFilter =    new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
         Log.i(TAG, "onCreated");
     }
 
@@ -93,7 +98,7 @@ public class WatchdogService extends Service {
             }
         }
         watchdogThread.start();
-
+        sendToast("Watchdog Service started");
         if(isDestroyed){
             stopSelf();
         }
@@ -217,6 +222,12 @@ public class WatchdogService extends Service {
                 }
                 break;
         }
+        CommunicationStatus csOld = getDataHandler().getCommunicationStatus();
+        getDataHandler().calcCommunicationStatus();
+        if(!csOld.equals(getDataHandler().getCommunicationStatus())){
+            Intent onSerialConnectionStatusChangeIntent = new Intent(Constants.EVENT.COMMUNICATION_STATUS_CHANGED);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(onSerialConnectionStatusChangeIntent);
+        }
     }
 
     private void stopServices(){
@@ -226,6 +237,7 @@ public class WatchdogService extends Service {
         if(!IpService.getIsDestroyed()){
             stopService(new Intent(WatchdogService.this,IpService.class));
         }
+        sendToast("Watchdog Service stopped");
     }
 
     private class SerialStatusChangeReceiver extends BroadcastReceiver {
@@ -244,7 +256,22 @@ public class WatchdogService extends Service {
         }
     }
 
+    private void sendToast(final String message){
+        handler.post(new Runnable() {
+            public void run() {
+                Toast toast = Toast.makeText(WatchdogService.this, message, Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+    }
+
+    private void sendToast(final int messageId){
+        handler.post(new Runnable() {
+            public void run() {
+                Toast toast = Toast.makeText(WatchdogService.this, getString(messageId), Toast.LENGTH_LONG);
+                toast.show();
+            }
+        });
+    }
 
 }
-
-

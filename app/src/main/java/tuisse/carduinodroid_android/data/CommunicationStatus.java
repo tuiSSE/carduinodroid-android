@@ -9,4 +9,26 @@ public enum CommunicationStatus {
         status = s;
     }
     private int status;
+
+    public synchronized boolean isOk(){
+        return this == CommunicationStatus.OK;
+    }
+    public synchronized boolean isConnecting(){
+        return  (this == CommunicationStatus.SERIAL_CONNECTING) ||
+                (this == CommunicationStatus.IP_CONNECTING) ||
+                (this == CommunicationStatus.BOTH_CONNECTING);
+    }
+    public synchronized boolean isError(){
+        return  (this == CommunicationStatus.ERROR) ||
+                (this == CommunicationStatus.IP_ERROR) ||
+                (this == CommunicationStatus.SERIAL_ERROR) ||
+                (this == CommunicationStatus.BOTH_ERROR);
+    }
+    public synchronized boolean isIdle(){
+        return this == CommunicationStatus.IDLE;
+    }
+
+    public synchronized boolean isIdleError(){
+        return isIdle() || isError();
+    }
 }

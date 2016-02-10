@@ -12,6 +12,7 @@ public class Constants {
     public interface EVENT {
         String SERIAL_STATUS_CHANGED ="tuisse.carduinodroid_android.event.serial_status_changed";
         String IP_STATUS_CHANGED ="tuisse.carduinodroid_android.event.ip_status_changed";
+        String COMMUNICATION_STATUS_CHANGED ="tuisse.carduinodroid_android.event.communication_status_changed";
         String SERIAL_DATA_RECEIVED = "tuisse.carduinodroid_android.event.serial_data_received";
         String IP_DATA_RECEIVED = "tuisse.carduinodroid_android.event.ip_data_received";
     }

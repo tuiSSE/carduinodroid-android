@@ -5,6 +5,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import tuisse.carduinodroid_android.R;
+
 /**
  * Created by keX on 10.12.2015.
  */
@@ -25,16 +27,24 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private boolean bluetoothEnabled = false;
     private boolean watchdogStarted = false;
     private CommunicationStatus communicationStatus = CommunicationStatus.IDLE;
+    private int screensaver = 60000;
 
     public DataHandler() {
     }
 
-    public CarduinoData getData(){
+    public synchronized CarduinoData getData(){
         return cd;
     }
 
-    public CarduinoDroidData getDData(){
+    public synchronized CarduinoDroidData getDData(){
         return ccd;
+    }
+
+    public synchronized void setScreensaver(int ss){
+        screensaver = ss;
+    }
+    public synchronized int getScreensaver(){
+        return screensaver;
     }
 
     public synchronized void setWatchdogStarted(boolean wds){
@@ -55,7 +65,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return communicationStatus;
     }
 
-    private synchronized void calcCommunicationStatus(){
+    public synchronized void calcCommunicationStatus(){
         switch (controlMode){
             case REMOTE:
                 if(getDData().getIpState().isRunning()){
@@ -146,6 +156,16 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
+    public synchronized int getCommunicationStatusColor(){
+        int color = R.color.colorCommunicationStatusOk;
+        if(getCommunicationStatus().isIdleError()){
+            color = R.color.colorCommunicationStatusIdleError;
+        }
+        if(getCommunicationStatus().isConnecting()){
+            color = R.color.colorCommunicationStatusConnecting;
+        }
+        return color;
+    }
 
     public synchronized void setControlMode(ControlMode cm){
         try {
