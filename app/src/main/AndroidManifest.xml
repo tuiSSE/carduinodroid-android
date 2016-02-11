@@ -20,7 +20,7 @@
     <application
         android:name=".CarduinodroidApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/logo"
+        android:icon="@drawable/logo"
         android:label="@string/appNameShort"
         android:theme="@style/AppTheme">
         <activity

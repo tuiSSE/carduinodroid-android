@@ -141,7 +141,7 @@ public class WatchdogService extends Service {
                         .setAction(Constants.ACTION.EXIT),
                 0);
         notificationBuilder
-                .setSmallIcon(R.drawable.logo_white)
+                .setSmallIcon(R.drawable.notification_logo_white)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(getText(R.string.appName))
