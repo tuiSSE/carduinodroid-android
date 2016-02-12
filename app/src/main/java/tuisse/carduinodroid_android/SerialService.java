@@ -19,14 +19,10 @@ import tuisse.carduinodroid_android.data.DataHandler;
 
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
-    static private boolean isDestroyed = false;
+    static private boolean isDestroyed = true;
     private CarduinodroidApplication carduino;
     private SerialConnection serial = null;
     private Handler handler;
-    private PowerManager.WakeLock mWakeLock;
-
-    private static final int NOTIFICATION = 1337;
-    public static final String EXIT_ACTION = "tuisse.carduinodroid_android.EXIT";
 
     private CarduinoData getData(){
         return carduino.dataHandler.getData();
@@ -35,48 +31,14 @@ public class SerialService extends Service {
         return carduino.dataHandler;
     }
 
-    @Nullable
-    private NotificationManager mNotificationManager = null;
-    private final NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder(this);
-
     protected CarduinodroidApplication getCarduino(){
         return carduino;
     }
 
-    private void setupNotifications() { //called in onCreate()
-        if (mNotificationManager == null) {
-            mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, StatusActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                0);
-        PendingIntent pendingCloseIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, StatusActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        .setAction(EXIT_ACTION),
-                0);
-        mNotificationBuilder
-                .setSmallIcon(R.drawable.logo_white)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContentTitle(getText(R.string.appName))
-                .setWhen(System.currentTimeMillis())
-                .setContentIntent(pendingIntent)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel,
-                        getString(R.string.exitApp), pendingCloseIntent)
-                .setOngoing(true);
+    static public boolean getIsDestroyed(){
+        return isDestroyed;
     }
 
-    protected void showNotification() {
-        mNotificationBuilder
-                .setWhen(System.currentTimeMillis())
-                .setTicker(getData().getSerialState().getStateName())
-                .setContentText(getData().getSerialState().getStateName());
-        if (mNotificationManager != null) {
-            mNotificationManager.notify(NOTIFICATION, mNotificationBuilder.build());
-        }
-    }
 
 
     @Override
@@ -88,12 +50,6 @@ public class SerialService extends Service {
     public void onCreate() {
         super.onCreate();
         handler = new Handler();
-/*
-        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-        mWakeLock.acquire();
-*/
-        setupNotifications();
         carduino = (CarduinodroidApplication) getApplication();
     }
 
@@ -166,17 +122,13 @@ public class SerialService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        isDestroyed = true;
         //disconnect
         if(serial != null){
             serial.close();
         } else {
             Log.e(TAG, "FATAL on close: serial was not created");
         }
-        if(mNotificationManager != null) {
-            mNotificationManager.cancel(NOTIFICATION);
-        }
-        //mWakeLock.release();
+        isDestroyed = true;
         Log.i(TAG, "onDestroyed");
     }
 

@@ -123,7 +123,7 @@ public class SerialFrameHandler implements SerialFrameIF{
         carduinoData.setTemperature(command[NUM_TEMPERATURE] & BYTE_MASK);
         carduinoData.setUltrasoundFront(command[NUM_ULTRASOUND_FRONT] & BYTE_MASK);
         carduinoData.setUltrasoundBack(command[NUM_ULTRASOUND_BACK] & BYTE_MASK);
-        Log.d(TAG, carduinoData.print());
+        //Log.d(TAG, carduinoData.print());
         return true;
     }
 

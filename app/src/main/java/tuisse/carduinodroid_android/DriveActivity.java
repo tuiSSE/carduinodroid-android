@@ -13,8 +13,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -32,18 +33,17 @@ import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoIF;
+import tuisse.carduinodroid_android.data.DataHandler;
 
 public class DriveActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoDriveActivity";
-    private final float MAX_SPEED_DEGREE = 20;
-    private final float MAX_STEER_DEGREE = 20;
 
     private CarduinodroidApplication carduino;
 
     private SerialDataRxReceiver serialDataRxReceiver;
     private IntentFilter serialDataRxFilter;
-    private SerialConnectionDriveActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
-    private IntentFilter serialConnectionStatusChangeFilter;
+    private IntentFilter communicationStatusChangeFilter;
+    private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -112,13 +112,16 @@ public class DriveActivity extends AppCompatActivity {
     private TextView textViewVoltage;
     private TextView textViewTemperature;
 
-    private FloatingActionButton buttonDrive;
-    private FloatingActionButton buttonHorn;
-    private FloatingActionButton buttonFrontLight;
-    private FloatingActionButton buttonStatusLed;
+    private ImageView buttonDrive;
+    private ImageView buttonHorn;
+    private ImageView buttonFrontLight;
+    private ImageView buttonStatusLed;
 
     private CarduinoData getData(){
-        return carduino.dataHandler.getData();
+        return getDataHandler().getData();
+    }
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
     }
 
     private void setDistance(ProgressBar pb, int distance){
@@ -178,52 +181,47 @@ public class DriveActivity extends AppCompatActivity {
     }
 
     private void initView(){
-        checkBoxFailsafeStop = (CheckBox) findViewById(R.id.checkBoxFailsafeStop);
-        checkBoxOrientation = (CheckBox) findViewById(R.id.checkBoxOrientation);
-        checkBoxDebug = (CheckBox) findViewById(R.id.checkBoxDebug);
-        seekBarSpeed = (VerticalSeekBar) findViewById(R.id.seekBarSpeed);
-        seekBarSteer = (SeekBar) findViewById(R.id.seekBarSteer);
-        progressbarDistanceFront    = (ProgressBar) (findViewById(R.id.progressbarDistanceFront));
-        progressbarDistanceBack     = (ProgressBar) (findViewById(R.id.progressbarDistanceBack));
+        checkBoxFailsafeStop        = (CheckBox)        findViewById(R.id.checkBoxFailsafeStop);
+        checkBoxOrientation         = (CheckBox)        findViewById(R.id.checkBoxOrientation);
+        checkBoxDebug               = (CheckBox)        findViewById(R.id.checkBoxDebug);
+        seekBarSpeed                = (VerticalSeekBar) findViewById(R.id.seekBarSpeed);
+        seekBarSteer                = (SeekBar)         findViewById(R.id.seekBarSteer);
+        progressbarDistanceFront    = (ProgressBar)     findViewById(R.id.progressbarDistanceFront);
+        progressbarDistanceBack     = (ProgressBar)     findViewById(R.id.progressbarDistanceBack);
 
-        textViewSpeed = (TextView) findViewById(R.id.textViewSpeed);
-        textViewSteer = (TextView) findViewById(R.id.textViewSteer);
-        textViewAngle0 = (TextView) findViewById(R.id.textViewAngle0);
-        textViewAngle1 = (TextView) findViewById(R.id.textViewAngle1);
-        textViewAngle2 = (TextView) findViewById(R.id.textViewAngle2);
+        textViewSpeed               = (TextView) findViewById(R.id.textViewSpeed);
+        textViewSteer               = (TextView) findViewById(R.id.textViewSteer);
+        textViewAngle0              = (TextView) findViewById(R.id.textViewAngle0);
+        textViewAngle1              = (TextView) findViewById(R.id.textViewAngle1);
+        textViewAngle2              = (TextView) findViewById(R.id.textViewAngle2);
 
-        textViewDistanceFront = (TextView) findViewById(R.id.textViewDistanceFront);
-        textViewDistanceBack = (TextView) findViewById(R.id.textViewDistanceBack);
-        textViewAbsBattery = (TextView) findViewById(R.id.textViewAbsBattery);
-        textViewRelBattery = (TextView) findViewById(R.id.textViewRelBattery);
-        textViewCurrent = (TextView) findViewById(R.id.textViewCurrent);
-        textViewVoltage = (TextView) findViewById(R.id.textViewVoltage);
-        textViewTemperature = (TextView) findViewById(R.id.textViewTemperature);
+        textViewDistanceFront       = (TextView) findViewById(R.id.textViewDistanceFront);
+        textViewDistanceBack        = (TextView) findViewById(R.id.textViewDistanceBack);
+        textViewAbsBattery          = (TextView) findViewById(R.id.textViewAbsBattery);
+        textViewRelBattery          = (TextView) findViewById(R.id.textViewRelBattery);
+        textViewCurrent             = (TextView) findViewById(R.id.textViewCurrent);
+        textViewVoltage             = (TextView) findViewById(R.id.textViewVoltage);
+        textViewTemperature         = (TextView) findViewById(R.id.textViewTemperature);
 
-        buttonDrive = (FloatingActionButton) findViewById(R.id.buttonDrive);
-        buttonHorn = (FloatingActionButton) findViewById(R.id.buttonHorn);
-        buttonFrontLight = (FloatingActionButton) findViewById(R.id.buttonFrontLight);
-        buttonStatusLed = (FloatingActionButton) findViewById(R.id.buttonStatusLed);
+        buttonDrive                 = (ImageView) findViewById(R.id.buttonDrive);
+        buttonHorn                  = (ImageView) findViewById(R.id.buttonHorn);
+        buttonFrontLight            = (ImageView) findViewById(R.id.buttonFrontLight);
+        buttonStatusLed             = (ImageView) findViewById(R.id.buttonStatusLed);
 
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
-            buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-            buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-            buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
-            buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorPrimaryLight)));
+
+            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
+            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
+            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
+            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
         } else {
             //if Transceiver mode
-            buttonDrive.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-            buttonHorn.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-            buttonFrontLight.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
-            buttonStatusLed.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.colorGreyed)));
+            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
+            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
+            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
+            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
         }
-
-        buttonDrive.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        buttonHorn.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        buttonFrontLight.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-        buttonStatusLed.setRippleColor(ContextCompat.getColor(this, R.color.colorPrimary));
-
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
         viewVideo = findViewById(R.id.fullscreen_content_video);
@@ -261,14 +259,10 @@ public class DriveActivity extends AppCompatActivity {
                             sensorManager.registerListener(magnetometerListener,
                                     magnetSensor,
                                     SensorManager.SENSOR_DELAY_GAME);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive_press));
-                            }
+                            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
                             return true;
                         case MotionEvent.ACTION_UP:
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonDrive.setImageDrawable(getDrawable(R.drawable.icon_drive));
-                            }
+                            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
                             sensorManager.unregisterListener(magnetometerListener);
                             sensorManager.unregisterListener(accelerometerListener);
                             sensorMeasureStart = true;
@@ -291,14 +285,10 @@ public class DriveActivity extends AppCompatActivity {
                         statusLedState = !statusLedState;
                         if (statusLedState) {
                             getData().setStatusLed(1);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led_press));
-                            }
+                            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
                         } else {
                             getData().setStatusLed(0);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonStatusLed.setImageDrawable(getDrawable(R.drawable.icon_status_led));
-                            }
+                            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
                         }
                         return true;
                     default:
@@ -315,15 +305,10 @@ public class DriveActivity extends AppCompatActivity {
                         frontLightState = !frontLightState;
                         if (frontLightState) {
                             getData().setFrontLight(1);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light_press));
-                            }
-
+                            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
                         } else {
                             getData().setFrontLight(0);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonFrontLight.setImageDrawable(getDrawable(R.drawable.icon_front_light));
-                            }
+                            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
                         }
                         return true;
                     default:
@@ -339,9 +324,7 @@ public class DriveActivity extends AppCompatActivity {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn_press));
-                            }
+                            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
                                     sound.horn();
@@ -355,9 +338,7 @@ public class DriveActivity extends AppCompatActivity {
                             }
                             return true;
                         case MotionEvent.ACTION_UP:
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                buttonHorn.setImageDrawable(getDrawable(R.drawable.icon_horn));
-                            }
+                            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
                                     sound.stop();
@@ -429,7 +410,6 @@ public class DriveActivity extends AppCompatActivity {
         initView();
         rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationLandscape)));
-
         initUI();
         goStop();
         reset();
@@ -440,7 +420,6 @@ public class DriveActivity extends AppCompatActivity {
         initView();
         rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationPortrait)));
-
         initUI();
         goStop();
         reset();
@@ -456,12 +435,11 @@ public class DriveActivity extends AppCompatActivity {
 
             sound = new Sound();
 
-            serialConnectionStatusChangeReceiver = new SerialConnectionDriveActivityStatusChangeReceiver();
-            serialConnectionStatusChangeFilter = new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-            //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
+            communicationStatusChangeReceiver = new CommunicationStatusChangeReceiver();
+            communicationStatusChangeFilter = new IntentFilter(Constants.EVENT.COMMUNICATION_STATUS_CHANGED);
 
             serialDataRxReceiver = new SerialDataRxReceiver();
-            serialDataRxFilter = new IntentFilter(getString(R.string.SERIAL_DATA_RX_RECEIVED));
+            serialDataRxFilter = new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -474,8 +452,9 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
-        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
-        registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
             refresh();
         }
@@ -484,23 +463,22 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onPause(){
         super.onPause();
-        unregisterReceiver(serialConnectionStatusChangeReceiver);
-        unregisterReceiver(serialDataRxReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(communicationStatusChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
     }
 
     private class SerialDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            //Log.d(TAG,"onDriveActivityReceiverReceive");
             refresh();
         }
     }
 
-    private class SerialConnectionDriveActivityStatusChangeReceiver extends BroadcastReceiver {
+    private class CommunicationStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,"onReceive status change event");
-            //TODO: update status
+            Log.d(TAG, "communication status change event: " + getDataHandler().getCommunicationStatus());
+            setBackgroundColor();
         }
     }
 
@@ -708,16 +686,16 @@ public class DriveActivity extends AppCompatActivity {
         int speed;
         switch (rotation) {
             case Surface.ROTATION_0:
-                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle1FilteredPitch,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             case Surface.ROTATION_90:
-                speed = (int) (scale(mAngle2FilteredRoll,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale(mAngle2FilteredRoll,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             case Surface.ROTATION_180:
-                speed = (int) (scale(mAngle1FilteredPitch,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale(mAngle1FilteredPitch,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
             default:
-                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_SPEED_DEGREE) * CarduinoIF.SPEED_MAX);
+                speed = (int) (scale((-1.0f)*mAngle2FilteredRoll,Constants.GESTURE_ANGLE.SPEED) * CarduinoIF.SPEED_MAX);
                 break;
         }
 
@@ -730,20 +708,24 @@ public class DriveActivity extends AppCompatActivity {
         int steering;
         switch (rotation) {
             case Surface.ROTATION_0:
-                steering = (int) (scale(mAngle2FilteredRoll,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale(mAngle2FilteredRoll,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             case Surface.ROTATION_90:
-                steering = (int) (scale(mAngle1FilteredPitch,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale(mAngle1FilteredPitch,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             case Surface.ROTATION_180:
-                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle2FilteredRoll,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
             default:
-                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,MAX_STEER_DEGREE) * CarduinoIF.STEER_MAX);
+                steering = (int) (scale((-1.0f)*mAngle1FilteredPitch,Constants.GESTURE_ANGLE.STEER) * CarduinoIF.STEER_MAX);
                 break;
         }
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
         seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
         getData().setSteer(steering);
+    }
+
+    private void setBackgroundColor(){
+        viewVideo.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
     }
 }

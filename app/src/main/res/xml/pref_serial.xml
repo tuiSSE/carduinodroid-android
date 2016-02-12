@@ -10,14 +10,14 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:title="@string/pref_title_serial_type"
-        android:icon="@drawable/ic_sync_black_24dp"/>
+        android:icon="@drawable/pref_icon_serial_connection_type"/>
 
     <EditTextPreference
         android:title="@string/pref_title_bluetooth_device_name"
         android:key="@string/pref_key_bluetooth_device_name"
         android:defaultValue="@string/serialDefaultBluetoothDeviceName"
         android:summary="@string/serialDefaultBluetoothDeviceName"
-        android:icon="@drawable/serial_type_bt"/>
+        android:icon="@drawable/pref_icon_bt_device_name"/>
 
     <ListPreference
         android:title="@string/pref_title_bluetooth_handling"
@@ -27,7 +27,7 @@
         android:entryValues="@array/pref_bluetooth_handling_values"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:icon="@drawable/serial_type_bt" />
+        android:icon="@drawable/pref_icon_bt_connection_handling" />
 
     <ListPreference
         android:title="@string/pref_title_failsafe_stop"
@@ -37,5 +37,5 @@
         android:entryValues="@array/pref_failsafe_stop_values"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:icon="@drawable/ic_info_black_24dp" />
+        android:icon="@drawable/pref_icon_failsafestop" />
 </PreferenceScreen>

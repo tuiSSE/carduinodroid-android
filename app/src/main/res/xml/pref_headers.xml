@@ -4,13 +4,13 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="tuisse.carduinodroid_android.SettingsActivity$ControlModePreferenceFragment"
-        android:icon="@drawable/ic_info_black_24dp"
+        android:fragment="tuisse.carduinodroid_android.SettingsActivity$GeneralPreferenceFragment"
+        android:icon="@drawable/pref_icon_debug"
         android:title="@string/pref_header_general" />
 
     <header
         android:fragment="tuisse.carduinodroid_android.SettingsActivity$SerialPreferenceFragment"
-        android:icon="@drawable/ic_sync_black_24dp"
+        android:icon="@drawable/pref_icon_serial_connection_type"
         android:title="@string/pref_header_serial" />
 <!--
         <header
