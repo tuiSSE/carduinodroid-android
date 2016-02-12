@@ -23,6 +23,7 @@ import tuisse.carduinodroid_android.data.DataHandler;
 public class WatchdogService extends Service {
 
     private final String TAG = "CarduinoWatchdog";
+    private final StopWatchdogThread stopWatchdogThread = new StopWatchdogThread();
     static private boolean isDestroyed = false;
     static private boolean isInForeground = false;
     private CarduinodroidApplication carduino;
@@ -97,6 +98,9 @@ public class WatchdogService extends Service {
                 isInForeground = true;
             }
         }
+        if(stopWatchdogThread.isAlive()){
+            stopWatchdogThread.interrupt();
+        }
         watchdogThread.start();
         sendToast("Watchdog Service started");
         if(isDestroyed){
@@ -120,10 +124,8 @@ public class WatchdogService extends Service {
                 notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
             }
         }
-        stopServices();
+        stopWatchdogThread.run();
         getDataHandler().setWatchdogStarted(false);
-        //disconnect
-        isDestroyed = true;
         Log.i(TAG, "onDestroyed");
     }
 
@@ -153,7 +155,6 @@ public class WatchdogService extends Service {
     }
 
     protected void showNotification() {
-
         notificationBuilder
                 .setWhen(System.currentTimeMillis())
                 .setTicker(getData().getSerialState().getStateName())
@@ -230,15 +231,26 @@ public class WatchdogService extends Service {
         }
     }
 
-    private void stopServices(){
-        if(!SerialService.getIsDestroyed()){
-            stopService(new Intent(WatchdogService.this,SerialService.class));
+    private class StopWatchdogThread extends Thread {
+        public StopWatchdogThread() {
+            super("WatchdogService-StopWatchdogThread");
         }
-        if(!IpService.getIsDestroyed()){
-            stopService(new Intent(WatchdogService.this,IpService.class));
+        @Override
+        public void run() {
+            synchronized (this) {
+                if (!SerialService.getIsDestroyed()) {
+                    stopService(new Intent(WatchdogService.this, SerialService.class));
+                    if (!IpService.getIsDestroyed()) {
+                        stopService(new Intent(WatchdogService.this, IpService.class));
+                    }
+                }
+                if (SerialService.getIsDestroyed() && IpService.getIsDestroyed()) {
+                    isDestroyed = true;
+                    sendToast("WatchdogThred stopped");
+                }
+            }
         }
-        sendToast("Watchdog Service stopped");
-    }
+    };
 
     private class SerialStatusChangeReceiver extends BroadcastReceiver {
         @Override

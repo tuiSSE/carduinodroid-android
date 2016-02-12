@@ -75,10 +75,10 @@ abstract public class SerialConnection {
                 else if(!error.equals("")){
                     Log.w(TAG, error);
                 }
-                if (serialService != null) {
-                    Intent onSerialConnectionStatusChangeIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
-                    LocalBroadcastManager.getInstance(serialService).sendBroadcast(onSerialConnectionStatusChangeIntent);
-                }
+            }
+            if (serialService != null) {
+                Intent onSerialConnectionStatusChangeIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
+                LocalBroadcastManager.getInstance(serialService).sendBroadcast(onSerialConnectionStatusChangeIntent);
             }
         }
         else{

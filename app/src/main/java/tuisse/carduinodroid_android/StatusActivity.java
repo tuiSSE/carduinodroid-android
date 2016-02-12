@@ -271,13 +271,8 @@ public class StatusActivity extends AppCompatActivity {
     }
 
     private void stopServices() {
-        stopService(new Intent(StatusActivity.this, WatchdogService.class));
-        while(WatchdogService.getIsDestroyed()){
-            try {
-                Thread.sleep(100);
-            }catch (InterruptedException e){
-
-            }
+        if(!WatchdogService.getIsDestroyed()){
+            stopService(new Intent(StatusActivity.this, WatchdogService.class));
         }
     }
 
