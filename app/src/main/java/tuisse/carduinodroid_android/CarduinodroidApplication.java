@@ -57,6 +57,10 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
                 dataHandler.setControlMode(ControlMode.fromInteger(Utils.getIntPref(key, ControlMode.toInteger(ControlMode.TRANSCEIVER))));
                 Log.d(TAG, key + ": " + dataHandler.getControlMode());
                 break;
+            case "pref_key_screensaver":
+                dataHandler.setScreensaver(Utils.getIntPref(key, 60000));
+                Log.d(TAG, key + ": " + dataHandler.getScreensaver());
+                break;
             case "pref_key_bluetooth_device_name":
                 dataHandler.setBluetoothDeviceName(sharedPreferences.getString(key, getString(R.string.serialDefaultBluetoothDeviceName)));
                 Log.d(TAG, key + ": " + dataHandler.getBluetoothDeviceName());
@@ -100,6 +104,8 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
                 else {
                     dataHandler.setDebugView(false);
                 }
+                dataHandler.setScreensaver(Utils.getIntPref("pref_key_screensaver", 60000));
+                Log.d(TAG, "pref_key_screensaver: " + dataHandler.getScreensaver());
                 Log.d(TAG, "pref_key_failsafe_stop: " + dataHandler.getFailSafeStopPref());
                 Log.d(TAG, "pref_key_debug_view: " + dataHandler.getDebugView());
                 Log.d(TAG, "pref_key_bluetooth_handling: " + dataHandler.getBluetoothHandling());

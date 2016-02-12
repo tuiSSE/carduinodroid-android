@@ -56,30 +56,6 @@ public class CarduinoData implements CarduinoIF{
         resetMotors();
     }
 
-    public CarduinoData(CarduinoData cd){
-        try {
-            setSerialType(cd.serialType);
-            setSerialState(cd.serialState);
-            setSerialName(cd.serialName);
-            setCurrent(cd.current);
-            setAbsBattCap(cd.absBattCap);
-            setRelBattCap(cd.relBattCap);
-            setVoltage(cd.voltage);
-            setTemperature(cd.temperature);
-            setUltrasoundFront(cd.ultrasoundFront);
-            setUltrasoundBack(cd.ultrasoundBack);
-
-            setSpeed(cd.speed);
-            setSteer(cd.steer);
-            setStatusLed(cd.statusLed);
-            setFrontLight(cd.frontLight);
-            setFailSafeStop(cd.failSafeStop);
-            setResetAccCur(cd.resetAccCur);
-        }catch (Exception e){
-            Log.e(TAG, e.toString());
-        }
-    }
-
     public synchronized String print(){
         return  " current         " + current+
                 " absCapacity     " + absBattCap+

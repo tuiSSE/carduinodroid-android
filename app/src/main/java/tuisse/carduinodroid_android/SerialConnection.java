@@ -1,6 +1,7 @@
 package tuisse.carduinodroid_android;
 
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -15,9 +16,6 @@ import tuisse.carduinodroid_android.data.DataHandler;
  */
 abstract public class SerialConnection {
     private final String            TAG = "CarduinoSerialConn";
-    protected final int             DELAY = 100;//100ms
-    protected final int             HEARTBEAT = 100;
-    protected final int             TIMEOUT = 1300;//800ms
     protected final int             RECEIVE_BUFFER_LENGTH = 30;
 
     protected SerialService             serialService;
@@ -45,7 +43,9 @@ abstract public class SerialConnection {
         if(serialSendThread.isAlive()){
             serialSendThread.interrupt();
         }
-        serialReceiveThread.interrupt();
+        if(serialReceiveThread.isAlive()) {
+            serialReceiveThread.interrupt();
+        }
         return true;
     }
 
@@ -65,8 +65,9 @@ abstract public class SerialConnection {
 
     protected synchronized void setSerialState(ConnectionEnum state, String error){
         if(getData().getSerialState() != null) {
-            //if (!state.equals(getSerialData().getSerialState().getState())) {//if not equal
-            getData().setSerialState(new ConnectionState(state, error));
+            if (!(  state.equals(getData().getSerialState().getState()) &&
+                    error.equals(getData().getSerialState().getError()))) {//if not equal
+                getData().setSerialState(new ConnectionState(state, error));
                 Log.d(TAG, "serial State changed: " + getData().getSerialState().getStateName());
                 if(getData().getSerialState().isError()){
                     Log.e(TAG, error);
@@ -74,15 +75,11 @@ abstract public class SerialConnection {
                 else if(!error.equals("")){
                     Log.w(TAG, error);
                 }
-                Intent onSerialConnectionStatusChangeIntent = new Intent(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
-                //onSerialConnectionStatusChangeIntent.putExtra(serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_EXTRA), getSerialData().getSerialState().getState().ordinal());
-                //serialService.getCarduino().sendBroadcast(onSerialConnectionStatusChangeIntent, serialService.getCarduino().getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION));
-
-                if (serialService != null) {
-                    serialService.sendBroadcast(onSerialConnectionStatusChangeIntent);
-                    serialService.showNotification();
-                }
-            //}
+            }
+            if (serialService != null) {
+                Intent onSerialConnectionStatusChangeIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
+                LocalBroadcastManager.getInstance(serialService).sendBroadcast(onSerialConnectionStatusChangeIntent);
+            }
         }
         else{
             Log.e(TAG,"no getSerialData()");
@@ -95,7 +92,7 @@ abstract public class SerialConnection {
         }
         @Override
         public void run() {
-            int heartbeat = HEARTBEAT;
+            int heartbeat = Constants.HEART_BEAT.SERIAL;
             Log.d(TAG, "SerialReceiveThread started");
             long lastReceiveTime = System.currentTimeMillis();
             while (isRunning()) {
@@ -103,10 +100,10 @@ abstract public class SerialConnection {
                     try{
                         if(receive() > 0){
                             lastReceiveTime = System.currentTimeMillis();
-                            Intent onSerialDataRxIntent = new Intent(serialService.getString(R.string.SERIAL_DATA_RX_RECEIVED));
-                            serialService.sendBroadcast(onSerialDataRxIntent);
+                            Intent onSerialDataRxIntent = new Intent(Constants.EVENT.SERIAL_DATA_RECEIVED);
+                            LocalBroadcastManager.getInstance(serialService).sendBroadcast(onSerialDataRxIntent);
                         }
-                        if(lastReceiveTime + TIMEOUT < System.currentTimeMillis()){
+                        if(lastReceiveTime + Constants.TIMEOUT.SERIAL < System.currentTimeMillis()){
                             Log.e(TAG, serialService.getString(R.string.serialErrorReceiveTimeout));
                             setSerialState(ConnectionEnum.STREAMERROR,R.string.serialErrorReceiveTimeout);
                             serialService.stopSelf();
@@ -116,10 +113,12 @@ abstract public class SerialConnection {
                         setSerialState(ConnectionEnum.STREAMERROR, String.format(serialService.getString(R.string.serialErrorReceiveFail),e.toString()));
                         serialService.stopSelf();
                     }
-                    Thread.sleep(DELAY);
-                    if(heartbeat-- == 0){
-                        heartbeat = HEARTBEAT;
-                        Log.d(TAG,"pulse SerialReceive");
+                    Thread.sleep(Constants.DELAY.SERIAL);
+                    if(heartbeat > 0) {
+                        if (heartbeat-- == 0) {
+                            heartbeat = Constants.HEART_BEAT.SERIAL;
+                            Log.d(TAG, "pulse SerialReceive");
+                        }
                     }
                 } catch (InterruptedException e) {
                     setSerialState(ConnectionEnum.IDLE);
@@ -138,22 +137,29 @@ abstract public class SerialConnection {
         }
         @Override
         public void run() {
-            int heartbeat = HEARTBEAT;
+            int heartbeat = Constants.HEART_BEAT.SERIAL;
             Log.d(TAG,"SerialSendThread started");
             while (isRunning()) {
                 try {
                     //check actual connection
                     try {
                         send();
+                        //reset Accumulated Current
+                        if(getData().getResetAccCur() == 1){
+                            getData().setResetAccCur(0);
+                            Utils.setIntPref(serialService.getString(R.string.pref_key_reset_battery), 0);
+                        }
                     } catch (java.io.IOException e){
                         Log.e(TAG, String.format(serialService.getString(R.string.serialErrorSendFail),e.toString()));
                         setSerialState(ConnectionEnum.STREAMERROR,String.format(serialService.getString(R.string.serialErrorSendFail),e.toString()));
                         serialService.stopSelf();
                     }
-                    Thread.sleep(DELAY);
-                    if (heartbeat-- == 0) {
-                        heartbeat = HEARTBEAT;
-                        Log.d(TAG, "pulse SerialSend");
+                    Thread.sleep(Constants.DELAY.SERIAL);
+                    if(heartbeat > 0) {
+                        if (heartbeat-- == 0) {
+                            heartbeat = Constants.HEART_BEAT.SERIAL;
+                            Log.d(TAG, "pulse SerialSend");
+                        }
                     }
                 } catch (InterruptedException e) {
                     setSerialState(ConnectionEnum.IDLE);

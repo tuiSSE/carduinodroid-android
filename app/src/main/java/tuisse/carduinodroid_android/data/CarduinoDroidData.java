@@ -34,23 +34,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
 
     public CarduinoDroidData(){
         super();
-        try{
-            init();
-        }catch (Exception e){
-            Log.e(TAG, e.toString());
-        }
-    }
-/*
-    public CarduinoDroidData (CarduinoDroidData ccd){
-        super();
-        try{
-            init();
-        }catch (Exception e){
-            Log.e(TAG, e.toString());
-        }
-    }
-*/
-    private void init(){
         setIpState(new ConnectionState(ConnectionEnum.IDLE));
         setIpType(IpType.WLAN);
 
@@ -70,8 +53,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
 
         setWlanActive(0);
         setWlanAvailable(0);
-
-
     }
 
 

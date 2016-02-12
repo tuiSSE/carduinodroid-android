@@ -9,16 +9,18 @@ import android.graphics.drawable.LayerDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
-import tuisse.carduinodroid_android.data.CarduinoDroidIF;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
@@ -27,7 +29,12 @@ public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
 
+    private final Handler screensaverHandler = new Handler();
+
+    private View      statusActivityView;
+
     //main toolbar
+    private Toolbar   topToolbar;
     private ImageView imageViewExit;
     private ImageView imageViewSettings;
 
@@ -65,10 +72,11 @@ public class StatusActivity extends AppCompatActivity {
 
     private CarduinodroidApplication carduino;
 
-    private IntentFilter serialConnectionStatusChangeFilter;
-    private SerialConnectionStatusActivityStatusChangeReceiver serialConnectionStatusChangeReceiver;
+    private IntentFilter serialStatusChangeFilter;
+    private SerialStatusActivityStatusChangeReceiver serialStatusChangeReceiver;
+    private IntentFilter ipStatusChangeFilter;
+    private IpStatusActivityStatusChangeReceiver ipStatusChangeReceiver;
     private UsbBroadcastReciever usbReciever;
-
     private IntentFilter usbFilter;
 
     private CarduinoData getData(){
@@ -89,15 +97,19 @@ public class StatusActivity extends AppCompatActivity {
         setContentView(R.layout.activity_status);
         // prevent the application from switching to landscape-mode
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        serialConnectionStatusChangeReceiver =  new SerialConnectionStatusActivityStatusChangeReceiver();
-        serialConnectionStatusChangeFilter =    new IntentFilter(getString(R.string.SERIAL_CONNECTION_STATUS_CHANGED));
+        serialStatusChangeReceiver =  new SerialStatusActivityStatusChangeReceiver();
+        serialStatusChangeFilter =    new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
+
+        ipStatusChangeReceiver =  new IpStatusActivityStatusChangeReceiver();
+        ipStatusChangeFilter =    new IntentFilter(Constants.EVENT.IP_STATUS_CHANGED);
 
         usbReciever = new UsbBroadcastReciever();
-        usbFilter = new IntentFilter(getString(R.string.USB_PERMISSION));
+        usbFilter = new IntentFilter(Constants.PERMISSION.USB);
         registerReceiver(usbReciever, usbFilter);
 
         //get the Views
-        Toolbar topToolbar =                (Toolbar  ) findViewById(R.id.topToolbar);
+        statusActivityView =                (View     ) findViewById(R.id.statusActivityView);
+        topToolbar =                        (Toolbar  ) findViewById(R.id.topToolbar);
         imageViewExit =                     (ImageView) findViewById(R.id.imageViewExit);
         imageViewSettings =                 (ImageView) findViewById(R.id.imageViewSettings);
 
@@ -128,6 +140,16 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModePrev =           (ImageView) findViewById(R.id.imageViewSwitchModePrev);
         imageViewSwitchModeNext =           (ImageView) findViewById(R.id.imageViewSwitchModeNext);
         textviewSwitchMode      =           (TextView ) findViewById(R.id.textviewSwitchMode);
+
+        statusActivityView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view,MotionEvent event) {
+                checkRestartScreensaver();
+                return true;
+
+            }
+        });
+
         //drive button toolbar
         driveButton =                       (Toolbar  ) findViewById(R.id.driveButton);
 
@@ -142,35 +164,18 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClickExit");
-                stopService(new Intent(StatusActivity.this, SerialService.class));
-                moveTaskToBack(true);
+                exit();
             }
         });
         imageViewSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopServices();
                 startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
                 Log.d(TAG, "onClickSettings");
             }
         });
 
-        imageViewDeviceArduino.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopService(new Intent(StatusActivity.this, IpService.class));
-                Log.d(TAG, "onClickSerialStart");
-            }
-        });
-
-        imageViewDeviceRemoteIp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startService(new Intent(StatusActivity.this, IpService.class));
-                //stopService(new Intent(StatusActivity.this, SerialService.class));
-                Log.d(TAG, "onClickSerialStop");
-
-            }
-        });
         imageViewSettingsBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +190,9 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Utils.setIntPref(getString(R.string.pref_key_control_mode), getDataHandler().setControlModePrev());
+                Intent updateControlModeIntent = new Intent(StatusActivity.this, WatchdogService.class);
+                updateControlModeIntent.setAction(Constants.ACTION.CONTROL_MODE_CHANGED);
+                startService(updateControlModeIntent);
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModePrev");
             }
@@ -194,6 +202,9 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Utils.setIntPref(getString(R.string.pref_key_control_mode), getDataHandler().setControlModeNext());
+                Intent updateControlModeIntent = new Intent(StatusActivity.this, WatchdogService.class);
+                updateControlModeIntent.setAction(Constants.ACTION.CONTROL_MODE_CHANGED);
+                startService(updateControlModeIntent);
                 updateControlMode();
                 Log.d(TAG, "onClickSwitchModeNext");
             }
@@ -211,16 +222,20 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter,getString(R.string.SERIAL_CONNECTION_STATUS_PERMISSION),null);
-        registerReceiver(serialConnectionStatusChangeReceiver, serialConnectionStatusChangeFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipStatusChangeReceiver, ipStatusChangeFilter);
         updateControlMode();
+        startService(new Intent(StatusActivity.this, WatchdogService.class));
+        checkRestartScreensaver();
         Log.d(TAG, "onStatusActivityResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(serialConnectionStatusChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipStatusChangeReceiver);
+        abortScreensaver();
         Log.d(TAG, "onStatusActivityPause");
     }
 
@@ -240,14 +255,24 @@ public class StatusActivity extends AppCompatActivity {
             return;
         }
         switch (action) {
-            case SerialService.EXIT_ACTION:
-                Log.d(TAG,"Notification send EXIT_ACTION");
-                stopService(new Intent(StatusActivity.this, SerialService.class));
-                moveTaskToBack(true);
+            case Constants.ACTION.EXIT:
+                Log.d(TAG, "Notification send action EXIT");
+                exit();
                 break;
             default:
                 Log.d(TAG,"Notification send unknown intent");
                 break;
+        }
+    }
+
+    private void exit(){
+        stopServices();
+        moveTaskToBack(true);
+    }
+
+    private void stopServices() {
+        if(!WatchdogService.getIsDestroyed()){
+            stopService(new Intent(StatusActivity.this, WatchdogService.class));
         }
     }
 
@@ -300,9 +325,7 @@ public class StatusActivity extends AppCompatActivity {
                 break;
         }
         updateStatus();
-
         //start services
-
     }
 
     private void updateStatus(){
@@ -361,25 +384,27 @@ public class StatusActivity extends AppCompatActivity {
         }
     }
 
-    private class SerialConnectionStatusActivityStatusChangeReceiver extends BroadcastReceiver {
+    private class SerialStatusActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            try {
-                Log.d(TAG, "onReceive status change event: " + getData().getSerialState().getStateName());
-            }catch (Exception e){
-                Log.e(TAG, e.toString());
-            }
+            Log.d(TAG, "serial status change event: " + getData().getSerialState().getStateName());
             updateStatus();
         }
     }
 
-
+    private class IpStatusActivityStatusChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "ip status change event: " + getData().getSerialState().getStateName());
+            updateStatus();
+        }
+    }
 
     class UsbBroadcastReciever extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (getString(R.string.USB_PERMISSION).equals(action)) {
+            if (action.equals(Constants.PERMISSION.USB)) {
                 synchronized (this) {
                     UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                     if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
@@ -410,6 +435,37 @@ public class StatusActivity extends AppCompatActivity {
                 stopService(new Intent(StatusActivity.this, SerialService.class));
                 Log.d(TAG, "usb cable: serialService stopped");
             }
+        }
+    }
+
+    private final Runnable triggerScreensaverRunnable = new Runnable() {
+        @Override
+        public void run() {
+            abortScreensaver();
+            startActivity(new Intent(StatusActivity.this,ScreensaverActivity.class));
+        }
+    };
+    private void abortScreensaver() {
+        screensaverHandler.removeCallbacks(triggerScreensaverRunnable);
+        //Log.d(TAG, "screensaverCounter stopped");
+    }
+    private void triggerScreensaver(){
+        if(getDataHandler().getScreensaver() >=0) {
+            screensaverHandler.postDelayed(triggerScreensaverRunnable, getDataHandler().getScreensaver());
+            //Log.d(TAG, "screensaverCounter started");
+        }
+    }
+    private void restartScreensaver(){
+        abortScreensaver();
+        triggerScreensaver();
+    }
+
+    private void checkRestartScreensaver(){
+        if(getDataHandler().getControlMode().isTransceiver()){
+            restartScreensaver();
+        }
+        else{
+            abortScreensaver();
         }
     }
 }

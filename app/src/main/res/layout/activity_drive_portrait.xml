@@ -226,61 +226,54 @@
                 android:layout_marginStart="@dimen/textMargin"/>
         </LinearLayout>
 
-        <android.support.design.widget.FloatingActionButton
+        <ImageView
             android:id="@+id/buttonDrive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:src="@drawable/icon_drive"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginRight="@dimen/fabMargin"
-            android:layout_marginEnd="@dimen/fabMargin"/>
-        <android.support.design.widget.FloatingActionButton
+            android:layout_marginEnd="@dimen/fabMargin"
+            android:contentDescription="@string/imageViewDriveDesc"/>
+        <ImageView
             android:id="@+id/buttonHorn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/icon_horn"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
-            android:layout_marginLeft="@dimen/fabMargin"/>
-        <android.support.design.widget.FloatingActionButton
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:contentDescription="@string/imageViewHornDesc"/>
+        <ImageView
             android:id="@+id/buttonFrontLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
             android:layout_above="@+id/buttonHorn"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/icon_front_light"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
-            android:layout_marginLeft="@dimen/fabMargin"/>
-        <android.support.design.widget.FloatingActionButton
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:contentDescription="@string/imageViewFrontLightDesc"/>
+        <ImageView
             android:id="@+id/buttonStatusLed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
             android:layout_above="@+id/buttonFrontLight"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/icon_status_led"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
-            android:layout_marginLeft="@dimen/fabMargin"/>
-
-        <ToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New ToggleButton"
-            android:id="@+id/toggleButton"
-            android:layout_alignParentBottom="true"
-            android:layout_alignLeft="@+id/buttonHorn"
-            android:layout_alignStart="@+id/buttonHorn"
-            android:layout_alignRight="@+id/buttonHorn"
-            android:layout_alignEnd="@+id/buttonHorn" />
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:contentDescription="@string/imageViewStatusLedDesc"/>
 
     </RelativeLayout>
 

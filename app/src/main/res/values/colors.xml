@@ -7,6 +7,12 @@
     <color name="colorBackground">#e1f5fe</color>
     <color name="colorBackgroundText">#ffffff</color>
     <color name="colorGreyed">#616161</color>
+    <color name="colorScreensaverStatusbar">#404040</color>
+    <color name="colorScreensaverBackground">#000000</color>
+
+    <color name="colorCommunicationStatusOk">#ffffff</color>
+    <color name="colorCommunicationStatusConnecting">#ffd740</color>
+    <color name="colorCommunicationStatusIdleError">#ff8a80</color>
 
     <color name="colorBlackOverlay">#66000000</color>
     <color name="colorDistanceOk">#6666ff00</color>

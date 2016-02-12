@@ -32,14 +32,6 @@ public class SerialUsb extends SerialConnection {
     private UsbEndpoint usbEndpointTx = null;
     private UsbInterface usbInterface = null;
 
-    private final int ARDUINO_USB_VENDOR_ID = 0x2341;
-    private final int ARDUINO_UNO_USB_PRODUCT_ID = 0x01;
-    private final int ARDUINO_MEGA_2560_USB_PRODUCT_ID = 0x10;
-    private final int ARDUINO_MEGA_2560_R3_USB_PRODUCT_ID = 0x42;
-    private final int ARDUINO_UNO_R3_USB_PRODUCT_ID = 0x43;
-    private final int ARDUINO_MEGA_2560_ADK_R3_USB_PRODUCT_ID = 0x44;
-    private final int ARDUINO_MEGA_2560_ADK_USB_PRODUCT_ID = 0x3F;
-
     public SerialUsb(SerialService s) {
         super(s);
         if(getData() != null) {
@@ -74,29 +66,29 @@ public class SerialUsb extends SerialConnection {
                         Log.d(TAG, "InterfaceCount: " + tempUsbDevice.getInterfaceCount());
                         Log.d(TAG, "DeviceProtocol: " + tempUsbDevice.getDeviceProtocol());
 
-                        if (tempUsbDevice.getVendorId() == ARDUINO_USB_VENDOR_ID) {
+                        if (tempUsbDevice.getVendorId() == Constants.USB_VENDOR_ID.ARDUINO) {
                             switch (tempUsbDevice.getProductId()) {
-                                case ARDUINO_UNO_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_UNO:
                                     getData().setSerialName(serialService.getString(R.string.arduino_uno));
                                     usbDevice = tempUsbDevice;
                                     break;
-                                case ARDUINO_UNO_R3_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_UNO_R3:
                                     getData().setSerialName(serialService.getString(R.string.arduino_uno_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
-                                case ARDUINO_MEGA_2560_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_MEGA_2560:
                                     getData().setSerialName(serialService.getString(R.string.arduino_mega));
                                     usbDevice = tempUsbDevice;
                                     break;
-                                case ARDUINO_MEGA_2560_R3_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_MEGA_2560_R3:
                                     getData().setSerialName(serialService.getString(R.string.arduino_mega_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
-                                case ARDUINO_MEGA_2560_ADK_R3_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_MEGA_2560_ADK:
                                     getData().setSerialName(serialService.getString(R.string.arduino_mega_adk));
                                     usbDevice = tempUsbDevice;
                                     break;
-                                case ARDUINO_MEGA_2560_ADK_USB_PRODUCT_ID:
+                                case Constants.USB_PRODUCT_ID.ARDUINO_MEGA_2560_ADK_R3:
                                     getData().setSerialName(serialService.getString(R.string.arduino_mega_adk_r3));
                                     usbDevice = tempUsbDevice;
                                     break;
@@ -151,7 +143,7 @@ public class SerialUsb extends SerialConnection {
             Log.e(TAG, serialService.getString(R.string.serialErrorNoUsbPermission));
             setSerialState(ConnectionEnum.TRYCONNECTERROR, serialService.getString(R.string.serialErrorNoUsbPermission));
             PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(serialService, 0, new Intent(
-                    serialService.getString(R.string.USB_PERMISSION)), 0);
+                    Constants.PERMISSION.USB), 0);
             usbManager.requestPermission(usbDevice, usbPermissionIntent);
             return false;
         }

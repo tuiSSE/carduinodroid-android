@@ -28,6 +28,13 @@
     <string name="imageViewDeviceArduinoDesc">describes the arduino device</string>
     <string name="imageViewGoDrive">forwards to the drive view</string>
 
+    <string name="imageViewDriveDesc">push to drive the car in direct or remote mode</string>
+    <string name="imageViewHornDesc">push to play the horn sound</string>
+    <string name="imageViewFrontLightDesc">push to toggle the front lights</string>
+    <string name="imageViewStatusLedDesc">push to toggle the status led</string>
+
+
+
     <string name="imageViewSwitchModeDesc">switch user modes</string>
 
 
@@ -87,7 +94,6 @@
     <string name="driveAngle2">%1$04d\trel Roll [°]</string>
 
 
-
     <!-- preference strings -->
     <string name="defaultIp">141.24.11.1</string>
     <string name="localIp">127.0.0.1</string>
@@ -140,28 +146,12 @@
     <string name="arduino_mega_adk">Arduino Mega 2560 ADK</string>
     <string name="arduino_mega_adk_r3">Arduino Mega 2560 ADK R3</string>
 
-    <!-- permissions -->
-    <string name="serialConnectionStatusLabel">Serial Connection Status Label</string>
-    <string name="serialConnectionStatusDescription">Serial Connection Status Description</string>
-    <string name="serialDataRxReceivedLabel">Serial Data Rx Received Label</string>
-    <string name="serialDataRxReceivedDescription">Serial Data Rx Received Description</string>
-
-    <!--Intent strings -->
-    <string name="SERIAL_CONNECTION_STATUS_PERMISSION">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_PERMISSION</string>
-    <string name="SERIAL_CONNECTION_STATUS_CHANGED">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_CHANGED</string>
-    <string name="SERIAL_CONNECTION_STATUS_EXTRA">tuisse.carduinodroid_android.SERIAL_CONNECTION_STATUS_EXTRA</string>
-
-    <string name="SERIAL_DATA_RX_RECEIVED_PERMISSION">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED_PERMISSION</string>
-    <string name="SERIAL_DATA_RX_RECEIVED">tuisse.carduinodroid_android.SERIAL_DATA_RX_RECEIVED</string>
-    <string name="USB_PERMISSION">tuisse.carduinodroid_android.USB_PERMISSION</string>
-
     <!-- preferences -->
-    <string name="preference_main">tuisse.carduinodroid_android.PREFERENCE_MAIN</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
     <!-- header settings -->
-    <string name="pref_header_general">Control mode</string>
+    <string name="pref_header_general">General settings</string>
     <string name="pref_header_serial">Serial connection</string>
     <!-- general settings -->
     <string name="pref_title_control_mode">Control mode</string>
@@ -180,10 +170,42 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <!-- screensaver -->
+    <string name="pref_key_screensaver">pref_key_screensaver</string>
+    <string name="pref_title_screensaver">Screensaver</string>
+    <string name="pref_screensaver_off">Off</string>
+    <string name="pref_screensaver_5" >Turn on after  5s</string>
+    <string name="pref_screensaver_10">Turn on after 10s</string>
+    <string name="pref_screensaver_30">Turn on after 30s</string>
+    <string name="pref_screensaver_60">Turn on after 60s</string>
+    <string-array name="pref_screensaver">
+        <item>@string/pref_screensaver_off</item>
+        <item>@string/pref_screensaver_5</item>
+        <item>@string/pref_screensaver_10</item>
+        <item>@string/pref_screensaver_30</item>
+        <item>@string/pref_screensaver_60</item>
+    </string-array>
+    <string-array name="pref_screensaver_values">
+        <item>-1</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>30000</item>
+        <item>60000</item>
+    </string-array>
     <!-- battery reset -->
     <string name="pref_key_reset_battery">pref_key_reset_battery</string>
     <string name="pref_title_reset_battery">Reset battery accumulation</string>
-    <string name="pref_summary_reset_battery">Will switch back off if message is delivered</string>
+    <string name="pref_battery_idle">idle</string>
+    <string name="pref_battery_reset">resetting: will switch back to idle on successr</string>
+    <string-array name="pref_reset_battery">
+        <item>@string/pref_battery_idle</item>
+        <item>@string/pref_battery_reset</item>
+    </string-array>
+    <string-array name="pref_reset_battery_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
     <!-- serial settings -->
     <string name="pref_title_serial_type">Serial connection type</string>
     <string name="pref_key_serial_type">pref_key_serial_type</string>
@@ -221,8 +243,8 @@
     <string name="pref_title_debug_view">Debug view</string>
     <string name="pref_key_debug_view">pref_key_debug_view</string>
     <string-array name="pref_debug_view">
-        <item>@string/pref_debug_view_on</item>
         <item>@string/pref_debug_view_off</item>
+        <item>@string/pref_debug_view_on</item>
     </string-array>
     <string name="pref_debug_view_on">Enabled</string>
     <string name="pref_debug_view_off">Disabled</string>
@@ -234,8 +256,8 @@
     <string name="pref_title_failsafe_stop">@string/driveFailsafeStop</string>
     <string name="pref_key_failsafe_stop">pref_key_failsafe_stop</string>
     <string-array name="pref_failsafe_stop">
-        <item>@string/pref_failsafe_stop_on</item>
         <item>@string/pref_failsafe_stop_off</item>
+        <item>@string/pref_failsafe_stop_on</item>
     </string-array>
     <string name="pref_failsafe_stop_on">Enabled</string>
     <string name="pref_failsafe_stop_off">Disabled</string>
