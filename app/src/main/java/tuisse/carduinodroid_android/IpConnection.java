@@ -6,13 +6,11 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
@@ -27,8 +25,6 @@ public class IpConnection {
     protected IpService ipService;
 
     protected IpDataConnectionThread ipDataConnectionThread;
-    //protected IpDataReceiveThread    ipDataReceiveThread;
-    //protected IpDataSendThread       ipDataSendThread;
     protected IpCtrlSendThread       ipCtrlSendThread;
 
     static final String TAG = "CarduinoIpConnection";
@@ -44,9 +40,6 @@ public class IpConnection {
     Socket ctrlClient;
     Socket dataClient;
 
-    //BufferedWriter outData;
-    //BufferedReader inData;
-
     private String incomingDataMsg;
 
     IpConnection(IpService s){
@@ -54,8 +47,6 @@ public class IpConnection {
         ipService = s;
 
         ipDataConnectionThread = new IpDataConnectionThread();
-        //ipDataReceiveThread = new IpDataReceiveThread();
-        //ipDataSendThread = new IpDataSendThread();
         ipCtrlSendThread = new IpCtrlSendThread();
 
         reset();
@@ -69,9 +60,6 @@ public class IpConnection {
         dataSocket = null;
         ctrlClient = null;
         dataClient = null;
-
-        //outData = null;
-        //inData = null;
     }
 
     //Initialization of both ServerSockets if a connection via another mobile phone or pc is wished
@@ -113,6 +101,7 @@ public class IpConnection {
         new Thread(new Runnable() {
             public void run() {
                 try {
+                    //hard work around for client.accept to cancel them without exception and do not miss used expetion
                     if(!ctrlSocket.isClosed()){
                         Socket socketFakeCtrl = new Socket("localhost", CTRLPORT);
                         socketFakeCtrl.close();}
@@ -279,7 +268,8 @@ public class IpConnection {
             try {
                 outData = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             } catch (IOException e) {
-
+                Log.d(TAG, "OutpuStream has an Error");
+                setIpState(ConnectionEnum.ERROR);
                 e.printStackTrace();
             }
 
@@ -287,6 +277,7 @@ public class IpConnection {
             {
                 try {
                     sendData(outData);
+                    //Real time trigger to set up with Max
                     Thread.sleep(3000);
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
@@ -390,20 +381,12 @@ public class IpConnection {
         return true;
     }
 
-    protected boolean isIdle() {
-        return getDData().getIpState().isIdle();
-    }
+    protected boolean isIdle() { return getDData().getIpState().isIdle();}
     protected boolean isConnected() { return getDData().getIpState().isConnected();}
-    protected boolean isError() {
-        return getDData().getIpState().isError();
-    }
+    protected boolean isError() { return getDData().getIpState().isError();}
     protected boolean isTryConnect() { return getDData().getIpState().isTryConnect(); }
-    protected boolean isRunning() {
-        return getDData().getIpState().isRunning();
-    }
-    protected boolean isUnknown() {
-        return getDData().getIpState().isUnknown();
-    }
+    protected boolean isRunning() { return getDData().getIpState().isRunning();}
+    protected boolean isUnknown() { return getDData().getIpState().isUnknown();}
 
     protected synchronized void setIpState(ConnectionEnum state){
         setIpState(state, "");

@@ -5,15 +5,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
-import tuisse.carduinodroid_android.data.DataHandler;
 
 public class IpService extends Service {
 
@@ -24,7 +18,6 @@ public class IpService extends Service {
     private IpConnection ip;
 
     private CarduinoDroidData getDData(){return carduino.dataHandler.getDData();}
-    private DataHandler getDataHandler(){return carduino.dataHandler;}
     protected CarduinodroidApplication getCarduino(){return carduino;}
 
     @Override
@@ -40,13 +33,10 @@ public class IpService extends Service {
         Log.d(TAG, "onCreate");
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        // Still some issues but cant locate how they are going to start. in Debug everything is fine
-        // Some Rare not really (re)producable scenarios causing only one (send or receive) data thread to work
-        // Sometimes the SocketServer cant be created even with the Reuse
+        // Starting the Service more then one time before closing can cause still cause some errors
         if(ip == null){
             if(!getDData().getIpState().isUnknown()){
                 Log.i(TAG, "IP Connection not yet started but in the wrong mode");
