@@ -36,7 +36,7 @@ public class IpService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        // Starting the Service more then one time before closing can cause still cause some errors
+        // Starting the Service more then one time before closing can cause still some errors
         if(ip == null){
             if(!getDData().getIpState().isUnknown()){
                 Log.i(TAG, "IP Connection not yet started but in the wrong mode");
@@ -63,6 +63,7 @@ public class IpService extends Service {
                 if(!ip.isUnknown())
                     ip.startThread("DataSocket");
             }
+            ip.connectClient("192.168.178.24");
         }
 
         return START_STICKY;
