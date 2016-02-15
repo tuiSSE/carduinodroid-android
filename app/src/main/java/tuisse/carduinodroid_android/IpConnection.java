@@ -139,19 +139,25 @@ public class IpConnection {
 
     protected void close(){
 
-        ipService.setIsClosing(true);
-
         Log.d(TAG, "Closing IP Connection Service");
+        //ipService.setIsClosing(true);
 
         new Thread(new Runnable() {
+
+            protected int counter = 0;
+
             public void run() {
                 try {
                     //hard work around for client.accept to cancel them without exception and do not miss used expetion
 
                     if(ctrlSocketServer!=null){
-                        if(!ctrlSocketServer.isClosed()){
+                        if(!ctrlSocketServer.isClosed() && isTryFind()){
+
                             Socket socketFakeCtrl = new Socket("localhost", Constants.IP_CONNECTION.CTRLPORT);
-                            socketFakeCtrl.close();}
+                            socketFakeCtrl.close();
+                        }else{
+
+                        }
                         while(!ctrlSocketServerDisconnected){
                             try {
                                 Thread.sleep(5);
@@ -162,6 +168,7 @@ public class IpConnection {
                                 break;
                             }
                         }
+                        ctrlSocket.close();
                         ctrlSocketServer.close();
                     }
                     if(dataSocketServer!=null){
@@ -171,6 +178,9 @@ public class IpConnection {
                         while(!dataSocketServerDisconnected){
                             try {
                                 Thread.sleep(5);
+                                //Protect Against endless Loop if its disconnected while RUNNING
+                                counter++;
+                                if(counter==5) dataSocketServerDisconnected=true;
                             } catch (InterruptedException e) {
                                 Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
@@ -178,10 +188,10 @@ public class IpConnection {
                                 break;
                             }
                         }
+                        dataSocket.close();
                         dataSocketServer.close();
                     }
-                    //To Protect against bad behaviour while changing modes
-                    //if(!isIdle()) setIpState(ConnectionEnum.IDLE);
+
                     Log.d(TAG, "Closed IP Connection Service");
 
                 } catch (IOException e) {
@@ -192,8 +202,6 @@ public class IpConnection {
                 ipService.setIsClosing(false);
             }
         }, "StopIpConnection").start();
-
-
     }
 
     protected void connectClient(String address){
@@ -291,6 +299,7 @@ public class IpConnection {
                     //Talk about a better solution - or just together with Receive Thread?
                     try {
                         Thread.sleep(5);
+                        if(dataSocketServerDisconnected) break;
                     } catch (InterruptedException e) {
                         setIpState(ConnectionEnum.ERROR);
                         e.printStackTrace();
@@ -314,8 +323,9 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    while((incomingDataMsg = inData.readLine())!=null){
+                    while(((incomingDataMsg = inData.readLine())!=null)){
                         receiveData(incomingDataMsg);
+                        if(dataSocketServerDisconnected) break;
                     }
                     setIpState(ConnectionEnum.TRYFIND);
                 } catch (IOException e) {
@@ -344,6 +354,7 @@ public class IpConnection {
                     sendData(outData);
                     //Real time trigger to set up with Max
                     Thread.sleep(1000);
+                    if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
                     Log.d(TAG, "Already Connection Lost before send");

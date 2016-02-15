@@ -12,8 +12,6 @@ import tuisse.carduinodroid_android.data.DataHandler;
 
 public class IpService extends Service {
 
-    private int Testcounter = 0;
-
     static final String TAG = "CarduinoIpService";
     private CarduinodroidApplication carduino;
     private IpConnection ip;
@@ -89,7 +87,7 @@ public class IpService extends Service {
             }
         }
 
-        if (getDData().getIpState().isIdle() && !isClosing) {
+        if (getDData().getIpState().isIdle() && !isDestroyed) {
 
             switch (getDataHandler().getControlMode()) {
                 case REMOTE:
@@ -113,6 +111,7 @@ public class IpService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isDestroyed = true;
+        isClosing = true;
 
         startingIpConnection.interrupt();
 
@@ -167,7 +166,7 @@ public class IpService extends Service {
         public StoppingIpConnection() {}
 
         public void run() {
-            Testcounter++;
+
             if (ip != null) {
                 ip.close();
                 while (isClosing) {
@@ -188,4 +187,5 @@ public class IpService extends Service {
     protected void setIsClosing(Boolean IsClosing){
         this.isClosing = IsClosing;
     }
+    protected boolean getIsClosing() { return isClosing;}
 }
