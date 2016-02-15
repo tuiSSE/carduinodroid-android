@@ -171,11 +171,11 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         try {
             if (controlMode == null || cd == null) {
                 cd = new CarduinoData();
-                if (cm.isDirect()) {
-                    ccd = null;
-                } else {
-                    ccd = new CarduinoDroidData();
-                }
+                //if (cm.isDirect()) {
+                //    ccd = null;
+                //} else {
+                ccd = new CarduinoDroidData();
+                //}
             }
             else {
                 switch (controlMode) {
@@ -186,11 +186,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                                 break;
                             case REMOTE:
                                 cd = new CarduinoData();
-                                ccd = new CarduinoDroidData();
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
+                                //ccd = new CarduinoDroidData();
                                 break;
                             default://DIRECT
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 //cd stays the same
-                                ccd = null;
+                                //ccd = null;
                                 break;
                         }
                         break;
@@ -199,14 +201,16 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                         switch (cm) {
                             case TRANSCEIVER:
                                 cd = new CarduinoData();
-                                ccd = new CarduinoDroidData();
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
+                                //ccd = new CarduinoDroidData();
                                 break;
                             case REMOTE:
                                 //do nothing
                                 break;
                             default://DIRECT
                                 cd = new CarduinoData();
-                                ccd = null;
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
+                                //ccd = null;
                                 break;
                         }
                         break;
@@ -215,11 +219,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                         switch (cm) {
                             case TRANSCEIVER:
                                 //cd stays the same
-                                ccd = new CarduinoDroidData();
+                                //ccd = new CarduinoDroidData();
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 break;
                             case REMOTE:
                                 cd = new CarduinoData();
-                                ccd = new CarduinoDroidData();
+                                //ccd = new CarduinoDroidData();
+                                ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 break;
                             default://DIRECT
                                 //do nothing
