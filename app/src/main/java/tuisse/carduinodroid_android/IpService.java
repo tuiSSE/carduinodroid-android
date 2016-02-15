@@ -8,19 +8,34 @@ import android.util.Log;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
+import tuisse.carduinodroid_android.data.DataHandler;
 
 public class IpService extends Service {
+
+    private int Testcounter = 0;
 
     static final String TAG = "CarduinoIpService";
     private CarduinodroidApplication carduino;
     private IpConnection ip;
-    private CarduinoDroidData getDData(){return carduino.dataHandler.getDData();}
+
     static private boolean isDestroyed = true;
-    protected CarduinodroidApplication getCarduino(){
+    static private boolean isClosing = false;
+    static private boolean startingProcess = false;
+    protected StartingIpConnection startingIpConnection;
+    protected StoppingIpConnection stoppingIpConnection;
+
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
+    }
+    private CarduinoDroidData getDData() {
+        return carduino.dataHandler.getDData();
+    }
+
+    protected CarduinodroidApplication getCarduino() {
         return carduino;
     }
 
-    static public boolean getIsDestroyed(){
+    static public boolean getIsDestroyed() {
         return isDestroyed;
     }
 
@@ -41,76 +56,136 @@ public class IpService extends Service {
         super.onStartCommand(intent, flags, startId);
         // Starting the Service more then one time before closing can cause still some errors
         isDestroyed = false;
-        if(ip == null){
-            if(!getDData().getIpState().isUnknown()){
-                Log.i(TAG, "IP Connection not yet started but in the wrong mode");
-                getDData().setIpState(new ConnectionState(ConnectionEnum.UNKNOWN, ""));
-            }
-        }else{
-            if(!getDData().getIpState().isIdle() && isDestroyed){
-                Log.i(TAG, "Service was closed earlier but IP Connection was still in use - Resetting");
+
+        if (getDData().getIpState().isUnknown()) {
+            Log.i(TAG, "Fatal Error - There should be no IP Service started");
+            stopSelf();
+            return START_STICKY;
+        }
+
+        if (getDData().getIpState().isError()) {
+            Log.i(TAG, "Error - Service has started with an Error. Try to reset");
+            if (ip != null) {
                 ip.close();
                 ip = null;
-                isDestroyed = false;
+            } else getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
+        }
+
+        if (getDData().getIpState().isFound()) {
+            Log.i(TAG, "Error - Service should no be in this State. Try to reset");
+            if (ip != null) {
+                ip.close();
+                ip = null;
+            } else getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
+        }
+
+        if (!getDData().getIpState().isIdle()) {
+            if (ip != null) {
+                Log.i(TAG, "Service has been already started");
+                return START_STICKY;
+            } else {
+                Log.i(TAG, "Emergency - IP Connection has no object but a state as if it runs");
+                getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
             }
         }
 
-        if(getDData().getIpState().isUnknown()){
-            Log.i(TAG, "Creating IP Connection");
-            ip = new IpConnection(this);
-            ip.init();
-        }
+        if (getDData().getIpState().isIdle() && !isClosing) {
 
-        if (ip != null) {
-            if (ip.isIdle()) {
-                ip.startThread("CtrlSocket");
-                if(!ip.isUnknown())
-                    ip.startThread("DataSocket");
+            switch (getDataHandler().getControlMode()) {
+                case REMOTE:
+                    startingIpConnection = new StartingIpConnection(this);
+                    startingIpConnection.start();
+                    break;
+                case TRANSCEIVER:
+                    startingIpConnection = new StartingIpConnection(this);
+                    startingIpConnection.start();
+                    break;
+                default:
+                    stopSelf();
+                    break;
             }
-            ip.connectClient("192.168.178.24");
-            new Thread(new Runnable() {
-                public void run() {
-
-                    if(ip != null) {
-
-                        ip.startThread("CtrlSocket");
-                        //ip.closeThreads();
-                        //Log.d(TAG, "New Init");
-                        //ip.init();
-                    }
-
-                    if(isDestroyed){
-                        stopSelf();
-                    }
-                }
-            }, "connectIpCtrlThread").start();
-
-            new Thread(new Runnable() {
-                public void run() {
-
-                    if(ip != null)
-
-                        ip.startThread("DataSocket");
-
-
-                    if(isDestroyed){
-                        stopSelf();
-                    }
-                }
-            }, "connectIpDataThread").start();
         }
+
         return START_STICKY;
     }
 
     @Override
-    public void onDestroy () {
-        isDestroyed = true;
+    public void onDestroy() {
         super.onDestroy();
-        if(ip != null){
+        isDestroyed = true;
 
-            ip.close();
-        }
-        isDestroyed=true;
+        startingIpConnection.interrupt();
+
+        stoppingIpConnection = new StoppingIpConnection();
+        stoppingIpConnection.start();
+
         Log.i(TAG, "onDestroyed");
+    }
+
+
+    public class StartingIpConnection extends Thread {
+
+        protected IpService ipService;
+
+        public StartingIpConnection(IpService Service) {
+            this.ipService = Service;}
+
+        public void run() {
+                //Secures a full rebuild especially for the important Threads for sending/receiving
+                if (ip != null) {
+                    ip.close();
+                    while(isClosing){
+                        try {
+                            Thread.sleep(5);
+                        } catch (InterruptedException e) {
+                            Log.i(TAG, "Error while Sleeping during the Starting Sequence");
+                            e.printStackTrace();
+                            getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
+                            break;
+                        }
+                    }
+                    ip = null;
+                }
+                //So first closes the old IP Connection and Rebuild it then
+                if (ip == null) {
+                    Log.i(TAG, "Creating IP Connection");
+                    ip = new IpConnection(ipService);
+
+                    ip.initServer();
+
+                    ip.startThread("CtrlSocket");
+                    ip.startThread("DataSocket");
+
+                    //ip.connectClient("192.168.178.24");
+                }
+
+        }
+    }
+
+    public class StoppingIpConnection extends Thread {
+
+        public StoppingIpConnection() {}
+
+        public void run() {
+            Testcounter++;
+            if (ip != null) {
+                ip.close();
+                while (isClosing) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
+                        e.printStackTrace();
+                        getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
+                        break;
+                    }
+                }
+                ip = null;
+            }
+        }
+    }
+
+    protected void setIsClosing(Boolean IsClosing){
+        this.isClosing = IsClosing;
     }
 }

@@ -65,4 +65,12 @@ public class Constants {
         int ARDUINO_MEGA_2560_ADK = 0x3F;
         int ARDUINO_MEGA_2560_ADK_R3 = 0x44;
     }
+
+
+    public interface IP_CONNECTION{
+        int DATAPORT = 12020;
+        int CTRLPORT = 12021;
+        String TAG_DATAPORT = "DataSocket";
+        String TAG_CTRLPORT = "CtrlSocket";
+    }
 }

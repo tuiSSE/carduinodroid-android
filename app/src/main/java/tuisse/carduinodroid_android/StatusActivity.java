@@ -395,7 +395,7 @@ public class StatusActivity extends AppCompatActivity {
     private class IpStatusActivityStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "ip status change event: " + getData().getSerialState().getStateName());
+            Log.d(TAG, "ip status change event: " + getDData().getIpState().getStateName());
             updateStatus();
         }
     }
