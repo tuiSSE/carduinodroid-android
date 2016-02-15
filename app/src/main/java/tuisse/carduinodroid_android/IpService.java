@@ -87,7 +87,7 @@ public class IpService extends Service {
             }
         }
 
-        if (getDData().getIpState().isIdle() && !isDestroyed) {
+        if (getDData().getIpState().isIdle() && !isDestroyed && !isClosing) {
 
             switch (getDataHandler().getControlMode()) {
                 case REMOTE:
@@ -132,6 +132,7 @@ public class IpService extends Service {
         public void run() {
                 //Secures a full rebuild especially for the important Threads for sending/receiving
                 if (ip != null) {
+                    isClosing = true;
                     ip.close();
                     while(isClosing){
                         try {
@@ -150,11 +151,19 @@ public class IpService extends Service {
                     Log.i(TAG, "Creating IP Connection");
                     ip = new IpConnection(ipService);
 
-                    ip.initServer();
+                    switch (getDataHandler().getControlMode()) {
+                        case REMOTE:
+                            ip.initClient();
+                            break;
+                        case TRANSCEIVER:
+                            ip.initServer();
 
-                    ip.startThread("CtrlSocket");
-                    ip.startThread("DataSocket");
-
+                            ip.startThread("CtrlSocket");
+                            ip.startThread("DataSocket");
+                            break;
+                        default:
+                            break;
+                    }
                     //ip.connectClient("192.168.178.24");
                 }
 

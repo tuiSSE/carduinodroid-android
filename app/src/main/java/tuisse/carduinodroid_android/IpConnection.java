@@ -75,11 +75,6 @@ public class IpConnection {
         }
     }
 
-    protected void initClient(){
-        //überhaupt notwendig, da kein Socket oder ähnliches vorhanden sein muss um eine Verbindung
-        //und die Threads immer als neue Instanz Realisiert werden
-    }
-
     //Creates a SocketServer depending on the expected Type (Data,Ctrl)
     protected boolean createSocketServer(String socketType) throws IOException {
 
@@ -132,7 +127,18 @@ public class IpConnection {
         }
     }
 
-    protected boolean checkConnectionObject(){
+    protected void initClient(){
+        setIpState(ConnectionEnum.TRYCONNECT);
+        //überhaupt notwendig, da kein Socket oder ähnliches vorhanden sein muss um eine Verbindung
+        //und die Threads immer als neue Instanz Realisiert werden
+    }
+
+    protected void connectClient(String address){
+
+        new ClientConnection(address).start();
+    }
+
+    protected boolean disconnectFromServer(){
 
         return true;
     }
@@ -151,13 +157,13 @@ public class IpConnection {
                     //hard work around for client.accept to cancel them without exception and do not miss used expetion
 
                     if(ctrlSocketServer!=null){
-                        if(!ctrlSocketServer.isClosed() && isTryFind()){
+                        if(!ctrlSocketServer.isClosed()/* && isTryFind()*/){
 
                             Socket socketFakeCtrl = new Socket("localhost", Constants.IP_CONNECTION.CTRLPORT);
+                            socketFakeCtrl.setSoTimeout(500);
                             socketFakeCtrl.close();
-                        }else{
-
                         }
+
                         while(!ctrlSocketServerDisconnected){
                             try {
                                 Thread.sleep(5);
@@ -173,8 +179,11 @@ public class IpConnection {
                     }
                     if(dataSocketServer!=null){
                         if(!dataSocketServer.isClosed()){
+
                             Socket socketFakeData = new Socket("localhost", Constants.IP_CONNECTION.DATAPORT);
+                            socketFakeData.setSoTimeout(500);
                             socketFakeData.close();}
+
                         while(!dataSocketServerDisconnected){
                             try {
                                 Thread.sleep(5);
@@ -202,16 +211,6 @@ public class IpConnection {
                 ipService.setIsClosing(false);
             }
         }, "StopIpConnection").start();
-    }
-
-    protected void connectClient(String address){
-
-        new ClientConnection(address).start();
-    }
-
-    protected boolean disconnectFromServer(){
-
-        return true;
     }
 
     // Giving information over the Control Channel if the Data Channel is free
@@ -451,7 +450,7 @@ public class IpConnection {
         }
 
         public void run(){
-            if(!(isConnected()||isRunning())) {
+            if(isTryConnect()) {
                 try {
                     //remoteCtrlSocket = new Socket(address, CTRLPORT); <- Richtige Funktion später
                     remoteCtrlSocket = new Socket("192.168.178.24", 12022);
@@ -493,6 +492,8 @@ public class IpConnection {
                     Log.d(TAG, "Client cant connect to Ctrl Server Socket");
                     e.printStackTrace();
                 }
+            }else if(isConnected()||isRunning()){
+                Log.d(TAG, "Client is already connected");
             }
         }
     }

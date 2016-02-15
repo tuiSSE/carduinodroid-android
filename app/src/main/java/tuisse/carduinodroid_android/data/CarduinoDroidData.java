@@ -55,7 +55,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setWlanAvailable(0);
     }
 
-
     public synchronized LayerDrawable getIpConnLogoId(){
         int status;
         int type;
