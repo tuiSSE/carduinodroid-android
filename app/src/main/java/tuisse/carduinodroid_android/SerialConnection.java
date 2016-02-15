@@ -50,6 +50,7 @@ abstract public class SerialConnection {
     }
 
     protected void start() {
+        if(isConnected())
         setSerialState(ConnectionEnum.RUNNING);
         serialSendThread.start();
         serialReceiveThread.start();

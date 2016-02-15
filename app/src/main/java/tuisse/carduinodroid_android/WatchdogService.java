@@ -125,7 +125,7 @@ public class WatchdogService extends Service {
             }
         }
         stopWatchdogThread.run();
-        getDataHandler().setWatchdogStarted(false);
+
         Log.i(TAG, "onDestroyed");
     }
 
@@ -237,7 +237,7 @@ public class WatchdogService extends Service {
         }
         @Override
         public void run() {
-            synchronized (this) {
+            while(!isDestroyed) {
                 if (!SerialService.getIsDestroyed()) {
                     stopService(new Intent(WatchdogService.this, SerialService.class));
                     if (!IpService.getIsDestroyed()) {
@@ -245,8 +245,14 @@ public class WatchdogService extends Service {
                     }
                 }
                 if (SerialService.getIsDestroyed() && IpService.getIsDestroyed()) {
-                    isDestroyed = true;
+                    getDataHandler().setWatchdogStarted(false);
                     sendToast("WatchdogThred stopped");
+                    isDestroyed = true;
+                    return;
+
+                }
+                else{
+                    Thread.yield();
                 }
             }
         }
