@@ -31,7 +31,8 @@ public enum BluetoothHandling {
             case 2:
                 return ON;
             default:
-                throw Exception e;
+                Exception e = new Exception();
+                throw e;
         }
     }
 
