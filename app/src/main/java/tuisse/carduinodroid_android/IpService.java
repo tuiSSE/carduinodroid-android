@@ -152,6 +152,7 @@ public class IpService extends Service {
                     switch (getDataHandler().getControlMode()) {
                         case REMOTE:
                             ip.initClient();
+                            ip.connectClient("192.168.178.31");
                             break;
                         case TRANSCEIVER:
                             ip.initServer();
@@ -162,7 +163,7 @@ public class IpService extends Service {
                         default:
                             break;
                     }
-                    //ip.connectClient("192.168.178.24");
+
                 }
         }
     }

@@ -139,7 +139,7 @@ public class IpFrameHandler implements IpFrameIF{
             /**** Including Video Data ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_VIDEO)) {
                 JSONObject JsonObjectVideoData = new JSONObject();
-
+                //TO-DO
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_NETWORK, JsonObjectVideoData);
                 isMaskTypeServer = true;
             }
@@ -231,12 +231,4 @@ public class IpFrameHandler implements IpFrameIF{
             return true;
         }else{ return false;}
     }
-
-    //Bisher ist mir hier nicht klar, was du damit vor hast? @Max
-    /*private synchronized int getClientVersion(){
-        return clientVersion;
-    }
-    private synchronized void setClientVersion(int _clientVersion){
-        clientVersion = _clientVersion;
-    }*/
 }

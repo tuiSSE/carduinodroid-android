@@ -146,11 +146,6 @@ public class IpConnection {
         new ClientConnection(address).start();
     }
 
-    protected boolean disconnectFromServer(){
-
-        return true;
-    }
-
     protected void close(){
 
         Log.d(TAG, "Closing IP Connection Service");
@@ -197,7 +192,7 @@ public class IpConnection {
                                 Thread.sleep(5);
                                 //Protect Against endless Loop if its disconnected while RUNNING
                                 counter++;
-                                if(counter==5) dataSocketServerDisconnected=true;
+                                if(counter>=5) dataSocketServerDisconnected=true;
                             } catch (InterruptedException e) {
                                 Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
@@ -207,6 +202,13 @@ public class IpConnection {
                         }
                         dataSocket.close();
                         dataSocketServer.close();
+                    }
+
+                    if(remoteDataSocket!=null){
+                        if(!remoteDataSocket.isClosed())
+                            dataSocketServerDisconnected=true;
+
+                        remoteDataSocket.close();
                     }
 
                     Log.d(TAG, "Closed IP Connection Service");
@@ -337,8 +339,8 @@ public class IpConnection {
             {
                 try {
                     while(((incomingDataMsg = inData.readLine())!=null)){
-                        receiveData(incomingDataMsg);
                         if(dataSocketServerDisconnected) break;
+                        receiveData(incomingDataMsg);
                     }
                     setIpState(ConnectionEnum.TRYFIND);
                 } catch (IOException e) {
@@ -466,8 +468,8 @@ public class IpConnection {
         public void run(){
             if(isTryConnect()) {
                 try {
-                    //remoteCtrlSocket = new Socket(address, CTRLPORT); <- Richtige Funktion später
-                    remoteCtrlSocket = new Socket("192.168.178.24", 12022);
+                    remoteCtrlSocket = new Socket(address, Constants.IP_CONNECTION.CTRLPORT);
+
                     BufferedReader reader = new BufferedReader(new InputStreamReader(remoteCtrlSocket.getInputStream()));
                     while ((incomingDataMsg = reader.readLine()) != null) {
                         receiveData(incomingDataMsg);
@@ -475,6 +477,8 @@ public class IpConnection {
                         if (receiveCtrl(incomingDataMsg)) isConnectedRunning = true;
                         else isConnectedRunning = false;
                     }
+
+                    remoteCtrlSocket.close();
 
                     try {
                         if (isConnectedRunning == true) {
@@ -484,8 +488,8 @@ public class IpConnection {
 
                             Log.d(TAG, "Data Server is free - Try to build up a Connection");
                             setIpState(ConnectionEnum.CONNECTED);
-                            //remoteCtrlSocket = new Socket(address, CTRLPORT);
-                            remoteDataSocket = new Socket("192.168.178.24", 12023);
+                            remoteDataSocket = new Socket(address, Constants.IP_CONNECTION.DATAPORT);
+                            //remoteDataSocket = new Socket("192.168.178.24", 12023);
 
                             inData = new BufferedReader(new InputStreamReader(remoteDataSocket.getInputStream()));
                             outData = new BufferedWriter(new OutputStreamWriter(remoteDataSocket.getOutputStream()));
