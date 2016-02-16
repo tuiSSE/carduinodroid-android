@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
+import tuisse.carduinodroid_android.data.DataHandler;
 import tuisse.carduinodroid_android.data.IpType;
 
 /**
@@ -57,6 +61,10 @@ public class IpConnection {
         dataSocketServer = null;
         ctrlSocket = null;
         dataSocket = null;
+    }
+
+    protected DataHandler getDataHandler(){
+        return ipService.getCarduino().dataHandler;
     }
 
     //Initialization of both ServerSockets if a connection via another mobile phone or pc is wished
@@ -237,7 +245,14 @@ public class IpConnection {
 
     protected void receiveData(String dataPacket) throws IOException{
         // Hier kommt noch die Verwertung und Weitergabe von JSON Paketen
-        Log.d(TAG, dataPacket);
+        Log.d(TAG,dataPacket);
+        try {
+            JSONObject jObject = new JSONObject(dataPacket);
+            getDataHandler().parseJson(jObject);
+        } catch (JSONException e) {
+            Log.d(TAG, "Error while Reading and Parsing JSON Object");
+            e.printStackTrace();
+        }
     }
 
     protected class IpDataConnectionServerThread extends Thread {

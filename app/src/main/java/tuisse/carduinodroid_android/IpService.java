@@ -121,7 +121,6 @@ public class IpService extends Service {
         Log.i(TAG, "onDestroyed");
     }
 
-
     public class StartingIpConnection extends Thread {
 
         protected IpService ipService;
@@ -166,7 +165,6 @@ public class IpService extends Service {
                     }
                     //ip.connectClient("192.168.178.24");
                 }
-
         }
     }
 
