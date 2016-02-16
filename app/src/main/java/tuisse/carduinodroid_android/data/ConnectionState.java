@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android.data;
 
+import android.util.Log;
+
 import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 
@@ -8,6 +10,7 @@ import tuisse.carduinodroid_android.R;
  */
 
 public class ConnectionState {
+    private final String TAG = "CarduinoConnectionState";
     private ConnectionEnum state;
     private String error;
 
@@ -40,16 +43,40 @@ public class ConnectionState {
     public synchronized String getStateName(){
         String s = "";
         switch (state){
-            case  IDLE:             s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateIdle);break;
-            case  TRYFIND:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryFind);break;
-            case  FOUND:            s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateFound);break;
-            case  TRYCONNECT:       s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnect);break;
-            case  CONNECTED:        s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateConnected);break;
-            case  RUNNING:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateRunning);break;
-            case  STREAMERROR:      s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateStreamError);break;
-            case  TRYCONNECTERROR:  s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnectError);break;
-            case  UNKNOWN:          s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateUnknown);break;
-            default:                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateError);break;
+            case IDLE:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateIdle);
+                break;
+            case TRYFIND:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryFind);
+                break;
+            case FOUND:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateFound);
+                break;
+            case TRYCONNECT:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnect);
+                break;
+            case CONNECTED:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateConnected);
+                break;
+            case RUNNING:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateRunning);
+                break;
+            case ERROR:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateError);
+                break;
+            case STREAMERROR:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateStreamError);
+                break;
+            case TRYCONNECTERROR:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateTryConnectError);
+                break;
+            case UNKNOWN:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.connectionStateUnknown);
+                break;
+            default:
+                s = "";
+                Log.e(TAG, "getStateName: unknown connection state");
+                break;
         }
         return s;
     }

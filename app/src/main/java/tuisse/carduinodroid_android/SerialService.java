@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
@@ -24,22 +25,36 @@ public class SerialService extends Service {
     private SerialConnection serial = null;
     private Handler handler;
 
-    private CarduinoData getData(){
-        return carduino.dataHandler.getData();
-    }
-    private DataHandler getDataHandler(){
-        return carduino.dataHandler;
-    }
-
     protected CarduinodroidApplication getCarduino(){
         return carduino;
     }
 
-    static public boolean getIsDestroyed(){
-        return isDestroyed;
+    /**
+     * Helper function to get the CarduinoData
+     *
+     * @return CarduinoData Object
+     */
+    private CarduinoData getData(){
+        return carduino.dataHandler.getData();
     }
 
+    /**
+     * Helper function to get the DataHandler
+     *
+     * @return DataHandler Object
+     */
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
+    }
 
+    /**
+     * static return function for the isDestroyed status.
+     *
+     * @return isDestroyed
+     */
+    static synchronized boolean getIsDestroyed(){
+        return isDestroyed;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -59,7 +74,6 @@ public class SerialService extends Service {
         isDestroyed = false;
         if(getData().getSerialState().isUnknown()){
             Log.e(TAG,"FATAL: this device should not start serial service!");
-            serial = null;
             stopSelf();
             return START_STICKY;
         }
@@ -94,18 +108,21 @@ public class SerialService extends Service {
         if(serial != null){
             new Thread(new Runnable() {
                 public void run() {
-                    if(!serial.find()){
-                        stopSelf();
+                    try {
+                        if (!serial.find()) {
+                            stopSelf();
+                        } else if (!serial.connect()) {
+                            stopSelf();
+                        } else {
+                            serial.start();
+                        }
+                        if (isDestroyed) {
+                            //if service should stop during connection, stop all threads
+                            serial.close();
+                        }
                     }
-                    else if(!serial.connect()) {
-                        stopSelf();
-                    }
-                    else{
-                        serial.start();
-                    }
-                    if(isDestroyed){
-                        //if service should stop during connection, stop all threads
-                        serial.close();
+                    catch (Exception e){
+                        Log.d(TAG,e.toString());
                     }
                 }
             }, "connectSerialThread").start();
@@ -122,7 +139,6 @@ public class SerialService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //disconnect
         if(serial != null){
             serial.close();
         } else {
@@ -136,6 +152,7 @@ public class SerialService extends Service {
         handler.post(new Runnable() {
             public void run() {
                 Toast toast = Toast.makeText(SerialService.this, message, Toast.LENGTH_LONG);
+                toast.setDuration(Toast.LENGTH_SHORT);
                 toast.show();
             }
         });
@@ -145,6 +162,7 @@ public class SerialService extends Service {
         handler.post(new Runnable() {
             public void run() {
                 Toast toast = Toast.makeText(SerialService.this, getString(messageId), Toast.LENGTH_LONG);
+                toast.setDuration(Toast.LENGTH_SHORT);
                 toast.show();
             }
         });

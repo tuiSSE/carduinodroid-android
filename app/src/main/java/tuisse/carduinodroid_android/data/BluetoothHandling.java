@@ -1,27 +1,34 @@
 package tuisse.carduinodroid_android.data;
 
+import android.util.Log;
+
 /**
  * @AUTOR Till Max Schwikal
  * @DATE 26.01.2016
  *
- * Enumeration which codes the bluetooth handling after establishing a connection.
+ * @enum Codes the bluetooth handling after establishing a connection.
  *
- * The enumeration has static conversion functions fromInteger and toInteger.
+ * @brief The enumeration has static conversion functions fromInteger and toInteger.
  *
- * @param OFF:  turn bluetooth off. This case is independent of the previous bluetooth state.
- * @param ON:   turn bluetooth on. This case is independent of the previous bluetooth state.
- * @param AUTO: turn bluetooth to the same state as chosen before.
- *
- * @see #DataHandler.setBluetoothHandling(int)
- * @see #DataHandler.getBluetoothHandling
+ * @see DataHandler
  */
 public enum BluetoothHandling {
-    AUTO(0),OFF(1),ON(2);
-    int handling;
+
+    AUTO(0),///< turn bluetooth to the same state as chosen before.
+    OFF(1), ///< turn bluetooth off. This case is independent of the previous bluetooth state.
+    ON(2);  ///< turn bluetooth on. This case is independent of the previous bluetooth state.
+
+    private int handling;
+    private static String TAG = "CarduinoBluetoothHandling";
     BluetoothHandling(int bth){
         handling = bth;
     }
 
+    /**
+     * @brief conversion Function Integer to BluetoothHandling
+     *
+     * @return always a valid BluetoothHandling
+     */
     public static BluetoothHandling fromInteger(int x) {
         switch(x) {
             case 0:
@@ -31,11 +38,16 @@ public enum BluetoothHandling {
             case 2:
                 return ON;
             default:
-                Exception e = new Exception();
-                throw e;
+                Log.e(TAG, "no valid conversion. Took AUTO");
+                return AUTO;
         }
     }
 
+    /**
+     * @brief conversion Function BluetoothHandling to Integer
+     *
+     * @return always a valid BluetoothHandling-Integer
+     */
     public static Integer toInteger(BluetoothHandling bth){
         switch (bth){
             case AUTO:
@@ -45,7 +57,8 @@ public enum BluetoothHandling {
             case ON:
                 return 2;
             default:
-                throw Exception e;
+                Log.e(TAG, "no valid conversion. Took AUTO");
+                return 0;
         }
     }
 }

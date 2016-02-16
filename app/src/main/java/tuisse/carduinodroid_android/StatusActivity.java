@@ -29,6 +29,8 @@ public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
 
+    private boolean onExit = false;
+
     private final Handler screensaverHandler = new Handler();
 
     private View      statusActivityView;
@@ -179,10 +181,19 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettingsBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopServices();
                 Intent intentOpenBluetoothSettings = new Intent();
                 intentOpenBluetoothSettings.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
                 startActivity(intentOpenBluetoothSettings);
                 Log.d(TAG, "onClickSettingsBluetooth");
+            }
+        });
+
+        imageViewSettingsTransceiver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopServices();
+                Log.d(TAG, "onClickSettingsTransceiver");
             }
         });
 
@@ -222,11 +233,13 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(ipStatusChangeReceiver, ipStatusChangeFilter);
-        updateControlMode();
-        startService(new Intent(StatusActivity.this, WatchdogService.class));
-        checkRestartScreensaver();
+        if(!onExit) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
+            LocalBroadcastManager.getInstance(this).registerReceiver(ipStatusChangeReceiver, ipStatusChangeFilter);
+            updateControlMode();
+            startService(new Intent(StatusActivity.this, WatchdogService.class));
+            checkRestartScreensaver();
+        }
         Log.d(TAG, "onStatusActivityResume");
     }
 
@@ -236,12 +249,14 @@ public class StatusActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipStatusChangeReceiver);
         abortScreensaver();
+        onExit = false;
         Log.d(TAG, "onStatusActivityPause");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopServices();
         unregisterReceiver(usbReciever);
         Log.d(TAG, "onStatusActivityDestroy");
     }
@@ -260,12 +275,13 @@ public class StatusActivity extends AppCompatActivity {
                 exit();
                 break;
             default:
-                Log.d(TAG,"Notification send unknown intent");
+                Log.e(TAG, "Notification send unknown intent");
                 break;
         }
     }
 
     private void exit(){
+        onExit = true;
         stopServices();
         moveTaskToBack(true);
     }
@@ -277,9 +293,6 @@ public class StatusActivity extends AppCompatActivity {
     }
 
     private void updateControlMode(){
-        //stop services
-        //stopService(new Intent(StatusActivity.this, SerialService.class));
-
         imageViewSettingsTransceiver.setVisibility(View.INVISIBLE);
         imageViewSettingsBluetooth.setVisibility(View.INVISIBLE);
 
@@ -325,7 +338,6 @@ public class StatusActivity extends AppCompatActivity {
                 break;
         }
         updateStatus();
-        //start services
     }
 
     private void updateStatus(){

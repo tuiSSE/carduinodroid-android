@@ -1,8 +1,8 @@
 package tuisse.carduinodroid_android.data;
 
 /**
- * @AUTOR Till Max Schwikal
- * @DATE 12.01.2016
+ * @author Till Max Schwikal
+ * @date 12.01.2016
  *
  * Enumeration which abstractly codes the status of a connection service.
  *
