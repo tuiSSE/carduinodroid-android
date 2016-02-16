@@ -8,8 +8,7 @@ import org.json.JSONObject;
  */
 public interface IpFrameIF {
 
-    boolean parseJson(JSONObject jsonObjectRxData);
-    boolean createJsonObject(String dataTypeMask, String transmitData);
-    JSONObject getTransmitData();
+    boolean parseJson(String jsonObjectRxData);
+    JSONObject getTransmitData(String dataTypeMask, boolean dataServerStatus);
 
 }

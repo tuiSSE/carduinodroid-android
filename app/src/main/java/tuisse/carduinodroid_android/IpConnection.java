@@ -227,32 +227,31 @@ public class IpConnection {
         return (isRunning()||isConnected());
     }
 
-    protected void sendDataServerStatus(BufferedWriter outCtrl) throws IOException{
-        //Anpassen dass der Status über JSON vom Data SocketServer gesendet wird mit richtigen Zustand
-        String Test = String.valueOf(requestDataStatus());
-        outCtrl.write(Test);
-        outCtrl.newLine();
-        outCtrl.flush();
-    }
+    private void sendData(BufferedWriter outData, String dataTypeMask) throws IOException{
 
-    protected void sendData(BufferedWriter outData) throws IOException{
-        //Hier kommt noch die Art und Weise Daten zu erstellen/erfragen aus den Handlern
-        Log.d(TAG, "verbunden");
-        outData.write("verbunden");
-        outData.newLine();
-        outData.flush();
+        JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
+
+        if(transmit != null){
+            Log.d(TAG, transmit.toString());
+            outData.write(transmit.toString());
+            outData.newLine();
+            outData.flush();
+        }else{
+            Log.d(TAG,"Error while Creating JSON Object on Handler");
+            setIpState(ConnectionEnum.ERROR);
+        }
     }
 
     protected void receiveData(String dataPacket) throws IOException{
         // Hier kommt noch die Verwertung und Weitergabe von JSON Paketen
         Log.d(TAG,dataPacket);
-        try {
-            JSONObject jObject = new JSONObject(dataPacket);
-            getDataHandler().parseJson(jObject);
-        } catch (JSONException e) {
-            Log.d(TAG, "Error while Reading and Parsing JSON Object");
-            e.printStackTrace();
-        }
+        getDataHandler().parseJson(dataPacket);
+    }
+
+    protected boolean receiveCtrl(String dataPacket) throws IOException{
+
+        Log.d(TAG, dataPacket);
+        return getDataHandler().parseJson(dataPacket);
     }
 
     protected class IpDataConnectionServerThread extends Thread {
@@ -365,7 +364,7 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData);
+                    sendData(outData, "Car");
                     //Real time trigger to set up with Max
                     Thread.sleep(1000);
                     if(dataSocketServerDisconnected) break;
@@ -433,7 +432,7 @@ public class IpConnection {
             try {
                 if(!socket.isClosed()){
                     BufferedWriter dataInfoOut = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                    sendDataServerStatus(dataInfoOut);
+                    sendData(dataInfoOut, "");
                     Thread.sleep(10);
 
                     dataInfoOut.close();
@@ -472,9 +471,8 @@ public class IpConnection {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(remoteCtrlSocket.getInputStream()));
                     while ((incomingDataMsg = reader.readLine()) != null) {
                         receiveData(incomingDataMsg);
-                        //Hier richtige Methode implementieren zum Auswerten von JSON für CTRL Data
-                        //Diese Methode ist nur erst einmal ein Test
-                        if (incomingDataMsg.toLowerCase().equals("true")) isConnectedRunning = true;
+
+                        if (receiveCtrl(incomingDataMsg)) isConnectedRunning = true;
                         else isConnectedRunning = false;
                     }
 

@@ -384,24 +384,18 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
-    public synchronized boolean parseJson(JSONObject jsonObjectRxData) {
+    public synchronized boolean parseJson(String jsonObjectRxData) {
         if(controlMode.isDirect()){
             return false;
         }
         return ipFrameHandler.parseJson(jsonObjectRxData);
     }
 
-    public synchronized boolean createJsonObject(String dataTypeMask, String transmitData) {
-        if(controlMode.isDirect()){
-            return false;
-        }
-        return ipFrameHandler.createJsonObject(dataTypeMask,transmitData);
-    }
-
-    public synchronized JSONObject getTransmitData() {
+    @Override
+    public JSONObject getTransmitData(String dataTypeMask, boolean dataServerStatus) {
         if(controlMode.isDirect()){
             return null;
         }
-        return ipFrameHandler.getTransmitData();
+        return ipFrameHandler.getTransmitData(dataTypeMask,dataServerStatus);
     }
 }

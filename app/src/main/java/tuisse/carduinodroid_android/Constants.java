@@ -45,9 +45,6 @@ public class Constants {
         int CAMERA      = 100;  //*DELAY.CAMERA
     }
 
-
-
-
     public interface GESTURE_ANGLE{
         int STEER = 20;//°
         int SPEED = 20;//°
@@ -66,11 +63,61 @@ public class Constants {
         int ARDUINO_MEGA_2560_ADK_R3 = 0x44;
     }
 
-
     public interface IP_CONNECTION{
         int DATAPORT = 12020;
         int CTRLPORT = 12021;
         String TAG_DATAPORT = "DataSocket";
         String TAG_CTRLPORT = "CtrlSocket";
+    }
+
+    public interface JSON_OBJECT{
+        int MY_VERSION = 2;
+
+        String TAG_HEADER_VERSION = "Version";
+        String TAG_HEADER_INFORMATION_TYPE = "Information Type";
+        String TAG_HEADER_DATA_SERVER_STATUS = "Data Server Status";
+        String TAG_HEADER = "Header";
+
+        String TAG_CAR_CURRENT = "Current";
+        String TAG_CAR_BATTERY_ABSOLUTE = "Battery Absolute";
+        String TAG_CAR_BATTERY_PERCENTAGE = "Battery Relative";
+        String TAG_CAR_VOLTAGE = "Voltage";
+        String TAG_CAR_TEMPERATURE = "Temperature";
+        String TAG_CAR_ULTRASONIC_FRONT = "Ultra Sonic Front";
+        String TAG_CAR_ULTRASONIC_BACK = "Ultra Sonic Back";
+        String TAG_CAR = "Car Information";
+        String NUM_CAR = "Car";
+
+        String TAG_MOBILITY_GPS = "GPS Data";
+        String TAG_MOBILITY_VIBRATION = "Vibration Value";
+        String TAG_MOBILITY = "Mobilty Information";
+        String NUM_MOBILITY = "Mobility";
+
+        String TAG_NETWORK_WLAN_AVAILABLE = "WLAN Available";
+        String TAG_NETWORK_WLAN_ACTIVE = "WLAN Active";
+        String TAG_NETWORK_MOBILE_AVAILABLE = "Mobile Available";
+        String TAG_NETWORK_MOBILE_ACTIVE = "Mobile Active";
+        String TAG_NETWORK = "Network Information";
+        String NUM_NETWORK = "Network";
+
+        String TAG_HARDWARE_CAMERA_RESOLUTION = "Camera Resolution";
+        String TAG_HARDWARE = "Hardware Information";
+        String NUM_HARDWARE = "Hardware";
+
+        String TAG_VIDEO = "Video Data";
+        String NUM_VIDEO = "Video";
+
+        String TAG_CONTROL = "Car Control";
+        String NUM_CONTROL = "Control";
+
+
+        String TAG_CAMERA = "Camera Setup";
+        String NUM_CAMERA = "Camera";
+
+
+        String TAG_SOUND = "Sound Setup";
+        String NUM_SOUND = "Sound";
+
+        String TAG_FALSE = "Creation Error";
     }
 }

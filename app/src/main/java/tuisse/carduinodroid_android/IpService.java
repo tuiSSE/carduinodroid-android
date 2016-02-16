@@ -18,7 +18,6 @@ public class IpService extends Service {
 
     static private boolean isDestroyed = true;
     static private boolean isClosing = false;
-    static private boolean startingProcess = false;
     protected StartingIpConnection startingIpConnection;
     protected StoppingIpConnection stoppingIpConnection;
 
@@ -194,5 +193,4 @@ public class IpService extends Service {
     protected void setIsClosing(Boolean IsClosing){
         this.isClosing = IsClosing;
     }
-    protected boolean getIsClosing() { return isClosing;}
 }
