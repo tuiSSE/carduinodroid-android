@@ -373,7 +373,7 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData, "Car");
+                    sendData(outData, "Control");
                     //Real time trigger to set up with Max
                     Thread.sleep(1000);
                     if(dataSocketServerDisconnected) break;

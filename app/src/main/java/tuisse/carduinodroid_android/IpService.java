@@ -128,45 +128,44 @@ public class IpService extends Service {
             this.ipService = Service;}
 
         public void run() {
-                //Secures a full rebuild especially for the important Threads for sending/receiving
-                if (ip != null) {
-                    isClosing = true;
-                    ip.close();
-                    while(isClosing){
-                        try {
-                            Thread.sleep(5);
-                        } catch (InterruptedException e) {
-                            Log.i(TAG, "Error while Sleeping during the Starting Sequence");
-                            e.printStackTrace();
-                            getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
-                            break;
-                        }
+            //Secures a full rebuild especially for the important Threads for sending/receiving
+            if (ip != null) {
+                isClosing = true;
+                ip.close();
+                while(isClosing){
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        Log.i(TAG, "Error while Sleeping during the Starting Sequence");
+                        e.printStackTrace();
+                        getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
+                        break;
                     }
-                    ip = null;
                 }
-                //So first closes the old IP Connection and Rebuild it then
-                if (ip == null) {
-                    Log.i(TAG, "Creating IP Connection");
-                    ip = new IpConnection(ipService);
+                ip = null;
+            }
+            //So first closes the old IP Connection and Rebuild it then
+            if (ip == null) {
+                Log.i(TAG, "Creating IP Connection");
+                ip = new IpConnection(ipService);
 
-                    switch (getDataHandler().getControlMode()) {
-                        case REMOTE:
-                            ip.initClient();
+                switch (getDataHandler().getControlMode()) {
+                    case REMOTE:
+                        ip.initClient();
 
-                            ip.startClientThread("192.168.178.31");
-                            //ip.connectClient("192.168.178.31");
-                            break;
-                        case TRANSCEIVER:
-                            ip.initServer();
+                        //ip.startClientThread("192.168.178.25"); //to Old Mobile Phone
+                        ip.startClientThread("192.168.178.31"); //to New Mobile Phone
+                        break;
+                    case TRANSCEIVER:
+                        ip.initServer();
 
-                            ip.startServerThread("CtrlSocket");
-                            ip.startServerThread("DataSocket");
-                            break;
-                        default:
-                            break;
-                    }
-
+                        ip.startServerThread("CtrlSocket");
+                        ip.startServerThread("DataSocket");
+                        break;
+                    default:
+                        break;
                 }
+            }
         }
     }
 
