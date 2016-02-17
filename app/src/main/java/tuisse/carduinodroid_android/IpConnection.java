@@ -1,8 +1,12 @@
 package tuisse.carduinodroid_android;
 
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.format.Formatter;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -71,6 +75,8 @@ public class IpConnection {
     protected void initServer(){
 
         isClient = false;
+        setMyIp(getLocalIpAddress());
+        setRemoteIP("Not Connected");
 
         ipDataConnectionServerThread = new IpDataConnectionServerThread();
         ipCtrlSendServerThread = new IpCtrlSendServerThread();
@@ -96,6 +102,7 @@ public class IpConnection {
                 dataSocketServer = new ServerSocket();
                 dataSocketServer.setReuseAddress(true);
                 dataSocketServer.bind(new InetSocketAddress(Constants.IP_CONNECTION.DATAPORT));
+
                 Log.d(TAG, "Created Data Server Socket");
             }else{Log.d(TAG, "Data Server Socket already initialized");}
 
@@ -140,6 +147,7 @@ public class IpConnection {
     protected void initClient(){
 
         isClient = true;
+        setMyIp(getLocalIpAddress());
 
         setIpState(ConnectionEnum.TRYCONNECT);
         // Thread einrichten der mit einem Delay immer prüft, ob man sich in Remote verbunden hat und
@@ -285,6 +293,7 @@ public class IpConnection {
                     Log.d(TAG, "Waiting for Data Connection Accept");
                     dataSocket = dataSocketServer.accept();
 
+                    setRemoteIP(dataSocket.getInetAddress().getHostAddress());
                 } catch (IOException e) {
                     setIpState(ConnectionEnum.ERROR);
                     e.printStackTrace();
@@ -348,8 +357,13 @@ public class IpConnection {
                         receiveData(incomingDataMsg);
                     }
 
-                    if(isClient) setIpState(ConnectionEnum.TRYCONNECT);
-                    else setIpState(ConnectionEnum.TRYFIND);
+                    if(isClient) {
+                        setIpState(ConnectionEnum.TRYCONNECT);
+                    }
+                    else{
+                        setIpState(ConnectionEnum.TRYFIND);
+                        setRemoteIP("Not Connected");
+                    }
                 } catch (IOException e) {
                     Log.d(TAG, "Already Connection Lost before send");
                     setIpState(ConnectionEnum.ERROR);
@@ -380,8 +394,13 @@ public class IpConnection {
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
                     Log.d(TAG, "Already Connection Lost before send");
-                    if(isClient) setIpState(ConnectionEnum.TRYCONNECT);
-                    else setIpState(ConnectionEnum.TRYFIND);
+                    if(isClient){
+                        setIpState(ConnectionEnum.TRYCONNECT);
+                    }
+                    else {
+                        setIpState(ConnectionEnum.TRYFIND);
+                        setRemoteIP("Not Connected");
+                    }
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     setIpState(ConnectionEnum.ERROR);
@@ -529,6 +548,28 @@ public class IpConnection {
                 }
             }
         }
+    }
+
+    protected String getLocalIpAddress(){
+
+        WifiManager wifiMgr = (WifiManager) ipService.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+        //TODO: Find a better Solution then Formatter
+        String ip = Formatter.formatIpAddress(wifiInfo.getIpAddress());
+
+        return ip;
+    }
+
+    protected void setRemoteIP(String ip){
+        getDData().setRemoteIp(ip);
+    }
+
+    protected void setTransceiverIP(String ip){
+        getDData().setTransceiverIp(ip);
+    }
+
+    protected void setMyIp(String ip){
+        getDData().setMyIp(ip);
     }
 
     protected boolean isIdle() { return getDData().getIpState().isIdle();}

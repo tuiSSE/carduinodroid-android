@@ -148,13 +148,13 @@ public class IpService extends Service {
             if (ip == null) {
                 Log.i(TAG, "Creating IP Connection");
                 ip = new IpConnection(ipService);
-
+                getDData().setMyIp(ip.getLocalIpAddress());
                 switch (getDataHandler().getControlMode()) {
                     case REMOTE:
                         ip.initClient();
 
-                        //ip.startClientThread("192.168.178.25"); //to Old Mobile Phone
-                        ip.startClientThread("192.168.178.31"); //to New Mobile Phone
+                        ip.startClientThread("192.168.178.25"); //to Old Mobile Phone
+                        //ip.startClientThread("192.168.178.31"); //to New Mobile Phone
                         break;
                     case TRANSCEIVER:
                         ip.initServer();

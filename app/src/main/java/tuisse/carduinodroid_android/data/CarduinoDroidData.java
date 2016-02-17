@@ -32,10 +32,18 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private int wlanAvail;//
     private int wlanActive;//
 
+    private String remoteIp;
+    private String transceiverIp;
+    private String myIp;
+
     public CarduinoDroidData(){
         super();
         setIpState(new ConnectionState(ConnectionEnum.IDLE));
         setIpType(IpType.WLAN);
+
+        setTransceiverIp("");
+        setRemoteIp("");
+        setMyIp("");
 
         setCameraType(0);
         setCameraResolution(0);
@@ -101,14 +109,29 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     }
 
     public synchronized String getRemoteIp(){
-        //TODO: implement
-        return CarduinodroidApplication.getAppContext().getString(R.string.ipDummyRemote);
+        return remoteIp;
+    }
+
+    public synchronized void setRemoteIp(String _remoteIp){
+        remoteIp = _remoteIp;
     }
 
     public synchronized String getTransceiverIp(){
-        //TODO: implement
-        return CarduinodroidApplication.getAppContext().getString(R.string.ipDummyTransceiver);
+        return transceiverIp;
     }
+
+    public synchronized void setTransceiverIp(String _transceiverIp){
+        transceiverIp = _transceiverIp;
+    }
+
+    public synchronized String getMyIp(){
+        return myIp;
+    }
+
+    public synchronized void setMyIp(String _myIp){
+        myIp = _myIp;
+    }
+
     public synchronized ConnectionState getIpState(){
         return ipState;
     }

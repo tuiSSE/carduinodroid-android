@@ -377,8 +377,18 @@ public class StatusActivity extends AppCompatActivity {
     private void updateIp(){
         //// TODO: 12.01.201 implement
         try{
-            textViewDeviceRemoteIp.setText(getDData().getRemoteIp());
-            textViewDeviceTransceiverIp.setText(getDData().getTransceiverIp());
+            switch(getDataHandler().getControlMode()){
+                case REMOTE:
+                    textViewDeviceRemoteIp.setText(getDData().getMyIp());
+                    textViewDeviceTransceiverIp.setText(getDData().getTransceiverIp());
+                    break;
+                case TRANSCEIVER:
+                    textViewDeviceRemoteIp.setText(getDData().getRemoteIp());
+                    textViewDeviceTransceiverIp.setText(getDData().getMyIp());
+                    break;
+                default:
+                    break;
+            }
         }catch (Exception e){
             Log.e(TAG,e.toString());
         }
