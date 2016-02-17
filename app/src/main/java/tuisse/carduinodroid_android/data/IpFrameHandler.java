@@ -16,8 +16,16 @@ public class IpFrameHandler implements IpFrameIF{
     private CarduinoData carduinoData;
 
     private JSONObject JsonObjectData;
-    private JSONObject JsonObjectFalse;
     private boolean isMaskTypeServer;
+
+    private boolean isCar;
+    private boolean isMobility;
+    private boolean isNetwork;
+    private boolean isHardware;
+    private boolean isVideo;
+    private boolean isControl;
+    private boolean isCamera;
+    private boolean isSound;
 
     private boolean isForClient;
     private boolean isForServer;
@@ -45,17 +53,67 @@ public class IpFrameHandler implements IpFrameIF{
                 String mask = JsonObjectHeader.getString(Constants.JSON_OBJECT.TAG_HEADER_INFORMATION_TYPE);
                 if(isMaskLogic(mask)){
                     //Define the Type for the right Parsing
+                    Log.i(TAG, String.valueOf(JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS)));
                     if(!isForServer&&!isForClient){
                         //Ctrl Server Socket Data: Information about Data Server Socket Status as feedback
-                        Log.i(TAG, String.valueOf(JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS)));
                         return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else if(isForClient){
                         //Parsing all the information given from a Server to the Client
+                        if(isCar){
+                            JSONObject JsonObjectCarInfo = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CAR);
 
-                        return true;
+                            carduinoData.setCurrent(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_CURRENT));
+                            carduinoData.setAbsBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_ABSOLUTE));
+                            carduinoData.setRelBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_PERCENTAGE));
+                            carduinoData.setVoltage(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_VOLTAGE));
+                            carduinoData.setTemperature(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_TEMPERATURE));
+                            carduinoData.setUltrasoundFront(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_FRONT));
+                            carduinoData.setUltrasoundBack(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_BACK));
+                        }
+                        if(isMobility){
+                            JSONObject JsonObjectMobility = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_MOBILITY);
+
+                            carduinoDroidData.setGpsData(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_GPS));
+                            carduinoDroidData.setVibration(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION));
+                        }
+                        if(isHardware){
+                            JSONObject JsonObjectHardware = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE);
+
+                            carduinoDroidData.setCameraSupportedSizes(JsonObjectHardware.getString(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION));
+                        }
+                        if(isHardware){
+                            //TO-DO ? Maybe we can leave it out in this app because i see no value out of it
+                        }
+                        if(isVideo){
+                            JSONObject JsonObjectVideo = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_VIDEO);
+
+                            //TO-DO - Nachdem HW/Camera Service integriert wurde
+                        }
+                        return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else{
                         //Parsing all the information given from a Client to the Server
+                        if(isControl){
+                            JSONObject JsonObjectControl = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CONTROL);
 
+                            carduinoData.setSpeed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_SPEED));
+                            carduinoData.setSteer(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STEER));
+                            carduinoData.setFrontLight(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_FRONT_LIGHT));
+                            carduinoData.setStatusLed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STATUS_LED));
+                        }
+                        if(isCamera){
+                            JSONObject JsonObjectCamera = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CAMERA);
+
+                            carduinoDroidData.setCameraType(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_TYPE));
+                            carduinoDroidData.setCameraResolution(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
+                            carduinoDroidData.setCameraFlashlight(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT));
+                            carduinoDroidData.setCameraQuality(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY));
+                        }
+                        if(isSound){
+                            JSONObject JsonObjectSound = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SOUND);
+
+                            carduinoDroidData.setSoundPlay(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_PLAY));
+                            carduinoDroidData.setSoundRecord(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_RECORD));
+                        }
                         return true;
                     }
                 }else{
@@ -64,6 +122,7 @@ public class IpFrameHandler implements IpFrameIF{
                 }
             }
         } catch (JSONException e) {
+            Log.e(TAG, "Error on JSON Parsing by missing information)");
             e.printStackTrace();
             return true;
         }
@@ -71,14 +130,14 @@ public class IpFrameHandler implements IpFrameIF{
 
     private boolean isMaskLogic(String mask){
 
-        boolean isCar = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAR);
-        boolean isMobility = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_MOBILITY);
-        boolean isNetwork = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_NETWORK);
-        boolean isHardware = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_HARDWARE);
-        boolean isVideo = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_VIDEO);
-        boolean isControl = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CONTROL);
-        boolean isCamera = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAMERA);
-        boolean isSound = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SOUND);
+        isCar = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAR);
+        isMobility = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_MOBILITY);
+        isNetwork = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_NETWORK);
+        isHardware = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_HARDWARE);
+        isVideo = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_VIDEO);
+        isControl = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CONTROL);
+        isCamera = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAMERA);
+        isSound = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SOUND);
 
         isForClient = (isCar || isMobility || isNetwork || isHardware || isVideo);
         isForServer = (isControl || isCamera ||isSound);
@@ -139,8 +198,11 @@ public class IpFrameHandler implements IpFrameIF{
             /**** Including Video Data ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_VIDEO)) {
                 JSONObject JsonObjectVideoData = new JSONObject();
-                //TO-DO
-                JsonObjectData.put(Constants.JSON_OBJECT.TAG_NETWORK, JsonObjectVideoData);
+                //**** TO-DO - Wenn HW/Cam Handler integriert ist und Bild/Video Material bereitgestellt wurde
+                JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_TYPE, "");
+                JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE, "");
+
+                JsonObjectData.put(Constants.JSON_OBJECT.TAG_VIDEO, JsonObjectVideoData);
                 isMaskTypeServer = true;
             }
             /**** Including Network Information ****/
@@ -164,7 +226,7 @@ public class IpFrameHandler implements IpFrameIF{
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_HARDWARE)) {
 
                 JSONObject JsonObjectHardwareInformation = new JSONObject();
-                //TO-DO
+
                 JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolution());
 
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_HARDWARE, JsonObjectHardwareInformation);
@@ -175,37 +237,50 @@ public class IpFrameHandler implements IpFrameIF{
             /**** Including Car Control ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_CONTROL)) {
 
-                if(isMaskTypeServer == true) {
+                if(isMaskTypeServer) {
                     Log.i(TAG,"Error on Creating JSON Object - Mixed up Types of Server and Client");
                     return false;
                 }
                 else{
                     JSONObject JsonObjectCarControl = new JSONObject();
-                    // TO-DO
+
+                    JsonObjectCarControl.put(Constants.JSON_OBJECT.TAG_CONTROL_SPEED, carduinoData.getSpeed());
+                    JsonObjectCarControl.put(Constants.JSON_OBJECT.TAG_CONTROL_STEER, carduinoData.getSteer());
+                    JsonObjectCarControl.put(Constants.JSON_OBJECT.TAG_CONTROL_FRONT_LIGHT, carduinoData.getFrontLight());
+                    JsonObjectCarControl.put(Constants.JSON_OBJECT.TAG_CONTROL_STATUS_LED, carduinoData.getStatusLed());
+
                     JsonObjectData.put(Constants.JSON_OBJECT.TAG_CONTROL, JsonObjectCarControl);
                 }
             }
             /**** Including Camera Information ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_CAMERA)) {
-                if(isMaskTypeServer == true) {
+                if(isMaskTypeServer) {
                     Log.i(TAG,"Error on Creating JSON Object - Mixed up Types of Server and Client");
                     return false;
                 }
                 else {
                     JSONObject JsonObjectCameraInformation = new JSONObject();
-                    // TO-DO
+
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_TYPE, carduinoDroidData.getCameraType());
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolution());
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT, carduinoDroidData.getCameraFlashlight());
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY, carduinoDroidData.getCameraQuality());
+
                     JsonObjectData.put(Constants.JSON_OBJECT.TAG_CAMERA, JsonObjectCameraInformation);
                 }
             }
             /**** Including Sound Options ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_SOUND)) {
-                if(isMaskTypeServer == true) {
+                if(isMaskTypeServer) {
                     Log.i(TAG,"Error on Creating JSON Object - Mixed up Types of Server and Client");
                     return false;
                 }
                 else {
                     JSONObject JsonObjectSoundOptions = new JSONObject();
                     // TO-DO
+                    JsonObjectSoundOptions.put(Constants.JSON_OBJECT.TAG_SOUND_PLAY, carduinoDroidData.getSoundPlay());
+                    JsonObjectSoundOptions.put(Constants.JSON_OBJECT.TAG_SOUND_RECORD, carduinoDroidData.getSoundRecord());
+
                     JsonObjectData.put(Constants.JSON_OBJECT.TAG_SOUND, JsonObjectSoundOptions);
                 }
             }

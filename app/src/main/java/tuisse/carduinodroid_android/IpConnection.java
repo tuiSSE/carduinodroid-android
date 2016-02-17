@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -22,7 +21,6 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
-import tuisse.carduinodroid_android.data.IpType;
 
 /**
  * Created by keX on 04.01.2016.
@@ -42,6 +40,8 @@ public class IpConnection {
     Socket dataSocket;
     Socket remoteCtrlSocket;
     Socket remoteDataSocket;
+
+    protected boolean isClient;
 
     protected boolean ctrlSocketServerDisconnected;
     protected boolean dataSocketServerDisconnected;
@@ -69,6 +69,8 @@ public class IpConnection {
 
     //Initialization of both ServerSockets if a connection via another mobile phone or pc is wished
     protected void initServer(){
+
+        isClient = false;
 
         ipDataConnectionServerThread = new IpDataConnectionServerThread();
         ipCtrlSendServerThread = new IpCtrlSendServerThread();
@@ -116,7 +118,7 @@ public class IpConnection {
         return true;
     }
 
-    protected void startThread(String dataType){
+    protected void startServerThread(String dataType){
 
         if(dataType.toLowerCase().equals(Constants.IP_CONNECTION.TAG_CTRLPORT.toLowerCase()))
         {
@@ -136,12 +138,15 @@ public class IpConnection {
     }
 
     protected void initClient(){
+
+        isClient = true;
+
         setIpState(ConnectionEnum.TRYCONNECT);
-        //überhaupt notwendig, da kein Socket oder ähnliches vorhanden sein muss um eine Verbindung
-        //und die Threads immer als neue Instanz Realisiert werden
+        // Thread einrichten der mit einem Delay immer prüft, ob man sich in Remote verbunden hat und
+        // falls kein Connected/Running ist, dann wird wieder ein Verbindungsversuch angetriggert
     }
 
-    protected void connectClient(String address){
+    protected void startClientThread(String address){
 
         new ClientConnection(address).start();
     }
@@ -342,7 +347,9 @@ public class IpConnection {
                         if(dataSocketServerDisconnected) break;
                         receiveData(incomingDataMsg);
                     }
-                    setIpState(ConnectionEnum.TRYFIND);
+
+                    if(isClient) setIpState(ConnectionEnum.TRYCONNECT);
+                    else setIpState(ConnectionEnum.TRYFIND);
                 } catch (IOException e) {
                     Log.d(TAG, "Already Connection Lost before send");
                     setIpState(ConnectionEnum.ERROR);
@@ -373,7 +380,8 @@ public class IpConnection {
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
                     Log.d(TAG, "Already Connection Lost before send");
-                    setIpState(ConnectionEnum.TRYFIND);
+                    if(isClient) setIpState(ConnectionEnum.TRYCONNECT);
+                    else setIpState(ConnectionEnum.TRYFIND);
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     setIpState(ConnectionEnum.ERROR);
@@ -466,51 +474,59 @@ public class IpConnection {
         }
 
         public void run(){
-            if(isTryConnect()) {
-                try {
-                    remoteCtrlSocket = new Socket(address, Constants.IP_CONNECTION.CTRLPORT);
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(remoteCtrlSocket.getInputStream()));
-                    while ((incomingDataMsg = reader.readLine()) != null) {
-                        receiveData(incomingDataMsg);
-
-                        if (receiveCtrl(incomingDataMsg)) isConnectedRunning = true;
-                        else isConnectedRunning = false;
-                    }
-
-                    remoteCtrlSocket.close();
-
+            while(isConnected() || isRunning() || isTryConnect()) {
+                if (isTryConnect()) {
                     try {
-                        if (isConnectedRunning == true) {
+                        remoteCtrlSocket = new Socket(address, Constants.IP_CONNECTION.CTRLPORT);
 
-                            Log.d(TAG, "Data Server is already in use - No Connection has been established");
-                        } else if (isConnectedRunning == false) {
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(remoteCtrlSocket.getInputStream()));
+                        while ((incomingDataMsg = reader.readLine()) != null) {
+                            receiveData(incomingDataMsg);
 
-                            Log.d(TAG, "Data Server is free - Try to build up a Connection");
-                            setIpState(ConnectionEnum.CONNECTED);
-                            remoteDataSocket = new Socket(address, Constants.IP_CONNECTION.DATAPORT);
-                            //remoteDataSocket = new Socket("192.168.178.24", 12023);
-
-                            inData = new BufferedReader(new InputStreamReader(remoteDataSocket.getInputStream()));
-                            outData = new BufferedWriter(new OutputStreamWriter(remoteDataSocket.getOutputStream()));
-                            setIpState(ConnectionEnum.RUNNING);
-
-                            new IpDataSendThread(outData).start();
-                            new IpDataReceiveThread(inData).start();
+                            if (receiveCtrl(incomingDataMsg)) isConnectedRunning = true;
+                            else isConnectedRunning = false;
                         }
+
+                        remoteCtrlSocket.close();
+
+                        try {
+                            if (isConnectedRunning) {
+
+                                Log.d(TAG, "Data Server is already in use - No Connection has been established");
+                            } else if (!isConnectedRunning) {
+
+                                Log.d(TAG, "Data Server is free - Try to build up a Connection");
+                                setIpState(ConnectionEnum.CONNECTED);
+                                remoteDataSocket = new Socket(address, Constants.IP_CONNECTION.DATAPORT);
+
+                                inData = new BufferedReader(new InputStreamReader(remoteDataSocket.getInputStream()));
+                                outData = new BufferedWriter(new OutputStreamWriter(remoteDataSocket.getOutputStream()));
+                                setIpState(ConnectionEnum.RUNNING);
+
+                                new IpDataSendThread(outData).start();
+                                new IpDataReceiveThread(inData).start();
+                            }
+                        } catch (IOException e) {
+                            setIpState(ConnectionEnum.TRYCONNECTERROR);
+                            Log.d(TAG, "Client cant connect to Data Server Socket");
+                            e.printStackTrace();
+                        }
+
                     } catch (IOException e) {
-                        setIpState(ConnectionEnum.TRYCONNECTERROR);
-                        Log.d(TAG, "Client cant connect to Data Server Socket");
+                        setIpState(ConnectionEnum.ERROR);
+                        Log.d(TAG, "Client cant connect to Ctrl Server Socket");
                         e.printStackTrace();
                     }
+                } else if (isConnected() || isRunning()) {
+                    Log.d(TAG, "Client is already connected");
+                }
 
-                } catch (IOException e) {
-                    setIpState(ConnectionEnum.ERROR);
-                    Log.d(TAG, "Client cant connect to Ctrl Server Socket");
+                try {
+                    Thread.sleep(Constants.DELAY.CONNECTIONTRY);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "Error while Setting up the next Connection Try");
                     e.printStackTrace();
                 }
-            }else if(isConnected()||isRunning()){
-                Log.d(TAG, "Client is already connected");
             }
         }
     }

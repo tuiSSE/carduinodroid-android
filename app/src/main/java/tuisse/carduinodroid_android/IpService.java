@@ -152,13 +152,15 @@ public class IpService extends Service {
                     switch (getDataHandler().getControlMode()) {
                         case REMOTE:
                             ip.initClient();
-                            ip.connectClient("192.168.178.31");
+
+                            ip.startClientThread("192.168.178.31");
+                            //ip.connectClient("192.168.178.31");
                             break;
                         case TRANSCEIVER:
                             ip.initServer();
 
-                            ip.startThread("CtrlSocket");
-                            ip.startThread("DataSocket");
+                            ip.startServerThread("CtrlSocket");
+                            ip.startServerThread("DataSocket");
                             break;
                         default:
                             break;

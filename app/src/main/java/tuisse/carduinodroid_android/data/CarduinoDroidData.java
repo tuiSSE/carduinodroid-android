@@ -15,9 +15,9 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private ConnectionState ipState;
     private IpType ipType;
 
+    private String cameraSupportedSizes; // All the possible Resolutions/Sizes supported by the Transceiver
     private int cameraType; // Front= - Back=
-    private int cameraResolution; // Defines position of the resolution out of an String-Array with
-    // all supported ones
+    private int cameraResolution; // Defines position of the resolution out of an String-Array with all supported ones
     private int cameraFlashlight; // On=1 - Off=0;
     private int cameraQuality; // Value between 0(low) to 100 (high)
 
@@ -122,6 +122,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         ipType = it;
     }
 
+    public synchronized String getCameraSupportedSizes() { return cameraSupportedSizes;}
     public synchronized int getCameraType(){
         return cameraType;
     }
@@ -142,6 +143,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         return soundRecord;
     }
 
+    public synchronized void setCameraSupportedSizes(String _cameraSupportedSizes) { cameraSupportedSizes = _cameraSupportedSizes;}
     public synchronized void setCameraType(int _cameraType) {
         cameraType = _cameraType;
     }

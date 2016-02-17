@@ -30,6 +30,7 @@ public class Constants {
         int SERIAL      = 100;      //ms
         int IP          = 100;      //ms
         int CAMERA      = 1000/25;  //ms
+        int CONNECTIONTRY = 3000;   //ms
     }
 
     public interface TIMEOUT{
@@ -104,20 +105,28 @@ public class Constants {
         String TAG_HARDWARE = "Hardware Information";
         String NUM_HARDWARE = "Hardware";
 
+        String TAG_VIDEO_TYPE = "";
+        String TAG_VIDEO_SOURCE = "";
         String TAG_VIDEO = "Video Data";
         String NUM_VIDEO = "Video";
 
+        String TAG_CONTROL_SPEED = "";
+        String TAG_CONTROL_STEER = "";
+        String TAG_CONTROL_FRONT_LIGHT = "";
+        String TAG_CONTROL_STATUS_LED = "";
         String TAG_CONTROL = "Car Control";
         String NUM_CONTROL = "Control";
 
-
+        String TAG_CAMERA_TYPE = "";
+        String TAG_CAMERA_RESOLUTION = "";
+        String TAG_CAMERA_LIGHT = "";
+        String TAG_CAMERA_QUALITY = "";
         String TAG_CAMERA = "Camera Setup";
         String NUM_CAMERA = "Camera";
 
-
+        String TAG_SOUND_PLAY = "";
+        String TAG_SOUND_RECORD = "";
         String TAG_SOUND = "Sound Setup";
         String NUM_SOUND = "Sound";
-
-        String TAG_FALSE = "Creation Error";
     }
 }
