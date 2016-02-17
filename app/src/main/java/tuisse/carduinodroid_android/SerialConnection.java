@@ -179,15 +179,11 @@ abstract public class SerialConnection {
     protected synchronized boolean isFound() {
         return getData().getSerialState().isFound();
     }
-    protected synchronized boolean isConnected() {
-        return getData().getSerialState().isConnected();
-    }
+    protected synchronized boolean isConnected() { return getData().getSerialState().isConnected();}
     protected synchronized boolean isError() {
         return getData().getSerialState().isError();
     }
-    protected synchronized boolean isTryConnect() {
-        return getData().getSerialState().isTryConnect();
-    }
+    protected synchronized boolean isTryConnect() { return getData().getSerialState().isTryConnect();}
     protected synchronized boolean isRunning() {
         return getData().getSerialState().isRunning();
     }

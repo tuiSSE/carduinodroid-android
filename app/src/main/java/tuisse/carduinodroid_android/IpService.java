@@ -18,6 +18,8 @@ public class IpService extends Service {
 
     static private boolean isDestroyed = true;
     static private boolean isClosing = false;
+    static private boolean isRecreating = false;
+
     protected StartingIpConnection startingIpConnection;
     protected StoppingIpConnection stoppingIpConnection;
 
@@ -86,8 +88,9 @@ public class IpService extends Service {
             }
         }
 
-        if (getDData().getIpState().isIdle() && !isDestroyed && !isClosing) {
-
+        if (getDData().getIpState().isIdle() && !isDestroyed && !isClosing && !isRecreating) {
+            isClosing = true;
+            isRecreating = true;
             switch (getDataHandler().getControlMode()) {
                 case REMOTE:
                     startingIpConnection = new StartingIpConnection(this);
@@ -98,6 +101,8 @@ public class IpService extends Service {
                     startingIpConnection.start();
                     break;
                 default:
+                    isClosing = false;
+                    isRecreating = false;
                     stopSelf();
                     break;
             }
@@ -110,9 +115,9 @@ public class IpService extends Service {
     public void onDestroy() {
         super.onDestroy();
         isDestroyed = true;
-        isClosing = true;
 
         startingIpConnection.interrupt();
+        isRecreating = false;
 
         stoppingIpConnection = new StoppingIpConnection();
         stoppingIpConnection.start();
@@ -130,7 +135,7 @@ public class IpService extends Service {
         public void run() {
             //Secures a full rebuild especially for the important Threads for sending/receiving
             if (ip != null) {
-                isClosing = true;
+                //isClosing = true;
                 ip.close();
                 while(isClosing){
                     try {
@@ -144,6 +149,7 @@ public class IpService extends Service {
                 }
                 ip = null;
             }
+            isClosing = false;
             //So first closes the old IP Connection and Rebuild it then
             if (ip == null) {
                 Log.i(TAG, "Creating IP Connection");
@@ -153,8 +159,7 @@ public class IpService extends Service {
                     case REMOTE:
                         ip.initClient();
 
-                        ip.startClientThread("192.168.178.25"); //to Old Mobile Phone
-                        //ip.startClientThread("192.168.178.31"); //to New Mobile Phone
+                        ip.startClientThread();
                         break;
                     case TRANSCEIVER:
                         ip.initServer();
@@ -165,6 +170,7 @@ public class IpService extends Service {
                     default:
                         break;
                 }
+                isRecreating = false;
             }
         }
     }

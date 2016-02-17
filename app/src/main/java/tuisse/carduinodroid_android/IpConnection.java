@@ -49,6 +49,8 @@ public class IpConnection {
 
     protected boolean ctrlSocketServerDisconnected;
     protected boolean dataSocketServerDisconnected;
+    protected boolean dataReceiveDisconnected;
+    protected boolean dataSendDisconnected;
 
     private String incomingDataMsg;
 
@@ -154,9 +156,9 @@ public class IpConnection {
         // falls kein Connected/Running ist, dann wird wieder ein Verbindungsversuch angetriggert
     }
 
-    protected void startClientThread(String address){
+    protected void startClientThread(){
 
-        new ClientConnection(address).start();
+        new ClientConnection().start();
     }
 
     protected void close(){
@@ -220,8 +222,15 @@ public class IpConnection {
                     if(remoteDataSocket!=null){
                         if(!remoteDataSocket.isClosed())
                             dataSocketServerDisconnected=true;
-
-                        remoteDataSocket.close();
+                        while(!dataReceiveDisconnected&&!dataSendDisconnected){
+                            try {
+                                Thread.sleep(5);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.d(TAG, "Client Threads Closed");
+                        if(!remoteDataSocket.isClosed())remoteDataSocket.close();
                     }
 
                     Log.d(TAG, "Closed IP Connection Service");
@@ -290,10 +299,9 @@ public class IpConnection {
                 dataSocket = null;
 
                 try {
+
                     Log.d(TAG, "Waiting for Data Connection Accept");
                     dataSocket = dataSocketServer.accept();
-
-                    setRemoteIP(dataSocket.getInetAddress().getHostAddress());
                 } catch (IOException e) {
                     setIpState(ConnectionEnum.ERROR);
                     e.printStackTrace();
@@ -302,7 +310,7 @@ public class IpConnection {
                 if(dataSocket!=null) {
                     if (!String.valueOf(dataSocket.getInetAddress().getHostName()).equals("localhost")){
                         setIpState(ConnectionEnum.CONNECTED);
-
+                        setRemoteIP(dataSocket.getInetAddress().getHostAddress());
 
                         try {
                             inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
@@ -334,6 +342,7 @@ public class IpConnection {
                         e.printStackTrace();
                     }
                 }
+                if(dataSocketServerDisconnected) break;
             }
         }
     }
@@ -348,7 +357,7 @@ public class IpConnection {
         }
         @Override
         public void run() {
-
+            dataReceiveDisconnected = false;
             while(isRunning())
             {
                 try {
@@ -368,8 +377,10 @@ public class IpConnection {
                     Log.d(TAG, "Already Connection Lost before send");
                     setIpState(ConnectionEnum.ERROR);
                     e.printStackTrace();
+                    break;
                 }
             }
+            dataReceiveDisconnected = true;
         }
     }//IpDataReceiveThread
 
@@ -383,7 +394,7 @@ public class IpConnection {
         }
         @Override
         public void run() {
-
+            dataSendDisconnected = false;
             while(isRunning())
             {
                 try {
@@ -405,8 +416,10 @@ public class IpConnection {
                 } catch (InterruptedException e) {
                     setIpState(ConnectionEnum.ERROR);
                     e.printStackTrace();
+                    break;
                 }
             }
+            dataSendDisconnected = true;
         }
     }//IpDataSendThread
 
@@ -484,9 +497,8 @@ public class IpConnection {
         protected BufferedWriter outData;
         protected boolean isConnectedRunning;
 
-        public ClientConnection(String ipAddress){
+        public ClientConnection(){
 
-            this.address = ipAddress;
             inData = null;
             outData = null;
             isConnectedRunning = true;
@@ -496,6 +508,7 @@ public class IpConnection {
             while(isConnected() || isRunning() || isTryConnect()) {
                 if (isTryConnect()) {
                     try {
+                        address = getTransceiverIP();
                         remoteCtrlSocket = new Socket(address, Constants.IP_CONNECTION.CTRLPORT);
 
                         BufferedReader reader = new BufferedReader(new InputStreamReader(remoteCtrlSocket.getInputStream()));
@@ -537,7 +550,28 @@ public class IpConnection {
                         e.printStackTrace();
                     }
                 } else if (isConnected() || isRunning()) {
-                    Log.d(TAG, "Client is already connected");
+                    if(address!= getTransceiverIP()) {
+                        address = getTransceiverIP();
+                        if(remoteDataSocket!=null){
+                            if(!remoteDataSocket.isClosed())
+                                dataSocketServerDisconnected=true;
+                            while(!dataReceiveDisconnected&&!dataSendDisconnected){
+                                try {
+                                    Thread.sleep(5);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            Log.d(TAG, "Client Threads Closed");
+                            if(!remoteDataSocket.isClosed()) try {
+                                remoteDataSocket.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }else{
+                        Log.d(TAG, "Client is already running");
+                    }
                 }
 
                 try {
@@ -566,6 +600,9 @@ public class IpConnection {
 
     protected void setTransceiverIP(String ip){
         getDData().setTransceiverIp(ip);
+    }
+    protected String getTransceiverIP(){
+        return getDData().getTransceiverIp();
     }
 
     protected void setMyIp(String ip){

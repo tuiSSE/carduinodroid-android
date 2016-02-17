@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +18,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.net.Inet4Address;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
@@ -215,6 +223,40 @@ public class StatusActivity extends AppCompatActivity {
             public void onClick(View v) {
                 startActivity(new Intent(StatusActivity.this, DriveActivity.class));
                 Log.d(TAG, "onClickDrive");
+            }
+        });
+
+        imageViewSettingsTransceiver.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                //TODO: Integrieren DialogBox für IP Eingabe mit Eingabe und DropDown
+                final Dialog dialogTransceiverIp = new Dialog(StatusActivity.this);
+
+                dialogTransceiverIp.setContentView(R.layout.dialog_transceiver_ip);
+                dialogTransceiverIp.setTitle("Transceiver IP");
+
+                Button dialogButtonOK = (Button) dialogTransceiverIp.findViewById(R.id.dialogButtonOK);
+                Button dialogButtonCancel = (Button) dialogTransceiverIp.findViewById(R.id.dialogButtonCancel);
+
+                final EditText editIP = (EditText) dialogTransceiverIp.findViewById(R.id.editText);
+                editIP.setText(getDData().getTransceiverIp());
+
+                dialogButtonCancel.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        dialogTransceiverIp.dismiss();
+                    }
+                });
+                dialogButtonOK.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if(validateIP(String.valueOf(editIP.getText()))) getDData().setTransceiverIp(String.valueOf(editIP.getText()));
+                        else Log.e(TAG, "Entered IP is not in the right format");
+                        Log.d(TAG, String.valueOf(editIP.getText()));
+                        dialogTransceiverIp.dismiss();
+                    }
+                });
+
+                dialogTransceiverIp.show();
+                Log.d(TAG, "onClickTransceiverIP");
             }
         });
     }
@@ -477,5 +519,20 @@ public class StatusActivity extends AppCompatActivity {
         else{
             abortScreensaver();
         }
+    }
+
+    private boolean validateIP(String ip){
+        Pattern pattern;
+        Matcher matcher;
+        String IPADDRESS_PATTERN =
+                "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                        "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                        "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                        "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
+
+        pattern = Pattern.compile(IPADDRESS_PATTERN);
+        matcher = pattern.matcher(ip);
+
+        return matcher.matches();
     }
 }
