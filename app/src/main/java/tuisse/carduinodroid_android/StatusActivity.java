@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.drawable.LayerDrawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
@@ -232,14 +233,14 @@ public class StatusActivity extends AppCompatActivity {
                 //TODO: Integrieren DialogBox für IP Eingabe mit Eingabe und DropDown
                 final Dialog dialogTransceiverIp = new Dialog(StatusActivity.this);
 
-                dialogTransceiverIp.setContentView(R.layout.dialog_transceiver_ip);
+                dialogTransceiverIp.setContentView(R.layout.dialog_transceiverip_layout);
                 dialogTransceiverIp.setTitle("Transceiver IP");
 
-                Button dialogButtonOK = (Button) dialogTransceiverIp.findViewById(R.id.dialogButtonOK);
-                Button dialogButtonCancel = (Button) dialogTransceiverIp.findViewById(R.id.dialogButtonCancel);
-
-                final EditText editIP = (EditText) dialogTransceiverIp.findViewById(R.id.editText);
+                final EditText editIP = (EditText) dialogTransceiverIp.findViewById(R.id.editIP);
                 editIP.setText(getDData().getTransceiverIp());
+
+                Button dialogButtonOK = (Button) dialogTransceiverIp.findViewById(R.id.buttonOK);
+                Button dialogButtonCancel = (Button) dialogTransceiverIp.findViewById(R.id.buttonCancel);
 
                 dialogButtonCancel.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {

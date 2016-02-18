@@ -138,6 +138,11 @@
     <string name="serialUsbRelease">usb interface released</string>
     <string name="serialErrorUsbNumInterface">usb too few interfaces</string>
 
+    <!-- IP Connection Dialog -->
+    <string name="labelIpDialogInfo">Enter your destination Address here:</string>
+    <string name="labelIpDialogButtonOK">OK</string>
+    <string name="labelIpDialogButtonCancel">Cancel</string>
+
     <!-- Arduino versions -->
     <string name="arduino_uno">Arduino Uno</string>
     <string name="arduino_uno_r3">Arduino Uno R3</string>
