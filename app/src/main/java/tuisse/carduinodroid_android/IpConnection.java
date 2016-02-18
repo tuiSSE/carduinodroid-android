@@ -268,13 +268,13 @@ public class IpConnection {
 
     protected void receiveData(String dataPacket) throws IOException{
         // Hier kommt noch die Verwertung und Weitergabe von JSON Paketen
-        Log.d(TAG,dataPacket);
+        //Log.d(TAG,dataPacket);
         getDataHandler().parseJson(dataPacket);
     }
 
     protected boolean receiveCtrl(String dataPacket) throws IOException{
 
-        Log.d(TAG, dataPacket);
+        //Log.d(TAG, dataPacket);
         return getDataHandler().parseJson(dataPacket);
     }
 
@@ -295,7 +295,7 @@ public class IpConnection {
             dataSocketServerDisconnected=false;
 
             while(isRunning()||isTryFind()||isConnected()){
-
+                
                 dataSocket = null;
 
                 try {
@@ -400,7 +400,7 @@ public class IpConnection {
                 try {
                     sendData(outData, "Control");
                     //Real time trigger to set up with Max
-                    Thread.sleep(1000);
+                    Thread.sleep(Constants.DELAY.IP);
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping

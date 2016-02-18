@@ -226,8 +226,11 @@
                 android:layout_marginStart="@dimen/textMargin"/>
         </LinearLayout>
 
-        <ImageView
+        <Button
+            android:drawable="@drawable/icon_drive"
+            android:gravity="left|center_vertical"
             android:id="@+id/buttonDrive"
+            android:background="@color/colorTransparent"
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:layout_alignParentBottom="true"
@@ -237,9 +240,13 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginRight="@dimen/fabMargin"
             android:layout_marginEnd="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewDriveDesc"/>
-        <ImageView
+            android:contentDescription="@string/imageViewDriveDesc"
+            style="?android:attr/borderlessButtonStyle"/>
+        <Button
+            android:drawable="@drawable/icon_horn"
+            android:gravity="left|center_vertical"
             android:id="@+id/buttonHorn"
+            android:background="@color/colorTransparent"
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:layout_alignParentBottom="true"
@@ -249,9 +256,13 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewHornDesc"/>
-        <ImageView
+            android:contentDescription="@string/imageViewHornDesc"
+            style="?android:attr/borderlessButtonStyle"/>
+        <Button
+            android:drawable="@drawable/icon_front_light"
+            android:gravity="center"
             android:id="@+id/buttonFrontLight"
+            android:background="@color/colorTransparent"
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:layout_above="@+id/buttonHorn"
@@ -261,19 +272,23 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewFrontLightDesc"/>
-        <ImageView
+            android:contentDescription="@string/imageViewFrontLightDesc"
+            style="?android:attr/borderlessButtonStyle"/>
+        <Button
+            android:drawable="@drawable/icon_status_led"
+            android:gravity="center"
             android:id="@+id/buttonStatusLed"
+            android:background="@color/colorTransparent"
             android:layout_width="@dimen/imageSize"
             android:layout_height="@dimen/imageSize"
             android:layout_above="@+id/buttonFrontLight"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/icon_status_led"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewStatusLedDesc"/>
+            android:contentDescription="@string/imageViewStatusLedDesc"
+            style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>
 

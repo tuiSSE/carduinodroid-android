@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -112,10 +113,10 @@ public class DriveActivity extends AppCompatActivity {
     private TextView textViewVoltage;
     private TextView textViewTemperature;
 
-    private ImageView buttonDrive;
-    private ImageView buttonHorn;
-    private ImageView buttonFrontLight;
-    private ImageView buttonStatusLed;
+    private Button buttonDrive;
+    private Button buttonHorn;
+    private Button buttonFrontLight;
+    private Button buttonStatusLed;
 
     private CarduinoData getData(){
         return getDataHandler().getData();
@@ -203,24 +204,24 @@ public class DriveActivity extends AppCompatActivity {
         textViewVoltage             = (TextView) findViewById(R.id.textViewVoltage);
         textViewTemperature         = (TextView) findViewById(R.id.textViewTemperature);
 
-        buttonDrive                 = (ImageView) findViewById(R.id.buttonDrive);
-        buttonHorn                  = (ImageView) findViewById(R.id.buttonHorn);
-        buttonFrontLight            = (ImageView) findViewById(R.id.buttonFrontLight);
-        buttonStatusLed             = (ImageView) findViewById(R.id.buttonStatusLed);
+        buttonDrive                 = (Button) findViewById(R.id.buttonDrive);
+        buttonHorn                  = (Button) findViewById(R.id.buttonHorn);
+        buttonFrontLight            = (Button) findViewById(R.id.buttonFrontLight);
+        buttonStatusLed             = (Button) findViewById(R.id.buttonStatusLed);
 
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
 
-            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
-            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
-            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
-            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
+            buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
+            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
+            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
+            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
         } else {
             //if Transceiver mode
-            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
-            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
-            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
-            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
+            buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
+            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
+            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
+            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
         }
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
@@ -259,10 +260,10 @@ public class DriveActivity extends AppCompatActivity {
                             sensorManager.registerListener(magnetometerListener,
                                     magnetSensor,
                                     SensorManager.SENSOR_DELAY_GAME);
-                            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
+                            buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
                             return true;
                         case MotionEvent.ACTION_UP:
-                            buttonDrive.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
+                            buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
                             sensorManager.unregisterListener(magnetometerListener);
                             sensorManager.unregisterListener(accelerometerListener);
                             sensorMeasureStart = true;
@@ -285,10 +286,10 @@ public class DriveActivity extends AppCompatActivity {
                         statusLedState = !statusLedState;
                         if (statusLedState) {
                             getData().setStatusLed(1);
-                            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
+                            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
                         } else {
                             getData().setStatusLed(0);
-                            buttonStatusLed.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
+                            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
                         }
                         return true;
                     default:
@@ -305,10 +306,10 @@ public class DriveActivity extends AppCompatActivity {
                         frontLightState = !frontLightState;
                         if (frontLightState) {
                             getData().setFrontLight(1);
-                            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
+                            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
                         } else {
                             getData().setFrontLight(0);
-                            buttonFrontLight.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
+                            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
                         }
                         return true;
                     default:
@@ -324,7 +325,7 @@ public class DriveActivity extends AppCompatActivity {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_DOWN:
-                            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
+                            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
                                     sound.horn();
@@ -338,7 +339,7 @@ public class DriveActivity extends AppCompatActivity {
                             }
                             return true;
                         case MotionEvent.ACTION_UP:
-                            buttonHorn.setImageDrawable(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
+                            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
                                     sound.stop();
