@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android;
 
+import android.widget.Toast;
+
 /**
  * Created by mate on 08.02.2016.
  */

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
@@ -23,18 +24,43 @@ public class IpService extends Service {
     protected StartingIpConnection startingIpConnection;
     protected StoppingIpConnection stoppingIpConnection;
 
-    private DataHandler getDataHandler(){
-        return carduino.dataHandler;
-    }
-    private CarduinoDroidData getDData() {
-        return carduino.dataHandler.getDData();
-    }
-
-    protected CarduinodroidApplication getCarduino() {
+    protected CarduinodroidApplication getCarduino(){
         return carduino;
     }
 
-    static public boolean getIsDestroyed() {
+    /**
+     * Helper function to get the CarduinoData
+     *
+     * @return CarduinoData Object
+     */
+    private CarduinoData getData(){
+        return carduino.dataHandler.getData();
+    }
+
+    /**
+     * Helper function to get the CarduinoDroidData
+     *
+     * @return CarduinoDroidData Object
+     */
+    private CarduinoDroidData getDData(){
+        return carduino.dataHandler.getDData();
+    }
+
+    /**
+     * Helper function to get the DataHandler
+     *
+     * @return DataHandler Object
+     */
+    private DataHandler getDataHandler(){
+        return carduino.dataHandler;
+    }
+
+    /**
+     * static return function for the isDestroyed status.
+     *
+     * @return isDestroyed
+     */
+    static synchronized boolean getIsDestroyed(){
         return isDestroyed;
     }
 

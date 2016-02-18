@@ -70,6 +70,12 @@
     <string name="connectionStateUnknown">Unknown</string>
     <string name="connectionStateDefaultError">Unknown error</string>
 
+    <!-- CommunicationStatus -->
+    <string name="communicationStatusIdle">Idle</string>
+    <string name="communicationStatusConnecting">Connecting</string>
+    <string name="communicationStatusOk">Communication Established</string>
+    <string name="communicationStatusError">Error</string>
+
     <!-- serial data display strings -->
     <string name="driveSpeed">%1$04d Speed</string>
     <string name="driveSteer">%1$04d Steering</string>

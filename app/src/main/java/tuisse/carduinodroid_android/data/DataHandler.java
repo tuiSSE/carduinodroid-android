@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 
 /**
@@ -25,7 +26,6 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private boolean failSafeStopPref = true;
     private boolean debugView = false;
     private boolean bluetoothEnabled = false;
-    private boolean watchdogStarted = false;
     private CommunicationStatus communicationStatus = CommunicationStatus.IDLE;
     private int screensaver = 60000;
 
@@ -45,13 +45,6 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     }
     public synchronized int getScreensaver(){
         return screensaver;
-    }
-
-    public synchronized void setWatchdogStarted(boolean wds){
-        watchdogStarted = wds;
-    }
-    public synchronized boolean isWatchdogStarted(){
-        return watchdogStarted;
     }
 
     public synchronized void setBluetoothEnabled(boolean bte){
@@ -167,6 +160,34 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return color;
     }
 
+    public synchronized String getCommunicationStatusString(){
+        String s = "";
+        switch (communicationStatus){
+            case IDLE:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.communicationStatusIdle);
+                break;
+            case BOTH_CONNECTING:
+            case IP_CONNECTING:
+            case SERIAL_CONNECTING:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.communicationStatusConnecting);
+                break;
+            case OK:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.communicationStatusOk);
+                break;
+            case ERROR:
+            case BOTH_ERROR:
+            case IP_ERROR:
+            case SERIAL_ERROR:
+                s = CarduinodroidApplication.getAppContext().getString(R.string.communicationStatusError);
+                break;
+            default:
+                s = "";
+                Log.e(TAG, "getCommunicationStatusString: unknown communication status");
+                break;
+        }
+        return s;
+    }
+
     public synchronized void setControlMode(ControlMode cm){
         try {
             if (controlMode == null || cd == null) {
@@ -271,6 +292,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                 break;
             default:
                 setControlMode(ControlMode.TRANSCEIVER);
+                Log.e(TAG, "error in setControlModeNext, set ControlMode.Transceiver");
                 break;
         }
         return ControlMode.toInteger(controlMode);
@@ -289,6 +311,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                     setControlMode(ControlMode.REMOTE);
                     break;
                 default:
+                    Log.e(TAG, "error in setControlModePrev, set ControlMode.Transceiver");
                     setControlMode(ControlMode.TRANSCEIVER);
                     break;
             }
