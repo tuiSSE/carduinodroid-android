@@ -17,6 +17,8 @@ import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -263,18 +265,20 @@ public class StatusActivity extends AppCompatActivity {
                 Button dialogButtonCancel = (Button) dialogTransceiverIp.findViewById(R.id.buttonCancel);
 
                 String item[] = getFillIP();
+
                 ArrayAdapter<String> adapter;
-                adapter = new ArrayAdapter<String>(StatusActivity.this, android.R.layout.simple_dropdown_item_1line, item);
+                adapter = new ArrayAdapter<>(StatusActivity.this, android.R.layout.simple_dropdown_item_1line, item);
 
                 editIP.setThreshold(0);
                 editIP.setAdapter(adapter);
-
                 editIP.setText(getDData().getTransceiverIp());
 
                 editIP.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        if ((++autoCompleteCounter % 2) == 1) editIP.showDropDown();
-                        else {
+                        if ((++autoCompleteCounter % 2) == 1) {
+
+                            editIP.showDropDown();
+                        } else {
                             editIP.dismissDropDown();
                             autoCompleteCounter = 0;
                         }
@@ -285,6 +289,21 @@ public class StatusActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         autoCompleteCounter = 0;
+                    }
+                });
+
+                editIP.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if(editIP.getText().length()==0) autoCompleteCounter = 0;
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
                     }
                 });
 
@@ -593,7 +612,6 @@ public class StatusActivity extends AppCompatActivity {
         String[] ipValues = new String[Constants.IP_CONNECTION.MAX_PREF_IP];
 
         ipShared = getSharedPreferences(Constants.IP_CONNECTION.TAG_PREF_IP, MODE_PRIVATE);
-        int latestItem = ipShared.getInt(Constants.IP_CONNECTION.PREF_COUNTER_IP,0);
 
         while(counter < 5)
             if(!ipShared.getString(Constants.IP_CONNECTION.PREF_IP_NAMES[counter], "").equals("")){

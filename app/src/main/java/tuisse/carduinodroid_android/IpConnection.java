@@ -268,9 +268,11 @@ public class IpConnection {
     }
 
     protected void receiveData(String dataPacket) throws IOException{
-        // Hier kommt noch die Verwertung und Weitergabe von JSON Paketen
-        //Log.d(TAG,dataPacket);
+
         getDataHandler().parseJson(dataPacket);
+
+        Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
+        LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
     }
 
     protected boolean receiveCtrl(String dataPacket) throws IOException{

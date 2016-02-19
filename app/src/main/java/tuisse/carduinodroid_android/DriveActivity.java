@@ -42,9 +42,12 @@ public class DriveActivity extends AppCompatActivity {
     private CarduinodroidApplication carduino;
 
     private SerialDataRxReceiver serialDataRxReceiver;
+    private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
+    private IpDataRxReceiver ipDataRxReceiver;
+
     private IntentFilter serialDataRxFilter;
     private IntentFilter communicationStatusChangeFilter;
-    private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
+    private IntentFilter ipDataRxFilter;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -442,6 +445,9 @@ public class DriveActivity extends AppCompatActivity {
             serialDataRxReceiver = new SerialDataRxReceiver();
             serialDataRxFilter = new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
 
+            ipDataRxReceiver = new IpDataRxReceiver();
+            ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
+
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -455,6 +461,7 @@ public class DriveActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
         setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
             refresh();
@@ -466,6 +473,15 @@ public class DriveActivity extends AppCompatActivity {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(communicationStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataRxReceiver);
+    }
+
+    private class IpDataRxReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent){
+            setClientValues();
+            //refresh();
+        }
     }
 
     private class SerialDataRxReceiver extends BroadcastReceiver {
@@ -728,5 +744,16 @@ public class DriveActivity extends AppCompatActivity {
 
     private void setBackgroundColor(){
         viewVideo.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
+    }
+
+    private void setClientValues(){
+
+        int speed = getData().getSpeed();
+        int steering = getData().getSteer();
+
+        textViewSpeed.setText(String.format(getString(R.string.driveSpeed), speed));
+        seekBarSpeed.setProgress(speed + CarduinoIF.SPEED_MAX);
+        textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
+        seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
     }
 }

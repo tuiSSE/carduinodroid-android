@@ -79,7 +79,6 @@ public class Constants {
         String PREF_THIRD_IP = "Third Value";
         String PREF_FOURTH_IP = "Fourth Value";
         String PREF_FIFTH_IP = "Fifth Value";
-        String PREF_COUNTER_IP = "Counter Value";
         String PREF_IP_NAMES[] = {PREF_FIRST_IP,PREF_SECOND_IP,PREF_THIRD_IP,PREF_FOURTH_IP,PREF_FIFTH_IP};
     }
 
