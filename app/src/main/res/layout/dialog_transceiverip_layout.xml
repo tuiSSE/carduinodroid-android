@@ -18,13 +18,15 @@
             android:text="@string/labelIpDialogInfo"
             android:id="@+id/textInfo" />
 
-        <EditText
+        <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/editIP"
             android:layout_gravity="center_horizontal"
             android:inputType="number"
-            android:digits="0123456789."/>
+            android:digits="0123456789."
+            android:hint="Transceiver IP"
+            android:dropDownHeight="150dp"/>
 
         <TableRow
             android:layout_width="match_parent"

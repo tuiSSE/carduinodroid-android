@@ -243,6 +243,7 @@ public class WatchdogService extends Service {
             case REMOTE:
                 if(getDData().getIpState().isIdleError()){
                     startService(new Intent(WatchdogService.this,IpService.class));
+                    stopService(new Intent(WatchdogService.this, CameraService.class));
                 }
                 if(!SerialService.getIsDestroyed()){
                     stopService(new Intent(WatchdogService.this,SerialService.class));
@@ -259,13 +260,17 @@ public class WatchdogService extends Service {
                 if(getDData().getIpState().isIdleError()){
                     startService(new Intent(WatchdogService.this,IpService.class));
                 }
+                if(getDData().getIpState().isConnected()||getDData().getIpState().isRunning()){
+                    startService(new Intent(WatchdogService.this, CameraService.class));
+                }else{stopService(new Intent(WatchdogService.this, CameraService.class));}
                 break;
             default://DIRECT
+                stopService(new Intent(WatchdogService.this, CameraService.class));
                 if(getData().getSerialState().isIdleError()){
                     startService(new Intent(WatchdogService.this,SerialService.class));
                 }
                 if(!IpService.getIsDestroyed()){
-                    stopService(new Intent(WatchdogService.this,IpService.class));
+                    stopService(new Intent(WatchdogService.this, IpService.class));
                 }
                 break;
         }
@@ -289,6 +294,7 @@ public class WatchdogService extends Service {
                 stopService(new Intent(WatchdogService.this, SerialService.class));
                 if (!IpService.getIsDestroyed()) {
                     stopService(new Intent(WatchdogService.this, IpService.class));
+                    stopService(new Intent(WatchdogService.this, CameraService.class));
                 }
             }
             if (SerialService.getIsDestroyed() && IpService.getIsDestroyed()) {

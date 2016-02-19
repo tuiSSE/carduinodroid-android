@@ -71,6 +71,16 @@ public class Constants {
         int CTRLPORT = 12021;
         String TAG_DATAPORT = "DataSocket";
         String TAG_CTRLPORT = "CtrlSocket";
+
+        int MAX_PREF_IP = 5;
+        String TAG_PREF_IP = "Last IP Connections";
+        String PREF_FIRST_IP = "First Value";
+        String PREF_SECOND_IP = "Second Value";
+        String PREF_THIRD_IP = "Third Value";
+        String PREF_FOURTH_IP = "Fourth Value";
+        String PREF_FIFTH_IP = "Fifth Value";
+        String PREF_COUNTER_IP = "Counter Value";
+        String PREF_IP_NAMES[] = {PREF_FIRST_IP,PREF_SECOND_IP,PREF_THIRD_IP,PREF_FOURTH_IP,PREF_FIFTH_IP};
     }
 
     public interface JSON_OBJECT{

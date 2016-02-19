@@ -1,9 +1,13 @@
 package tuisse.carduinodroid_android.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.LayerDrawable;
+import android.preference.PreferenceManager;
 import android.util.Log;
-
 import tuisse.carduinodroid_android.CarduinodroidApplication;
+import tuisse.carduinodroid_android.Constants;
+
 import tuisse.carduinodroid_android.R;
 
 /**

@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.drawable.LayerDrawable;
@@ -19,12 +20,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 
 import java.net.Inet4Address;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,6 +95,10 @@ public class StatusActivity extends AppCompatActivity {
     private IpStatusActivityStatusChangeReceiver ipStatusChangeReceiver;
     private UsbBroadcastReciever usbReciever;
     private IntentFilter usbFilter;
+
+    private int autoCompleteCounter;
+    private SharedPreferences ipShared;
+    SharedPreferences.Editor editor;
 
     private CarduinoData getData(){
         return carduino.dataHandler.getData();
@@ -242,27 +252,55 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //TODO: Integrieren DialogBox für IP Eingabe mit Eingabe und DropDown
+                autoCompleteCounter = 0;
                 final Dialog dialogTransceiverIp = new Dialog(StatusActivity.this);
 
                 dialogTransceiverIp.setContentView(R.layout.dialog_transceiverip_layout);
                 dialogTransceiverIp.setTitle("Transceiver IP");
 
-                final EditText editIP = (EditText) dialogTransceiverIp.findViewById(R.id.editIP);
-                editIP.setText(getDData().getTransceiverIp());
-
+                final AutoCompleteTextView editIP = (AutoCompleteTextView) dialogTransceiverIp.findViewById(R.id.editIP);
                 Button dialogButtonOK = (Button) dialogTransceiverIp.findViewById(R.id.buttonOK);
                 Button dialogButtonCancel = (Button) dialogTransceiverIp.findViewById(R.id.buttonCancel);
+
+                String item[] = getFillIP();
+                ArrayAdapter<String> adapter;
+                adapter = new ArrayAdapter<String>(StatusActivity.this, android.R.layout.simple_dropdown_item_1line, item);
+
+                editIP.setThreshold(0);
+                editIP.setAdapter(adapter);
+
+                editIP.setText(getDData().getTransceiverIp());
+
+                editIP.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if ((++autoCompleteCounter % 2) == 1) editIP.showDropDown();
+                        else {
+                            editIP.dismissDropDown();
+                            autoCompleteCounter = 0;
+                        }
+                    }
+                });
+
+                editIP.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        autoCompleteCounter = 0;
+                    }
+                });
 
                 dialogButtonCancel.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         dialogTransceiverIp.dismiss();
                     }
                 });
+
                 dialogButtonOK.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        if(validateIP(String.valueOf(editIP.getText()))) getDData().setTransceiverIp(String.valueOf(editIP.getText()));
+                        if(validateIP(String.valueOf(editIP.getText()))) {
+                            getDData().setTransceiverIp(String.valueOf(editIP.getText()));
+                            saveIP(String.valueOf(editIP.getText()));
+                        }
                         else Log.e(TAG, "Entered IP is not in the right format");
-                        Log.d(TAG, String.valueOf(editIP.getText()));
                         dialogTransceiverIp.dismiss();
                     }
                 });
@@ -547,5 +585,48 @@ public class StatusActivity extends AppCompatActivity {
         matcher = pattern.matcher(ip);
 
         return matcher.matches();
+    }
+
+    private String[] getFillIP(){
+
+        int counter = 0;
+        String[] ipValues = new String[Constants.IP_CONNECTION.MAX_PREF_IP];
+
+        ipShared = getSharedPreferences(Constants.IP_CONNECTION.TAG_PREF_IP, MODE_PRIVATE);
+        int latestItem = ipShared.getInt(Constants.IP_CONNECTION.PREF_COUNTER_IP,0);
+
+        while(counter < 5)
+            if(!ipShared.getString(Constants.IP_CONNECTION.PREF_IP_NAMES[counter], "").equals("")){
+                ipValues[counter] = ipShared.getString(Constants.IP_CONNECTION.PREF_IP_NAMES[counter], "");
+                counter++;
+            }else{
+                break;
+            }
+
+        return Arrays.copyOfRange(ipValues, 0, counter);
+    }
+
+    private synchronized void saveIP(String ip){
+
+        boolean isAlreadyInList = false;
+        ipShared = getSharedPreferences(Constants.IP_CONNECTION.TAG_PREF_IP, MODE_PRIVATE);
+        editor = ipShared.edit();
+
+        for(int i = 0; i < 5; i++){
+            if(ipShared.getString(Constants.IP_CONNECTION.PREF_IP_NAMES[i],"").equals(ip)){
+                isAlreadyInList = true;
+            }
+        }
+
+        if(!isAlreadyInList){
+            editor.putString(Constants.IP_CONNECTION.PREF_FIFTH_IP,ipShared.getString(Constants.IP_CONNECTION.PREF_FOURTH_IP,""));
+            editor.putString(Constants.IP_CONNECTION.PREF_FOURTH_IP,ipShared.getString(Constants.IP_CONNECTION.PREF_THIRD_IP,""));
+            editor.putString(Constants.IP_CONNECTION.PREF_THIRD_IP,ipShared.getString(Constants.IP_CONNECTION.PREF_SECOND_IP,""));
+            editor.putString(Constants.IP_CONNECTION.PREF_SECOND_IP,ipShared.getString(Constants.IP_CONNECTION.PREF_FIRST_IP,""));
+            editor.putString(Constants.IP_CONNECTION.PREF_FIRST_IP,ip);
+        }
+
+        editor.commit();
+
     }
 }
