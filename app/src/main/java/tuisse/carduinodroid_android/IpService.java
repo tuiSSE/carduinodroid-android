@@ -25,6 +25,7 @@ public class IpService extends Service {
     protected StoppingIpConnection stoppingIpConnection;
 
     protected CarduinodroidApplication getCarduino(){
+
         return carduino;
     }
 

@@ -17,6 +17,7 @@ public class Constants {
         String COMMUNICATION_STATUS_CHANGED ="tuisse.carduinodroid_android.event.communication_status_changed";
         String SERIAL_DATA_RECEIVED = "tuisse.carduinodroid_android.event.serial_data_received";
         String IP_DATA_RECEIVED = "tuisse.carduinodroid_android.event.ip_data_received";
+        String CAMERA_DATA_RECEIVED = "tuisse.carduinodroid_android.event.camera_data_received";
     }
 
     public interface PERMISSION{

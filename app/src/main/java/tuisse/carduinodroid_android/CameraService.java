@@ -5,11 +5,35 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.CarduinoDroidData;
+import tuisse.carduinodroid_android.data.DataHandler;
+
 public class CameraService extends Service {
 
     static final String TAG = "CameraService";
+    private CarduinodroidApplication carduino;
     private CameraControl cam;
 
+    protected CarduinodroidApplication getCarduino(){
+
+        return carduino;
+    }
+
+    private CarduinoData getData(){
+
+        return carduino.dataHandler.getData();
+    }
+
+    private CarduinoDroidData getDData(){
+
+        return carduino.dataHandler.getDData();
+    }
+
+    private DataHandler getDataHandler(){
+
+        return carduino.dataHandler;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -20,7 +44,7 @@ public class CameraService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //carduino = (CarduinodroidApplication) getApplication();
+        carduino = (CarduinodroidApplication) getApplication();
         Log.d(TAG, "onCreate");
     }
 
@@ -29,13 +53,15 @@ public class CameraService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.i(TAG, "Camera Service onStartCommand");
 
-
+        if(cam==null) cam = new CameraControl(this);
 
         return START_STICKY;
     }
 
     public void onDestroy() {
         super.onDestroy();
+
+        cam.close();
         Log.i(TAG, "Camera Service has been killed");
     }
 }

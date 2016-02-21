@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,6 +35,7 @@ import android.widget.TextView;
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
+import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.CarduinoIF;
 import tuisse.carduinodroid_android.data.DataHandler;
 
@@ -44,10 +47,12 @@ public class DriveActivity extends AppCompatActivity {
     private SerialDataRxReceiver serialDataRxReceiver;
     private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
     private IpDataRxReceiver ipDataRxReceiver;
+    private CameraDataReceiver cameraDataReceiver;
 
     private IntentFilter serialDataRxFilter;
     private IntentFilter communicationStatusChangeFilter;
     private IntentFilter ipDataRxFilter;
+    private IntentFilter cameraDataFilter;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -87,7 +92,7 @@ public class DriveActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View viewVideo;
+    private ImageView viewImage;
     private View viewStop;
     private View viewDistance;
     private View viewDebug;
@@ -124,6 +129,7 @@ public class DriveActivity extends AppCompatActivity {
     private CarduinoData getData(){
         return getDataHandler().getData();
     }
+    private CarduinoDroidData getDData() { return getDataHandler().getDData(); }
     private DataHandler getDataHandler(){
         return carduino.dataHandler;
     }
@@ -228,7 +234,7 @@ public class DriveActivity extends AppCompatActivity {
         }
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
-        viewVideo = findViewById(R.id.fullscreen_content_video);
+        viewImage = (ImageView) findViewById(R.id.fullscreen_content_video);
         viewDistance = findViewById(R.id.fullscreen_content_distance);
         viewStop = findViewById(R.id.fullscreen_content_stop);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDebug.getLayoutParams();
@@ -448,6 +454,9 @@ public class DriveActivity extends AppCompatActivity {
             ipDataRxReceiver = new IpDataRxReceiver();
             ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
 
+            cameraDataReceiver = new CameraDataReceiver();
+            cameraDataFilter = new IntentFilter(Constants.EVENT.CAMERA_DATA_RECEIVED);
+
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             accelerationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             magnetSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -462,6 +471,7 @@ public class DriveActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(cameraDataReceiver, cameraDataFilter);
         setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
             refresh();
@@ -474,6 +484,7 @@ public class DriveActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(communicationStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataRxReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraDataReceiver);
     }
 
     private class IpDataRxReceiver extends BroadcastReceiver {
@@ -499,6 +510,16 @@ public class DriveActivity extends AppCompatActivity {
         }
     }
 
+    private class CameraDataReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(TAG,"Bild Update auf Activity");
+            byte[] image = getDData().getCameraPicture();
+            Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+            viewImage.setImageBitmap(bitmap);
+        }
+    }
+
     private final Runnable initSystemUIRunnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -508,7 +529,7 @@ public class DriveActivity extends AppCompatActivity {
             // and API 19 (KitKat).
             // It is safe to use them, as they are inlined
             // at compile-time and do nothing on earlier devices.
-            viewVideo.setSystemUiVisibility(
+            viewImage.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
                 //View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
@@ -542,7 +563,7 @@ public class DriveActivity extends AppCompatActivity {
     @SuppressLint("InlinedApi")
     private void showAll() {
         // Show the system bar
-        viewVideo.setSystemUiVisibility(
+        viewImage.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mHideHandler.removeCallbacks(initSystemUIRunnable);
@@ -743,7 +764,7 @@ public class DriveActivity extends AppCompatActivity {
     }
 
     private void setBackgroundColor(){
-        viewVideo.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
+        viewImage.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
     }
 
     private void setClientValues(){

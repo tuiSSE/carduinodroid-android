@@ -38,10 +38,12 @@ public interface CarduinoDroidIF{
     int getMobileActive();
     int getWLANAvailable();
     int getWLANActive();
+    byte[] getCameraPicture();
     void setGpsData(int _gpsData);
     void setVibration(int _vibration);
     void setMobileAvailable(int _mobileAvailable);
     void setMobileActive(int _mobileActive);
     void setWlanAvailable(int _wlanAvailable);
     void setWlanActive(int _wlanActive);
+    void setCameraPicture(byte[] _cameraPicture);
 }

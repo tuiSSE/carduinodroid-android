@@ -40,6 +40,8 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private String transceiverIp;
     private String myIp;
 
+    private byte[] cameraPicture;
+
     public CarduinoDroidData(){
         super();
         setIpState(new ConnectionState(ConnectionEnum.IDLE));
@@ -229,4 +231,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     public synchronized void setVibration(int _vibration) {
         vibration = _vibration;
     }
+
+    public synchronized void setCameraPicture(byte[] _cameraPicture) { cameraPicture = _cameraPicture;}
+    public synchronized byte[] getCameraPicture() { return cameraPicture;}
 }
