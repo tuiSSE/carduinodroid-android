@@ -513,10 +513,15 @@ public class DriveActivity extends AppCompatActivity {
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
+            //TODO: Anzeige nur bei Remote und bei Debug-On
             Log.i(TAG,"Bild Update auf Activity");
+            int width = viewImage.getWidth();
+            int height = viewImage.getHeight();
+
             byte[] image = getDData().getCameraPicture();
             Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-            viewImage.setImageBitmap(bitmap);
+
+            viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap,width,height,false));
         }
     }
 

@@ -47,10 +47,13 @@ public class CameraControl {
     private int previewHeight;
     private int previewQuality;
 
+    private boolean onDestroy;
+
     CameraControl(CameraService s){
 
         cameraService = s;
         init();
+        onDestroy = false;
     }
 
     protected DataHandler getDataHandler(){
@@ -76,7 +79,13 @@ public class CameraControl {
                 getSupportedPreviewSizes();
                 numSupportedPrevSizes = supportedPreviewSizes.size();
 
-                parameters.setPreviewSize(supportedPreviewSizes.get(numSupportedPrevSizes-1).width, supportedPreviewSizes.get(numSupportedPrevSizes-1).height);
+                //previewHeight = supportedPreviewSizes.get(numSupportedPrevSizes-1).height;
+                //previewWidth = supportedPreviewSizes.get(numSupportedPrevSizes-1).width;
+
+                previewHeight = supportedPreviewSizes.get(1).height;
+                previewWidth = supportedPreviewSizes.get(1).width;
+
+                parameters.setPreviewSize(previewWidth, previewHeight);
                 parameters.setJpegQuality(100);
                 setCompressQuality(30);
                 setOrientation(270);
@@ -102,13 +111,12 @@ public class CameraControl {
 
         releaseCamera();
         camera = null;
-        //camerasurface
-
     }
 
     private void releaseCamera(){
         //disable FlashLight
         setFlash(0);
+        camera.setPreviewCallback(null);
         camera.stopPreview();
         camera.release();
     }
@@ -209,55 +217,25 @@ public class CameraControl {
         return ID;
     }
 
-    /*protected class TakingPictures extends Thread {
-
-        public TakingPictures() { }
-
-        public void run() {
-            while(true){
-                try {
-                    Thread.sleep(2000);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        }
-    }*/
-
     Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
         int i=0;
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            //if(i==0) {
-                previewData = data.clone();
-                //Bitmap bitmapPicture = BitmapFactory.decodeByteArray(data, 0, data.length);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                YuvImage temp = new YuvImage(data, parameters.getPreviewFormat(), parameters.getPreviewSize().width,
-                        parameters.getPreviewSize().height, null);
-                Rect rect = new Rect(0, 0, parameters.getPreviewSize().width, parameters.getPreviewSize().height);
-                temp.compressToJpeg(rect, previewQuality, baos);
-                byte[] image = baos.toByteArray();
-                /*Hier ersetzen durch speichern der komprimierten Variante, für Senden über JSON
-                //FileOutputStream outStream = null;
-                try {
-                    //outStream = new FileOutputStream("/sdcard/Image.jpg");
-                    //outStream.write(image);
-                    //outStream.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                i++;*/
+            previewData = data.clone();
 
-                getDData().setCameraPicture(image);
-                Intent onCameraDataIntent = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
-                LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraDataIntent);
-                Log.i(TAG, "Bild yes");
-            //}
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            YuvImage temp = new YuvImage(data, parameters.getPreviewFormat(), parameters.getPreviewSize().width,
+                    parameters.getPreviewSize().height, null);
+            Rect rect = new Rect(0, 0, parameters.getPreviewSize().width, parameters.getPreviewSize().height);
+            temp.compressToJpeg(rect, previewQuality, baos);
+            byte[] image = baos.toByteArray();
+
+            getDData().setCameraPicture(image);
+
+            Intent onCameraDataIntent = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
+            LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraDataIntent);
+            Log.i(TAG, "Bild yes");
         }
     };
 
