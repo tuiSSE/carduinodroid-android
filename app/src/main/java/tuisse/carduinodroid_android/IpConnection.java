@@ -404,7 +404,7 @@ public class IpConnection {
                 try {
                     sendData(outData, "Camera,Control");
                     //Real time trigger to set up with Max
-                    Thread.sleep(3000);
+                    Thread.sleep(Constants.DELAY.IP);
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping

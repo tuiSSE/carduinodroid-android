@@ -53,15 +53,27 @@ public class CameraService extends Service {
         super.onStartCommand(intent, flags, startId);
         Log.i(TAG, "Camera Service onStartCommand");
 
-        if(cam==null) cam = new CameraControl(this);
+        if(cam==null) {
+            cam = new CameraControl(this);
+
+            new Thread(new Runnable() {
+                public void run() {
+                    if(cam!=null){
+                        cam.init();
+                        cam.start();
+                    }
+
+                }
+            }, "CameraConnectionThread").start();
+        }
 
         return START_STICKY;
     }
 
     public void onDestroy() {
         super.onDestroy();
-
-        cam.close();
+        if(cam != null)
+            cam.close();
         Log.i(TAG, "Camera Service has been killed");
     }
 }

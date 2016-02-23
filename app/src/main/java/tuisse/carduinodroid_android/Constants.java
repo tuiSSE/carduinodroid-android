@@ -31,7 +31,7 @@ public class Constants {
     public interface DELAY{
         int WATCHDOG    = 3000;     //ms
         int SERIAL      = 100;      //ms
-        int IP          = 100;      //ms
+        int IP          = 3000;      //ms
         int CAMERA      = 1000/25;  //ms
         int CONNECTIONTRY = 3000;   //ms
     }

@@ -12,16 +12,12 @@ import android.graphics.SurfaceTexture;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
-import android.opengl.GLES20;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.TextureView;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,49 +31,52 @@ import tuisse.carduinodroid_android.data.DataHandler;
 public class CameraControl extends SurfaceView implements Camera.PreviewCallback, Runnable{
 
     static final String TAG = "CameraControl";
-    private CameraService cameraService;
-    private Context context;
-    private SurfaceHolder sHolder;
 
+    private CameraService cameraService;
     protected PackageManager packageManager;
     protected Camera camera;
     protected Camera.Parameters parameters;
+    private SurfaceTexture surfaceTexture;
+    private int surfID;
+
     protected List<Camera.Size> supportedPreviewSizes;
     protected int numSupportedPrevSizes;
-    protected List<Integer> supportedPreviewFPS;
 
     private IpDataRxReceiver ipDataRxReceiver;
     private IntentFilter ipDataRxFilter;
 
-    private SurfaceTexture surfaceTexture;
-
     private int cameraID;
+
     private String[] previewResolution;
-    private int previewResolutionID;
     private int previewWidth;
     private int previewHeight;
+
+    private int previewResolutionID;
     private int previewQuality;
     private int previewOrtientation;
     private int previewFlashLight;
     private int previewCamType;
 
-    CameraControl(CameraService s){
-        super(s);
-
-        cameraService = s;
-
-        init();
-        start();
-    }
+    private boolean isRunning;
 
     protected DataHandler getDataHandler(){
 
         return cameraService.getCarduino().dataHandler;
     }
 
+    CameraControl(CameraService s){
+
+        super(s);
+        cameraService = s;
+    }
+
     protected void init(){
 
-        previewResolutionID = 5;
+        isRunning = false;
+
+        surfID = 10;
+
+        previewResolutionID = 0;
         previewQuality = 50;
         previewOrtientation = 0;
         previewFlashLight = 0;
@@ -85,6 +84,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     }
 
     protected void update(){
+
+        isRunning = false;
 
         previewResolutionID = getDData().getCameraResolutionID();
         previewQuality = getDData().getCameraQuality();
@@ -115,8 +116,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                 try{
                     camera = Camera.open(cameraID);
 
-                    //surfaceTexture = new SurfaceTexture(textID); textID mit Zähler?
-                    surfaceTexture = new SurfaceTexture(10);
+                    surfaceTexture = new SurfaceTexture(surfID);
 
                     try {
                         camera.setPreviewTexture(surfaceTexture);
@@ -128,14 +128,13 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
                     getSupportedPreviewSizes();
                     numSupportedPrevSizes = supportedPreviewSizes.size();
-                    //Set at beginning on lowest Resolution to get best Bandwidth
-                    setCameraResolution(previewResolutionID);
-                    //parameters.setPreviewSize(previewWidth, previewHeight);
+
                     setCompressQuality(previewQuality);
                     setOrientation(previewOrtientation);
                     setFlash(previewFlashLight);
 
-                    parameters.setPreviewSize(640,480);
+                    setCameraResolution(previewResolutionID);
+                    parameters.setPreviewSize(previewWidth, previewHeight);
 
                     camera.setParameters(parameters);
 
@@ -152,10 +151,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected void close(){
 
         LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataRxReceiver);
+        isRunning = false;
 
         releaseCamera();
         camera = null;
-
     }
 
     private void releaseCamera(){
@@ -171,8 +170,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
     private void setFlash(int status){
 
-        if(status==1) activateFlash();
-        else disableFlash();
+        if(status==1)
+            activateFlash();
+        else
+            disableFlash();
         previewFlashLight = status;
     }
 
@@ -192,21 +193,34 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
     private void setCameraResolution(int ID){
 
-        previewHeight = supportedPreviewSizes.get(ID).height;
-        previewWidth = supportedPreviewSizes.get(ID).width;
-
-        parameters.setPreviewSize(previewWidth, previewHeight);
-        //parameters.setPictureSize(previewWidth, previewHeight);
-        previewResolutionID = ID;
+        if((ID <= (supportedPreviewSizes.size()-1)) && (ID >= 0)) {
+            previewHeight = supportedPreviewSizes.get(ID).height;
+            previewWidth = supportedPreviewSizes.get(ID).width;
+            previewResolutionID = ID;
+        }else{
+            Log.e(TAG,"Error on Setting a Resolution - ID is not in the expected Range");
+        }
     }
 
     private void setOrientation(int degree){
 
-        parameters.setRotation(degree);
-        previewOrtientation = degree;
-    }
+        String[] degreeValues = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
+        int numValues = degreeValues.length;
+        boolean isValue = false;
 
-    //TODO: Try to integrate FPS?
+        for(int i = 0; i < numValues; i++){
+            if(Integer.parseInt(degreeValues[i])==degree){
+                isValue = true;
+            }
+        }
+
+        if(isValue){
+            parameters.setRotation(degree);
+            previewOrtientation = degree;
+        }else{
+            Log.e(TAG, "Error on Setting Orientation Value of Camera - It's not allowed Value");
+        }
+    }
 
     private void setCompressQuality(int quality){
 
@@ -270,6 +284,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     private void updateCameraData(){
 
         boolean isUpdated = false;
+
         int _resolutionID = getDData().getCameraResolutionID(); //Width and Height
         int _cameraType = getDData().getCameraType();
         int _cameraDegree = getDData().getCameraDegree();
@@ -278,19 +293,23 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         if(_resolutionID != previewResolutionID) isUpdated = true;
         if(_cameraDegree != previewOrtientation) isUpdated = true;
-        if(_flashLight != previewFlashLight) isUpdated = true;
-        if(_cameraQuality != previewQuality) isUpdated = true;
         if(_cameraType != previewCamType) isUpdated = true;
 
         if(isUpdated){
             close();
             update();
             start();
+        }else{
+            if(_flashLight != previewFlashLight)
+                setFlash(_flashLight);
+            if(_cameraQuality != previewQuality)
+                setCompressQuality(_cameraQuality);
         }
     }
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
+        isRunning = true;
 
         Camera.Parameters param = camera.getParameters();
         int width = param.getPreviewSize().width;
@@ -335,7 +354,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     private class IpDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            updateCameraData();
+            if(isRunning)
+                updateCameraData();
         }
     }
 
