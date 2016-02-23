@@ -402,7 +402,7 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData, "");
+                    sendData(outData, "Camera,Control");
                     //Real time trigger to set up with Max
                     Thread.sleep(3000);
                     if(dataSocketServerDisconnected) break;
