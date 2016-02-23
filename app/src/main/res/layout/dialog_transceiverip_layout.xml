@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,12 +26,14 @@
             android:inputType="number"
             android:digits="0123456789."
             android:hint="Transceiver IP"
-            android:dropDownHeight="150dp"/>
+            android:dropDownHeight="150dp"
+            android:layout_below="@+id/textInfo"/>
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:layout_below="@+id/editIP">
 
             <Button
                 android:layout_width="wrap_content"
@@ -49,5 +51,5 @@
                 android:layout_weight="1"/>
         </TableRow>
 
-    </LinearLayout>
+    </RelativeLayout>
 </RelativeLayout>

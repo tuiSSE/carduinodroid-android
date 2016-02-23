@@ -1,6 +1,7 @@
 package tuisse.carduinodroid_android;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,12 +25,15 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar;
@@ -125,6 +129,7 @@ public class DriveActivity extends AppCompatActivity {
     private Button buttonHorn;
     private Button buttonFrontLight;
     private Button buttonStatusLed;
+    private Button buttonCamSettings;
 
     private CarduinoData getData(){
         return getDataHandler().getData();
@@ -217,6 +222,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn                  = (Button) findViewById(R.id.buttonHorn);
         buttonFrontLight            = (Button) findViewById(R.id.buttonFrontLight);
         buttonStatusLed             = (Button) findViewById(R.id.buttonStatusLed);
+        buttonCamSettings           = (Button) findViewById(R.id.buttonSettings);
 
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
@@ -225,12 +231,14 @@ public class DriveActivity extends AppCompatActivity {
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
+            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings));
         } else {
             //if Transceiver mode
             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
+            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_settings));
         }
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
@@ -252,6 +260,71 @@ public class DriveActivity extends AppCompatActivity {
             textViewAngle2.setVisibility(View.GONE);
         }
         viewDebug.setLayoutParams(params);
+
+        buttonCamSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Dialog dialogCamSettings = new Dialog(DriveActivity.this);
+
+                dialogCamSettings.setContentView(R.layout.dialog_camera_settings);
+                dialogCamSettings.setTitle("Camera Settings");
+
+                final Spinner spinnerResolution = (Spinner) dialogCamSettings.findViewById(R.id.spinnerResolution);
+                final Spinner spinnerDegree = (Spinner) dialogCamSettings.findViewById(R.id.spinnerDegree);
+                final CheckBox checkBoxCameraType = (CheckBox) dialogCamSettings.findViewById(R.id.checkboxCameraType);
+                final EditText editQuality = (EditText) dialogCamSettings.findViewById(R.id.editQuality);
+                Button dialogButtonOK = (Button) dialogCamSettings.findViewById(R.id.buttonOK);
+                Button dialogButtonCancel = (Button) dialogCamSettings.findViewById(R.id.buttonCancel);
+
+                String[] itemsResolution;
+                String[] itemsDegree;
+                int cameraDegreeID;
+
+                itemsDegree = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
+                itemsResolution = getDData().getCameraSupportedSizes();
+
+                ArrayAdapter<String> adapterResolution;
+                adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
+                spinnerResolution.setAdapter(adapterResolution);
+
+                spinnerResolution.setSelection(getCameraResolutionID());
+
+                if(getDData().getCameraType()==0)checkBoxCameraType.setChecked(false);
+                else checkBoxCameraType.setChecked(true);
+
+                ArrayAdapter<String> adapterDegree;
+                adapterDegree = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsDegree);
+                spinnerDegree.setAdapter(adapterDegree);
+
+                cameraDegreeID = getCameraDegreeID();
+                if(cameraDegreeID < 0) Log.e(TAG, "Error while checking the Custom Camera Orientation Degree");
+                else spinnerDegree.setSelection(cameraDegreeID);
+
+                editQuality.setText(String.valueOf(getDData().getCameraQuality()));
+
+                dialogButtonCancel.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        dialogCamSettings.dismiss();
+                    }
+                });
+
+                dialogButtonOK.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        setCameraResolutionID(spinnerResolution.getSelectedItemPosition());
+                        setCameraType(checkBoxCameraType.isChecked());
+                        setCameraDegree(spinnerDegree.getSelectedItem().toString());
+                        setCameraQuality(editQuality.getText().toString());
+
+                        dialogCamSettings.dismiss();
+                    }
+                });
+
+                dialogCamSettings.show();
+            }
+        });
 
         buttonDrive.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -513,15 +586,18 @@ public class DriveActivity extends AppCompatActivity {
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            //TODO: Anzeige nur bei Remote und bei Debug-On
-            Log.i(TAG,"Bild Update auf Activity");
-            int width = viewImage.getWidth();
-            int height = viewImage.getHeight();
+            try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
 
-            byte[] image = getDData().getCameraPicture();
-            Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                int width = viewImage.getWidth();
+                int height = viewImage.getHeight();
 
-            viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap,width,height,false));
+                byte[] image = getDData().getCameraPicture();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+
+                viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));
+            }catch(Exception e){
+                Log.e(TAG,"Error on setting the Video/Picture on Activity");
+            }
         }
     }
 
@@ -612,6 +688,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn.setAlpha(1.0f);
         buttonFrontLight.setAlpha(1.0f);
         buttonStatusLed.setAlpha(1.0f);
+        buttonCamSettings.setAlpha(1.0f);
     }
     private void uiDrive(){
         viewStop.setVisibility(View.GONE);
@@ -622,6 +699,7 @@ public class DriveActivity extends AppCompatActivity {
                 buttonHorn.setAlpha(0.6f);
                 buttonFrontLight.setAlpha(0.6f);
                 buttonStatusLed.setAlpha(0.6f);
+                buttonCamSettings.setAlpha(0.6f);
             }
         }
     }
@@ -781,5 +859,51 @@ public class DriveActivity extends AppCompatActivity {
         seekBarSpeed.setProgress(speed + CarduinoIF.SPEED_MAX);
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
         seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
+    }
+
+    private void setCameraQuality(String quality){
+
+        int value = Integer.parseInt(quality);
+
+        if(value > 100) getDData().setCameraQuality(100);
+        else if(value < 0) getDData().setCameraQuality(0);
+        else getDData().setCameraQuality(value);
+    }
+
+    private void setCameraType(boolean isChecked){
+
+        if(isChecked)
+            getDData().setCameraType(1);
+        else
+            getDData().setCameraType(0);
+    }
+
+    private void setCameraDegree(String degree){
+
+        int value = Integer.parseInt(degree);
+        getDData().setCameraDegree(value);
+    }
+
+    private int getCameraDegreeID(){
+
+        int ID = -1;
+        int actualValue = getDData().getCameraDegree();
+        String[] values = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
+
+        for(int i = 0; i < values.length; i++) {
+            if(String.valueOf(actualValue).equals(values[i]))
+                ID = i;
+        }
+        return ID;
+    }
+
+    private void setCameraResolutionID(int ID){
+
+        getDData().setCameraResolutionID(ID);
+    }
+
+    private int getCameraResolutionID(){
+
+        return getDData().getCameraResolutionID();
     }
 }

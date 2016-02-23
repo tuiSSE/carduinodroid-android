@@ -270,6 +270,7 @@ public class IpConnection {
     protected void receiveData(String dataPacket) throws IOException{
 
         getDataHandler().parseJson(dataPacket);
+        Log.d(TAG, dataPacket.toString());
 
         Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
         LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
@@ -401,9 +402,9 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData, "Control");
+                    sendData(outData, "");
                     //Real time trigger to set up with Max
-                    Thread.sleep(Constants.DELAY.IP);
+                    Thread.sleep(3000);
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping

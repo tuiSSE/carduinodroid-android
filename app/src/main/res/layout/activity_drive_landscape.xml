@@ -289,6 +289,22 @@
             android:contentDescription="@string/imageViewStatusLedDesc"
             style="?android:attr/borderlessButtonStyle"/>
 
+        <Button
+            style="?android:attr/borderlessButtonStyle"
+            android:drawable="@drawable/icon_settings"
+            android:gravity="center"
+            android:id="@+id/buttonSettings"
+            android:background="@color/colorTransparent"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
+            android:contentDescription="@string/imageViewStatusLedDesc"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:layout_above="@+id/buttonStatusLed" />
+
     </RelativeLayout>
 
 </FrameLayout>

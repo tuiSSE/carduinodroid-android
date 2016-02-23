@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android.data;
 
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -78,8 +80,8 @@ public class IpFrameHandler implements IpFrameIF{
                         }
                         if(isHardware){
                             JSONObject JsonObjectHardware = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE);
-
-                            carduinoDroidData.setCameraSupportedSizes(JsonObjectHardware.getString(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION));
+                            //TODO give all the Resolutions to show whats possible and the ID of the actual chosen one
+                            //carduinoDroidData.setCameraSupportedSizes(JsonObjectHardware.getJSONArray(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION));
                         }
                         if(isHardware){
                             //TO-DO ? Maybe we can leave it out in this app because i see no value out of it
@@ -104,7 +106,7 @@ public class IpFrameHandler implements IpFrameIF{
                             JSONObject JsonObjectCamera = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CAMERA);
 
                             carduinoDroidData.setCameraType(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_TYPE));
-                            carduinoDroidData.setCameraResolution(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
+                            carduinoDroidData.setCameraResolutionID(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
                             carduinoDroidData.setCameraFlashlight(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT));
                             carduinoDroidData.setCameraQuality(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY));
                         }
@@ -227,7 +229,7 @@ public class IpFrameHandler implements IpFrameIF{
 
                 JSONObject JsonObjectHardwareInformation = new JSONObject();
 
-                JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolution());
+                JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolutionID());
 
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_HARDWARE, JsonObjectHardwareInformation);
                 isMaskTypeServer = true;
@@ -262,7 +264,7 @@ public class IpFrameHandler implements IpFrameIF{
                     JSONObject JsonObjectCameraInformation = new JSONObject();
 
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_TYPE, carduinoDroidData.getCameraType());
-                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolution());
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolutionID());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT, carduinoDroidData.getCameraFlashlight());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY, carduinoDroidData.getCameraQuality());
 

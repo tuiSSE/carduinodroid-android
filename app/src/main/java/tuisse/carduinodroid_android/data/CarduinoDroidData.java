@@ -19,11 +19,12 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private ConnectionState ipState;
     private IpType ipType;
 
-    private String cameraSupportedSizes; // All the possible Resolutions/Sizes supported by the Transceiver
+    private String[] cameraSupportedSizes; // All the possible Resolutions/Sizes supported by the Transceiver
     private int cameraType; // Front= - Back=
-    private int cameraResolution; // Defines position of the resolution out of an String-Array with all supported ones
+    private int cameraResolutionID; // Defines position of the resolution out of an String-Array with all supported ones
     private int cameraFlashlight; // On=1 - Off=0;
     private int cameraQuality; // Value between 0(low) to 100 (high)
+    private int cameraDegree;
 
     private int soundPlay; // Play a horn sound=1 - No horn sound=0;
     private int soundRecord; // Start Recording=1 - Stop Recording=0;
@@ -51,10 +52,11 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setRemoteIp("");
         setMyIp("");
 
-        setCameraType(0);
-        setCameraResolution(0);
+        setCameraType(1);
+        setCameraResolutionID(0);
         setCameraFlashlight(0);
-        setCameraQuality(100);
+        setCameraQuality(50);
+        setCameraDegree(270);
 
         setSoundPlay(0);
         setSoundRecord(0);
@@ -151,12 +153,12 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         ipType = it;
     }
 
-    public synchronized String getCameraSupportedSizes() { return cameraSupportedSizes;}
+    public synchronized String[] getCameraSupportedSizes() { return cameraSupportedSizes;}
     public synchronized int getCameraType(){
         return cameraType;
     }
-    public synchronized int getCameraResolution(){
-        return cameraResolution;
+    public synchronized int getCameraResolutionID(){
+        return cameraResolutionID;
     }
     public synchronized int getCameraFlashlight(){
         return cameraFlashlight;
@@ -164,6 +166,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     public synchronized int getCameraQuality(){
         return cameraQuality;
     }
+    public synchronized int getCameraDegree() { return cameraDegree; }
 
     public synchronized int getSoundPlay(){
         return soundPlay;
@@ -172,12 +175,12 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         return soundRecord;
     }
 
-    public synchronized void setCameraSupportedSizes(String _cameraSupportedSizes) { cameraSupportedSizes = _cameraSupportedSizes;}
+    public synchronized void setCameraSupportedSizes(String[] _cameraSupportedSizes) { cameraSupportedSizes = _cameraSupportedSizes;}
     public synchronized void setCameraType(int _cameraType) {
         cameraType = _cameraType;
     }
-    public synchronized void setCameraResolution(int _cameraResolution) {
-        cameraResolution = _cameraResolution;
+    public synchronized void setCameraResolutionID(int _cameraResolutionID) {
+        cameraResolutionID = _cameraResolutionID;
     }
     public synchronized void setCameraFlashlight(int _cameraFlashlight) {
         cameraFlashlight = _cameraFlashlight;
@@ -185,7 +188,9 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     public synchronized void setCameraQuality(int _cameraQuality) {
         cameraQuality = _cameraQuality;
     }
-
+    public synchronized void setCameraDegree(int _cameraDegree) {
+        cameraDegree = _cameraDegree;
+    }
     public synchronized void setSoundPlay(int _soundPlay) {
         soundPlay = _soundPlay;
     }

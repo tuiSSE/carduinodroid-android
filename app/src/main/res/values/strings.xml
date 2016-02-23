@@ -149,6 +149,14 @@
     <string name="labelIpDialogButtonOK">OK</string>
     <string name="labelIpDialogButtonCancel">Cancel</string>
 
+    <!-- Camera Settings -->
+    <string name="labelCamResolution">Resolution:</string>
+    <string name="labelCamType">Front Camera:</string>
+    <string name="labelCamRotation">Rotation (Degree):</string>
+    <string name="labelCamQuality">Quality (0-100):</string>
+    <string name="labelCamTypeInfo">Activated</string>
+    <string name="labelCamDegreeHint">Rotation Degree</string>
+
     <!-- Arduino versions -->
     <string name="arduino_uno">Arduino Uno</string>
     <string name="arduino_uno_r3">Arduino Uno R3</string>

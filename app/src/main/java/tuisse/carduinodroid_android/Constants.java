@@ -141,4 +141,8 @@ public class Constants {
         String TAG_SOUND = "Sound Setup";
         String NUM_SOUND = "Sound";
     }
+
+    public interface CAMERA_VALUES{
+        String[] ORIENTATION_DEGREES = {"0","90","180","270"};
+    }
 }
