@@ -284,11 +284,12 @@ public class DriveActivity extends AppCompatActivity {
                 itemsDegree = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
                 itemsResolution = getDData().getCameraSupportedSizes();
 
-                ArrayAdapter<String> adapterResolution;
-                adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
-                spinnerResolution.setAdapter(adapterResolution);
-
-                spinnerResolution.setSelection(getCameraResolutionID());
+                if(itemsResolution != null){
+                    ArrayAdapter<String> adapterResolution;
+                    adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
+                    spinnerResolution.setAdapter(adapterResolution);
+                    spinnerResolution.setSelection(getCameraResolutionID());
+                }
 
                 if(getDData().getCameraType()==0)checkBoxCameraType.setChecked(false);
                 else checkBoxCameraType.setChecked(true);
@@ -564,6 +565,20 @@ public class DriveActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent){
             setClientValues();
+
+            try {//TODO: Anzeige nur bei Remote und bei Debug-On
+
+                int width = viewImage.getWidth();
+                int height = viewImage.getHeight();
+
+                byte[] image = getDData().getCameraPicture();
+                if(image != null){
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                    viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));}
+
+            }catch(Exception e){
+                Log.e(TAG,"Error on setting the Video/Picture on Activity");
+            }
             //refresh();
         }
     }
@@ -586,7 +601,7 @@ public class DriveActivity extends AppCompatActivity {
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
+            /*try {//TODO: Anzeige nur bei Remote und bei Debug-On
 
                 int width = viewImage.getWidth();
                 int height = viewImage.getHeight();
@@ -597,7 +612,7 @@ public class DriveActivity extends AppCompatActivity {
                 viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));
             }catch(Exception e){
                 Log.e(TAG,"Error on setting the Video/Picture on Activity");
-            }
+            }*/
         }
     }
 

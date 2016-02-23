@@ -257,7 +257,7 @@ public class IpConnection {
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
 
         if(transmit != null){
-            Log.d(TAG, transmit.toString());
+            Log.d(TAG,  "OUT: " +  transmit.toString());
             outData.write(transmit.toString());
             outData.newLine();
             outData.flush();
@@ -270,7 +270,7 @@ public class IpConnection {
     protected void receiveData(String dataPacket) throws IOException{
 
         getDataHandler().parseJson(dataPacket);
-        Log.d(TAG, dataPacket.toString());
+        Log.d(TAG, "IN: " + dataPacket.toString());
 
         Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
         LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
@@ -402,7 +402,10 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData, "Camera,Control");
+                    if(!isClient)
+                        sendData(outData, "Video");
+                    else
+                        sendData(outData, "Camera,Control");
                     //Real time trigger to set up with Max
                     Thread.sleep(Constants.DELAY.IP);
                     if(dataSocketServerDisconnected) break;

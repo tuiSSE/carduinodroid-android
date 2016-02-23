@@ -2,6 +2,7 @@ package tuisse.carduinodroid_android.data;
 
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -89,7 +90,9 @@ public class IpFrameHandler implements IpFrameIF{
                         if(isVideo){
                             JSONObject JsonObjectVideo = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_VIDEO);
 
-                            //TO-DO - Nachdem HW/Camera Service integriert wurde
+                            String PictureFrameBase64Encoded = JsonObjectVideo.getString(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE);
+                            byte[] PictureFrameBase64Decoded = Base64.decode(PictureFrameBase64Encoded, Base64.DEFAULT);
+                            carduinoDroidData.setCameraPicture(PictureFrameBase64Decoded);
                         }
                         return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else{
@@ -200,10 +203,18 @@ public class IpFrameHandler implements IpFrameIF{
             /**** Including Video Data ****/
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_VIDEO)) {
                 JSONObject JsonObjectVideoData = new JSONObject();
-                //**** TO-DO - Wenn HW/Cam Handler integriert ist und Bild/Video Material bereitgestellt wurde
-                JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_TYPE, "");
-                JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE, "");
 
+
+                byte[] PictureFrame = carduinoDroidData.getCameraPicture();
+                if (PictureFrame != null){
+                    String PictureFrameBase64Encoded = Base64.encodeToString(PictureFrame, Base64.DEFAULT);
+
+                    JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_TYPE, "");
+                    JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE, PictureFrameBase64Encoded);
+                }else{
+                    JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_TYPE, "");
+                    JsonObjectVideoData.put(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE, "");
+                }
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_VIDEO, JsonObjectVideoData);
                 isMaskTypeServer = true;
             }

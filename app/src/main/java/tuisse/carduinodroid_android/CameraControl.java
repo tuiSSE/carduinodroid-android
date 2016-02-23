@@ -13,6 +13,7 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -134,7 +135,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                     setFlash(previewFlashLight);
 
                     setCameraResolution(previewResolutionID);
-                    parameters.setPreviewSize(previewWidth, previewHeight);
+                    //parameters.setPreviewSize(previewWidth, previewHeight);
+                    parameters.setPreviewSize(640, 480);
 
                     camera.setParameters(parameters);
 
