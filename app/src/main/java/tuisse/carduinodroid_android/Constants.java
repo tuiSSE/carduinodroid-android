@@ -24,6 +24,12 @@ public class Constants {
         String USB = "tuisse.carduinodroid_android.permission.usb";
     }
 
+    public interface LOG{
+        boolean IP = false;
+        boolean SERIAL = false;
+        boolean RECEIVER = false;
+    }
+
     public interface NOTIFICATION_ID{
         int WATCHDOG = 1337;
     }

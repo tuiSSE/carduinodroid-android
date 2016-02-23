@@ -192,11 +192,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         try {
             if (controlMode == null || cd == null) {
                 cd = new CarduinoData();
-                //if (cm.isDirect()) {
-                //    ccd = null;
-                //} else {
                 ccd = new CarduinoDroidData();
-                //}
             }
             else {
                 switch (controlMode) {

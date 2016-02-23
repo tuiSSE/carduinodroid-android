@@ -257,7 +257,9 @@ public class IpConnection {
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
 
         if(transmit != null){
-            Log.d(TAG, transmit.toString());
+            if(Constants.LOG.IP) {
+                Log.d(TAG, transmit.toString());
+            }
             outData.write(transmit.toString());
             outData.newLine();
             outData.flush();
@@ -402,9 +404,9 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    sendData(outData, "");
+                    sendData(outData, "Camera, Control");
                     //Real time trigger to set up with Max
-                    Thread.sleep(3000);
+                    Thread.sleep(Constants.DELAY.IP);
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping

@@ -230,8 +230,8 @@
             android:gravity="left|center_vertical"
             android:id="@+id/buttonDrive"
             android:background="@color/colorTransparent"
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
+            android:layout_width="@dimen/fabSize"
+            android:layout_height="@dimen/fabSize"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
@@ -246,8 +246,8 @@
             android:gravity="left|center_vertical"
             android:id="@+id/buttonHorn"
             android:background="@color/colorTransparent"
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
+            android:layout_width="@dimen/fabSize"
+            android:layout_height="@dimen/fabSize"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
@@ -262,8 +262,8 @@
             android:gravity="center"
             android:id="@+id/buttonFrontLight"
             android:background="@color/colorTransparent"
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
+            android:layout_width="@dimen/fabSize"
+            android:layout_height="@dimen/fabSize"
             android:layout_above="@+id/buttonHorn"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
@@ -278,8 +278,8 @@
             android:gravity="center"
             android:id="@+id/buttonStatusLed"
             android:background="@color/colorTransparent"
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
+            android:layout_width="@dimen/fabSize"
+            android:layout_height="@dimen/fabSize"
             android:layout_above="@+id/buttonFrontLight"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
@@ -290,20 +290,20 @@
             style="?android:attr/borderlessButtonStyle"/>
 
         <Button
-            style="?android:attr/borderlessButtonStyle"
             android:drawable="@drawable/icon_settings_camera"
             android:gravity="center"
             android:id="@+id/buttonCameraSettings"
             android:background="@color/colorTransparent"
-            android:layout_width="@dimen/imageSize"
-            android:layout_height="@dimen/imageSize"
+            android:layout_width="@dimen/fabSize"
+            android:layout_height="@dimen/fabSize"
             android:contentDescription="@string/buttonCameraSettingsDesc"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:layout_above="@+id/buttonStatusLed" />
+            android:layout_above="@+id/buttonStatusLed"
+            style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>
 
