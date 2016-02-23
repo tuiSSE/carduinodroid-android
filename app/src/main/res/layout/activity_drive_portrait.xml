@@ -10,7 +10,7 @@
     <!-- The primary full-screen view. This can be replaced with whatever view
              is needed to present your content, e.g. VideoView, SurfaceView,
              TextureView, etc. -->
-    <TextView
+    <ImageView
         android:id="@+id/fullscreen_content_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -240,7 +240,7 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginRight="@dimen/fabMargin"
             android:layout_marginEnd="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewDriveDesc"
+            android:contentDescription="@string/buttonDriveDesc"
             style="?android:attr/borderlessButtonStyle"/>
         <Button
             android:drawable="@drawable/icon_horn"
@@ -256,7 +256,7 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewHornDesc"
+            android:contentDescription="@string/buttonHornDesc"
             style="?android:attr/borderlessButtonStyle"/>
         <Button
             android:drawable="@drawable/icon_front_light"
@@ -272,7 +272,7 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewFrontLightDesc"
+            android:contentDescription="@string/buttonFrontLightDesc"
             style="?android:attr/borderlessButtonStyle"/>
         <Button
             android:drawable="@drawable/icon_status_led"
@@ -287,7 +287,23 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:contentDescription="@string/imageViewStatusLedDesc"
+            android:contentDescription="@string/buttonStatusLedDesc"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <Button
+            android:drawable="@drawable/icon_settings_camera"
+            android:gravity="center"
+            android:id="@+id/buttonCameraSettings"
+            android:background="@color/colorTransparent"
+            android:layout_width="@dimen/imageSize"
+            android:layout_height="@dimen/imageSize"
+            android:contentDescription="@string/buttonCameraSettingsDesc"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="@dimen/fabMargin"
+            android:layout_marginStart="@dimen/fabMargin"
+            android:layout_marginLeft="@dimen/fabMargin"
+            android:layout_above="@+id/buttonStatusLed"
             style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>

@@ -7,16 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -129,7 +126,7 @@ public class DriveActivity extends AppCompatActivity {
     private Button buttonHorn;
     private Button buttonFrontLight;
     private Button buttonStatusLed;
-    private Button buttonCamSettings;
+    private Button buttonCameraSettings;
 
     private CarduinoData getData(){
         return getDataHandler().getData();
@@ -222,7 +219,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn                  = (Button) findViewById(R.id.buttonHorn);
         buttonFrontLight            = (Button) findViewById(R.id.buttonFrontLight);
         buttonStatusLed             = (Button) findViewById(R.id.buttonStatusLed);
-        buttonCamSettings           = (Button) findViewById(R.id.buttonSettings);
+        buttonCameraSettings        = (Button) findViewById(R.id.buttonCameraSettings);
 
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
@@ -231,14 +228,14 @@ public class DriveActivity extends AppCompatActivity {
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
-            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings));
+            buttonCameraSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings_camera));
         } else {
             //if Transceiver mode
             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
-            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_settings));
+            buttonCameraSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_settings_camera));
         }
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
@@ -261,7 +258,7 @@ public class DriveActivity extends AppCompatActivity {
         }
         viewDebug.setLayoutParams(params);
 
-        buttonCamSettings.setOnClickListener(new View.OnClickListener() {
+        buttonCameraSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -290,7 +287,7 @@ public class DriveActivity extends AppCompatActivity {
 
                 spinnerResolution.setSelection(getCameraResolutionID());
 
-                if(getDData().getCameraType()==0)checkBoxCameraType.setChecked(false);
+                if (getDData().getCameraType() == 0) checkBoxCameraType.setChecked(false);
                 else checkBoxCameraType.setChecked(true);
 
                 ArrayAdapter<String> adapterDegree;
@@ -298,7 +295,8 @@ public class DriveActivity extends AppCompatActivity {
                 spinnerDegree.setAdapter(adapterDegree);
 
                 cameraDegreeID = getCameraDegreeID();
-                if(cameraDegreeID < 0) Log.e(TAG, "Error while checking the Custom Camera Orientation Degree");
+                if (cameraDegreeID < 0)
+                    Log.e(TAG, "Error while checking the Custom Camera Orientation Degree");
                 else spinnerDegree.setSelection(cameraDegreeID);
 
                 editQuality.setText(String.valueOf(getDData().getCameraQuality()));
@@ -332,7 +330,7 @@ public class DriveActivity extends AppCompatActivity {
                 if (!carduino.dataHandler.getControlMode().isTransceiver()) {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
+                        case MotionEvent.ACTION_BUTTON_PRESS:
                             goDrive();
                             // register this class as a listener for the orientation and
                             // accelerometer sensors
@@ -344,7 +342,7 @@ public class DriveActivity extends AppCompatActivity {
                                     SensorManager.SENSOR_DELAY_GAME);
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
                             return true;
-                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_BUTTON_RELEASE:
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
                             sensorManager.unregisterListener(magnetometerListener);
                             sensorManager.unregisterListener(accelerometerListener);
@@ -364,7 +362,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_BUTTON_PRESS:
                         statusLedState = !statusLedState;
                         if (statusLedState) {
                             getData().setStatusLed(1);
@@ -384,7 +382,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_BUTTON_PRESS:
                         frontLightState = !frontLightState;
                         if (frontLightState) {
                             getData().setFrontLight(1);
@@ -406,7 +404,7 @@ public class DriveActivity extends AppCompatActivity {
                 if (!carduino.dataHandler.getControlMode().isTransceiver()) {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
+                        case MotionEvent.ACTION_BUTTON_PRESS:
                             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
@@ -420,7 +418,7 @@ public class DriveActivity extends AppCompatActivity {
                                     break;
                             }
                             return true;
-                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_BUTTON_RELEASE:
                             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
@@ -688,7 +686,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn.setAlpha(1.0f);
         buttonFrontLight.setAlpha(1.0f);
         buttonStatusLed.setAlpha(1.0f);
-        buttonCamSettings.setAlpha(1.0f);
+        buttonCameraSettings.setAlpha(1.0f);
     }
     private void uiDrive(){
         viewStop.setVisibility(View.GONE);
@@ -699,7 +697,7 @@ public class DriveActivity extends AppCompatActivity {
                 buttonHorn.setAlpha(0.6f);
                 buttonFrontLight.setAlpha(0.6f);
                 buttonStatusLed.setAlpha(0.6f);
-                buttonCamSettings.setAlpha(0.6f);
+                buttonCameraSettings.setAlpha(0.6f);
             }
         }
     }

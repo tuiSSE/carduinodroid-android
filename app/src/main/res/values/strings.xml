@@ -28,10 +28,11 @@
     <string name="imageViewDeviceArduinoDesc">describes the arduino device</string>
     <string name="imageViewGoDrive">forwards to the drive view</string>
 
-    <string name="imageViewDriveDesc">push to drive the car in direct or remote mode</string>
-    <string name="imageViewHornDesc">push to play the horn sound</string>
-    <string name="imageViewFrontLightDesc">push to toggle the front lights</string>
-    <string name="imageViewStatusLedDesc">push to toggle the status led</string>
+    <string name="buttonDriveDesc">push to drive the car in direct or remote mode</string>
+    <string name="buttonHornDesc">push to play the horn sound</string>
+    <string name="buttonFrontLightDesc">push to toggle the front lights</string>
+    <string name="buttonStatusLedDesc">push to toggle the status led</string>
+    <string name="buttonCameraSettingsDesc">camera settings</string>
 
 
 

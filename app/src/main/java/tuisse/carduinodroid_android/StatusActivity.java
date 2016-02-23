@@ -177,9 +177,10 @@ public class StatusActivity extends AppCompatActivity {
         driveButton =                       (Toolbar  ) findViewById(R.id.driveButton);
 
         setSupportActionBar(topToolbar);
-        LayerDrawable settingsIcon = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings);
-        imageViewSettingsTransceiver.setImageDrawable(settingsIcon);
-        imageViewSettingsBluetooth.setImageDrawable(settingsIcon);
+        LayerDrawable settingsIconIp = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings_ip);
+        imageViewSettingsTransceiver.setImageDrawable(settingsIconIp);
+        LayerDrawable settingsIconBt = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings_bluetooth);
+        imageViewSettingsBluetooth.setImageDrawable(settingsIconBt);
 
         updateControlMode();
 
