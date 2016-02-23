@@ -358,6 +358,7 @@ public class StatusActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopServices();
+        abortScreensaver();
         unregisterReceiver(usbReciever);
         Log.d(TAG, "onStatusActivityDestroy");
     }
@@ -564,18 +565,15 @@ public class StatusActivity extends AppCompatActivity {
     private final Runnable triggerScreensaverRunnable = new Runnable() {
         @Override
         public void run() {
-            abortScreensaver();
             startActivity(new Intent(StatusActivity.this,ScreensaverActivity.class));
         }
     };
     private void abortScreensaver() {
         screensaverHandler.removeCallbacks(triggerScreensaverRunnable);
-        //Log.d(TAG, "screensaverCounter stopped");
     }
     private void triggerScreensaver(){
         if(getDataHandler().getScreensaver() >=0) {
             screensaverHandler.postDelayed(triggerScreensaverRunnable, getDataHandler().getScreensaver());
-            //Log.d(TAG, "screensaverCounter started");
         }
     }
     private void restartScreensaver(){

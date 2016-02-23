@@ -330,7 +330,7 @@ public class DriveActivity extends AppCompatActivity {
                 if (!carduino.dataHandler.getControlMode().isTransceiver()) {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
-                        case MotionEvent.ACTION_BUTTON_PRESS:
+                        case MotionEvent.ACTION_DOWN:
                             goDrive();
                             // register this class as a listener for the orientation and
                             // accelerometer sensors
@@ -342,7 +342,8 @@ public class DriveActivity extends AppCompatActivity {
                                     SensorManager.SENSOR_DELAY_GAME);
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
                             return true;
-                        case MotionEvent.ACTION_BUTTON_RELEASE:
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
                             sensorManager.unregisterListener(magnetometerListener);
                             sensorManager.unregisterListener(accelerometerListener);
@@ -362,7 +363,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_BUTTON_PRESS:
+                    case MotionEvent.ACTION_DOWN:
                         statusLedState = !statusLedState;
                         if (statusLedState) {
                             getData().setStatusLed(1);
@@ -382,7 +383,7 @@ public class DriveActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
-                    case MotionEvent.ACTION_BUTTON_PRESS:
+                    case MotionEvent.ACTION_DOWN:
                         frontLightState = !frontLightState;
                         if (frontLightState) {
                             getData().setFrontLight(1);
@@ -404,7 +405,7 @@ public class DriveActivity extends AppCompatActivity {
                 if (!carduino.dataHandler.getControlMode().isTransceiver()) {
                     //if Remote or Direct mode
                     switch (event.getAction()) {
-                        case MotionEvent.ACTION_BUTTON_PRESS:
+                        case MotionEvent.ACTION_DOWN:
                             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
@@ -418,7 +419,8 @@ public class DriveActivity extends AppCompatActivity {
                                     break;
                             }
                             return true;
-                        case MotionEvent.ACTION_BUTTON_RELEASE:
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
                             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
@@ -556,6 +558,7 @@ public class DriveActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataRxReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraDataReceiver);
+        reset();
     }
 
     private class IpDataRxReceiver extends BroadcastReceiver {

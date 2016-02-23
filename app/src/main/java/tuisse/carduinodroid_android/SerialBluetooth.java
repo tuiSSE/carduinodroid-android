@@ -71,8 +71,6 @@ public class SerialBluetooth extends SerialConnection {
                 Log.d(TAG, "stop bluetooth discovery");
                 mBluetoothAdapter.cancelDiscovery();
             }
-            //if no bluetooth device is registered add it
-            Log.d(TAG, "+" + getDataHandler().getBluetoothDeviceName() + "+");
 
             Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
             if (pairedDevices != null) {
@@ -80,7 +78,6 @@ public class SerialBluetooth extends SerialConnection {
 
                     if (getDataHandler().getBluetoothDeviceName().equals("")) {
                         //start preferences
-                        Log.d(TAG, serialService.getString(R.string.serialErrorNoBluetoothDeviceChosen));
                         serialService.sendToast(R.string.serialErrorNoBluetoothDeviceChosen);
                         setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDeviceChosen);
                         return false;
@@ -119,7 +116,6 @@ public class SerialBluetooth extends SerialConnection {
                         return false;
                     }
                 } else {
-                    Log.e(TAG, serialService.getString(R.string.serialErrorNoBluetoothDevicePaired));
                     setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDevicePaired);
                     return false;
                 }
@@ -232,6 +228,7 @@ public class SerialBluetooth extends SerialConnection {
             if (mBluetoothAdapter.isDiscovering()) {
                 mBluetoothAdapter.cancelDiscovery();
             }
+            Log.d(TAG,"bluetoothHandling: " + getDataHandler().getBluetoothHandling().toString());
             switch (getDataHandler().getBluetoothHandling()) {
                 case ON:
                     break;
