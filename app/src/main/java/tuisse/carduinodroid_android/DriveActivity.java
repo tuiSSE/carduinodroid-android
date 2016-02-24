@@ -571,15 +571,29 @@ public class DriveActivity extends AppCompatActivity {
             if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
 
                 try {
-                    //TODO: Anzeige nur bei Remote und bei Debug-On/Thread
                     byte[] image = getDData().getCameraPicture();
 
                     //Here no Matrix Conversion - Problems with old devices
+                    //-> Conversion in Thread on Remote Side found by CameraControl processImages
                     Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
                     viewImage.setImageBitmap(bitmap);
-                    //viewImage.setRotation(getDData().getCameraDegree());
 
+                    int degree = getDData().getCameraDegree();
+                    viewImage.setRotation(degree);
 
+                    //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
+                    if(degree == 90 || degree == 270){
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
+
+                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        viewImage.setScaleX((float) height/width);
+                        viewImage.setScaleY((float) height/width);
+                    }else{
+
+                        viewImage.setScaleX(1);
+                        viewImage.setScaleY(1);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "Error on setting the Video/Picture on Activity");
                 }

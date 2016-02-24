@@ -46,7 +46,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected List<Camera.Size> supportedPreviewSizes;
     protected int numSupportedPrevSizes;
 
-    private IntentFilter cameraDataFilter;
+    private IntentFilter ipDataRxFilter;
+    private IpDataRxReceiver ipDataRxReceiver;
 
     private int cameraID;
 
@@ -71,6 +72,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         super(s);
         cameraService = s;
+
+        ipDataRxReceiver = new IpDataRxReceiver();
+        ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
     }
 
     protected void init(){
@@ -81,7 +85,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         previewResolutionID = -1;
         previewQuality = 50;
-        previewOrtientation = 270;
+        previewOrtientation = 90;
         previewFlashLight = 0;
         previewCamType = 1;
     }
@@ -100,6 +104,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected void start() {
 
         packageManager = cameraService.getPackageManager();
+
+        LocalBroadcastManager.getInstance(cameraService).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
 
         if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)){
 
@@ -132,6 +138,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                     setFlash(previewFlashLight);
 
                     setCameraResolution(previewResolutionID);
+                    setOrientation(previewOrtientation);
+
+                    parameters.setRotation(previewOrtientation);
                     parameters.setPreviewSize(previewWidth, previewHeight);
 
                     camera.setParameters(parameters);
@@ -149,6 +158,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected void close(){
 
         isRunning = false;
+
+        LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataRxReceiver);
 
         releaseCamera();
         camera = null;
@@ -219,6 +230,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             previewOrtientation = degree;
         }else{
             Log.e(TAG, "Error on Setting Orientation Value of Camera - It's not allowed Value");
+            previewOrtientation = 90;
         }
     }
 
@@ -314,15 +326,29 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
 
-        //isRunning = true;
-
+        isRunning = true;
         new processImages(camera, data, previewOrtientation).start();
+    }
+
+    private class IpDataRxReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (isRunning)
+
+                new Thread(new Runnable() {
+                    public void run() {
+
+                        updateCameraData();
+                    }
+                }, "CameraUpdateThread").start();
+        }
     }
 
     @Override
     public void run() {
         try {
-            // Add the first callback buffer to the queue
+
             camera.setPreviewCallback(this);
 
             Log.i(TAG,"setting camera callback with buffer");
@@ -340,24 +366,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
-    private class IpDataRxReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent){
-            if(isRunning)
-                updateCameraData();
-        }
-    }
-
-    protected synchronized CarduinoDroidData getDData(){
-
-        return cameraService.getCarduino().dataHandler.getDData();
-    }
-
-    protected synchronized CarduinoData getData(){
-
-        return cameraService.getCarduino().dataHandler.getData();
-    }
-
     public class processImages extends Thread {
 
         protected Camera camera;
@@ -365,6 +373,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         protected int degree;
 
         public processImages(Camera _camera, byte[] _data, int _degree) {
+
             camera = _camera;
             data = _data;
             degree = _degree;
@@ -384,7 +393,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             byte[] image = baos.toByteArray();
 
             /*** Test for Rotation ***/
-            Matrix mat = new Matrix();
+            //Not Working on really Huge Images ... We need to test whats the max Format to Rotate
+            /*Matrix mat = new Matrix();
             mat.postRotate(degree);
 
             ByteArrayOutputStream rotationBaos = new ByteArrayOutputStream();
@@ -393,15 +403,25 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             Bitmap rotatedBmp = Bitmap.createBitmap(bmp, 0, 0, width, height, mat, true);
 
             rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 100, rotationBaos);
-            byte[] rotatedImage = rotationBaos.toByteArray();
+            byte[] rotatedImage = rotationBaos.toByteArray();*/
 
-            getDData().setCameraPicture(rotatedImage);
+            getDData().setCameraPicture(image);
 
-            Log.i(TAG, "BILD Yes");
+            Log.i(TAG, "New picture data Available");
             isRunning = false;
 
             Intent onCameraData = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
             LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraData);
         }
+    }
+
+    protected synchronized CarduinoDroidData getDData(){
+
+        return cameraService.getCarduino().dataHandler.getDData();
+    }
+
+    protected synchronized CarduinoData getData(){
+
+        return cameraService.getCarduino().dataHandler.getData();
     }
 }
