@@ -112,6 +112,7 @@ public class IpFrameHandler implements IpFrameIF{
                             carduinoDroidData.setCameraResolutionID(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
                             carduinoDroidData.setCameraFlashlight(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT));
                             carduinoDroidData.setCameraQuality(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY));
+                            carduinoDroidData.setCameraDegree(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_ORIENTATION));
                         }
                         if(isSound){
                             JSONObject JsonObjectSound = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SOUND);
@@ -278,6 +279,7 @@ public class IpFrameHandler implements IpFrameIF{
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolutionID());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT, carduinoDroidData.getCameraFlashlight());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY, carduinoDroidData.getCameraQuality());
+                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_ORIENTATION, carduinoDroidData.getCameraDegree());
 
                     JsonObjectData.put(Constants.JSON_OBJECT.TAG_CAMERA, JsonObjectCameraInformation);
                 }

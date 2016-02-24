@@ -133,6 +133,7 @@ public class Constants {
         String TAG_CAMERA_RESOLUTION = "Camera Resolution";
         String TAG_CAMERA_LIGHT = "Camera Flashlight";
         String TAG_CAMERA_QUALITY = "Camera Quality";
+        String TAG_CAMERA_ORIENTATION = "Camera Orientation";
         String TAG_CAMERA = "Camera Setup";
         String NUM_CAMERA = "Camera";
 

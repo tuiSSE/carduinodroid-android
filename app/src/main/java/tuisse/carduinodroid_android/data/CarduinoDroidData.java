@@ -53,10 +53,10 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setMyIp("");
 
         setCameraType(1);
-        setCameraResolutionID(0);
+        setCameraResolutionID(-1);
         setCameraFlashlight(0);
         setCameraQuality(50);
-        setCameraDegree(270);
+        setCameraDegree(90);
 
         setSoundPlay(0);
         setSoundRecord(0);

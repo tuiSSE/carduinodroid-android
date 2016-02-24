@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.YuvImage;
@@ -43,8 +46,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected List<Camera.Size> supportedPreviewSizes;
     protected int numSupportedPrevSizes;
 
-    private IpDataRxReceiver ipDataRxReceiver;
-    private IntentFilter ipDataRxFilter;
+    private IntentFilter cameraDataFilter;
 
     private int cameraID;
 
@@ -77,9 +79,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         surfID = 10;
 
-        previewResolutionID = 0;
+        previewResolutionID = -1;
         previewQuality = 50;
-        previewOrtientation = 0;
+        previewOrtientation = 270;
         previewFlashLight = 0;
         previewCamType = 1;
     }
@@ -96,10 +98,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     }
 
     protected void start() {
-
-        ipDataRxReceiver = new IpDataRxReceiver();
-        ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
-        LocalBroadcastManager.getInstance(cameraService).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
 
         packageManager = cameraService.getPackageManager();
 
@@ -131,12 +129,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                     numSupportedPrevSizes = supportedPreviewSizes.size();
 
                     setCompressQuality(previewQuality);
-                    setOrientation(previewOrtientation);
                     setFlash(previewFlashLight);
 
                     setCameraResolution(previewResolutionID);
-                    //parameters.setPreviewSize(previewWidth, previewHeight);
-                    parameters.setPreviewSize(640, 480);
+                    parameters.setPreviewSize(previewWidth, previewHeight);
 
                     camera.setParameters(parameters);
 
@@ -152,7 +148,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
     protected void close(){
 
-        LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataRxReceiver);
         isRunning = false;
 
         releaseCamera();
@@ -199,6 +194,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             previewHeight = supportedPreviewSizes.get(ID).height;
             previewWidth = supportedPreviewSizes.get(ID).width;
             previewResolutionID = ID;
+        }else if(ID == -1) {
+            previewHeight = supportedPreviewSizes.get(supportedPreviewSizes.size()-1).height;
+            previewWidth = supportedPreviewSizes.get(supportedPreviewSizes.size()-1).width;
+            previewResolutionID = supportedPreviewSizes.size()-1;
         }else{
             Log.e(TAG,"Error on Setting a Resolution - ID is not in the expected Range");
         }
@@ -217,7 +216,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
 
         if(isValue){
-            parameters.setRotation(degree);
             previewOrtientation = degree;
         }else{
             Log.e(TAG, "Error on Setting Orientation Value of Camera - It's not allowed Value");
@@ -293,7 +291,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         int _flashLight = getDData().getCameraFlashlight();
         int _cameraQuality = getDData().getCameraQuality();
 
-        if(_resolutionID != previewResolutionID) isUpdated = true;
+        if(_resolutionID != previewResolutionID){
+            if(!( _resolutionID == -1 && previewResolutionID == (numSupportedPrevSizes-1))) {
+                isUpdated = true;
+            }
+        }
         if(_cameraDegree != previewOrtientation) isUpdated = true;
         if(_cameraType != previewCamType) isUpdated = true;
 
@@ -311,25 +313,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        isRunning = true;
 
-        Camera.Parameters param = camera.getParameters();
-        int width = param.getPreviewSize().width;
-        int height = param.getPreviewSize().height;
+        //isRunning = true;
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Rect rect = new Rect(0, 0, width, height);
-        YuvImage test = new YuvImage(data,ImageFormat.NV21,width,height,null);
-        test.compressToJpeg(rect,50,baos);
-
-        byte[] image = baos.toByteArray();
-
-        getDData().setCameraPicture(image);
-
-        Log.i(TAG, "BILD Yes");
-
-        Intent onCameraDataIntent = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
-        LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraDataIntent);
+        new processImages(camera, data, previewOrtientation).start();
     }
 
     @Override
@@ -369,5 +356,52 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected synchronized CarduinoData getData(){
 
         return cameraService.getCarduino().dataHandler.getData();
+    }
+
+    public class processImages extends Thread {
+
+        protected Camera camera;
+        protected byte[] data;
+        protected int degree;
+
+        public processImages(Camera _camera, byte[] _data, int _degree) {
+            camera = _camera;
+            data = _data;
+            degree = _degree;
+        }
+
+        public void run() {
+
+            Camera.Parameters param = camera.getParameters();
+            int width = param.getPreviewSize().width;
+            int height = param.getPreviewSize().height;
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Rect rect = new Rect(0, 0, width, height);
+            YuvImage test = new YuvImage(data,ImageFormat.NV21,width,height,null);
+            test.compressToJpeg(rect, 50, baos);
+
+            byte[] image = baos.toByteArray();
+
+            /*** Test for Rotation ***/
+            Matrix mat = new Matrix();
+            mat.postRotate(degree);
+
+            ByteArrayOutputStream rotationBaos = new ByteArrayOutputStream();
+
+            Bitmap bmp = BitmapFactory.decodeByteArray(image, 0, image.length);
+            Bitmap rotatedBmp = Bitmap.createBitmap(bmp, 0, 0, width, height, mat, true);
+
+            rotatedBmp.compress(Bitmap.CompressFormat.JPEG, 100, rotationBaos);
+            byte[] rotatedImage = rotationBaos.toByteArray();
+
+            getDData().setCameraPicture(rotatedImage);
+
+            Log.i(TAG, "BILD Yes");
+            isRunning = false;
+
+            Intent onCameraData = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
+            LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraData);
+        }
     }
 }

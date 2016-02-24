@@ -10,10 +10,12 @@ import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -563,23 +565,25 @@ public class DriveActivity extends AppCompatActivity {
 
     private class IpDataRxReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent){
+        public void onReceive(Context context, Intent intent) {
             setClientValues();
 
-            try {//TODO: Anzeige nur bei Remote und bei Debug-On
+            if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
 
-                int width = viewImage.getWidth();
-                int height = viewImage.getHeight();
+                try {
+                    //TODO: Anzeige nur bei Remote und bei Debug-On/Thread
+                    byte[] image = getDData().getCameraPicture();
 
-                byte[] image = getDData().getCameraPicture();
-                if(image != null){
+                    //Here no Matrix Conversion - Problems with old devices
                     Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                    viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));}
+                    viewImage.setImageBitmap(bitmap);
+                    //viewImage.setRotation(getDData().getCameraDegree());
 
-            }catch(Exception e){
-                Log.e(TAG,"Error on setting the Video/Picture on Activity");
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
+                }
             }
-            //refresh();
         }
     }
 
@@ -598,21 +602,24 @@ public class DriveActivity extends AppCompatActivity {
         }
     }
 
+
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            /*try {//TODO: Anzeige nur bei Remote und bei Debug-On
 
-                int width = viewImage.getWidth();
-                int height = viewImage.getHeight();
+            if (carduino.dataHandler.getControlMode().isTransceiver() && checkBoxDebug.isChecked()){
 
-                byte[] image = getDData().getCameraPicture();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                try {
 
-                viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));
-            }catch(Exception e){
-                Log.e(TAG,"Error on setting the Video/Picture on Activity");
-            }*/
+                    byte[] image = getDData().getCameraPicture();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                    viewImage.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
+                }
+            }else if(carduino.dataHandler.getControlMode().isTransceiver() && !checkBoxDebug.isChecked()){
+                viewImage.setImageDrawable(null);
+            }
         }
     }
 
