@@ -232,11 +232,11 @@ public class WatchdogService extends Service {
         switch (getDataHandler().getControlMode()){
             case REMOTE:
                 if(getDData().getIpState().isIdleError()){
-                    startService(new Intent(WatchdogService.this,IpService.class));
+                    startService(new Intent(WatchdogService.this, IpService.class));
                     stopService(new Intent(WatchdogService.this, CameraService.class));
                 }
                 if(!SerialService.getIsDestroyed()){
-                    stopService(new Intent(WatchdogService.this,SerialService.class));
+                    stopService(new Intent(WatchdogService.this, SerialService.class));
                 }
                 if(getData().getSerialState().isUnknown()){
                     //request for serial State status
@@ -245,10 +245,10 @@ public class WatchdogService extends Service {
                 break;
             case TRANSCEIVER:
                 if(getData().getSerialState().isIdleError()){
-                    startService(new Intent(WatchdogService.this,SerialService.class));
+                    startService(new Intent(WatchdogService.this, SerialService.class));
                 }
                 if(getDData().getIpState().isIdleError()){
-                    startService(new Intent(WatchdogService.this,IpService.class));
+                    startService(new Intent(WatchdogService.this, IpService.class));
                 }
                 if(getDData().getIpState().isConnected()||getDData().getIpState().isRunning()){
                     startService(new Intent(WatchdogService.this, CameraService.class));
@@ -257,7 +257,7 @@ public class WatchdogService extends Service {
             default://DIRECT
                 stopService(new Intent(WatchdogService.this, CameraService.class));
                 if(getData().getSerialState().isIdleError()){
-                    startService(new Intent(WatchdogService.this,SerialService.class));
+                    startService(new Intent(WatchdogService.this, SerialService.class));
                 }
                 if(!IpService.getIsDestroyed()){
                     stopService(new Intent(WatchdogService.this, IpService.class));
