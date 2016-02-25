@@ -150,17 +150,6 @@ public class WatchdogService extends Service {
     public void onDestroy() {
         super.onDestroy();
         watchdogRun = false;
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serialStatusChangeReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipStatusChangeReceiver);
-        synchronized (this) {
-            if(isInForeground) {
-                stopForeground(false);
-                isInForeground = false;
-            }
-            if(notificationManager != null) {
-                notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
-            }
-        }
         if(watchdogThread.isAlive()) {
             watchdogThread.interrupt();
         }
@@ -293,16 +282,32 @@ public class WatchdogService extends Service {
         public void run() {
             if (!SerialService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, SerialService.class));
-                if (!IpService.getIsDestroyed()) {
-                    stopService(new Intent(WatchdogService.this, IpService.class));
-                    stopService(new Intent(WatchdogService.this, CameraService.class));
-                }
+
             }
-            if (SerialService.getIsDestroyed() && IpService.getIsDestroyed()) {
-                stopSelf();
+            if (!IpService.getIsDestroyed()) {
+                stopService(new Intent(WatchdogService.this, IpService.class));
+            }
+            if (!CameraService.getIsDestroyed()) {
+                stopService(new Intent(WatchdogService.this, CameraService.class));
+            }
+            if (SerialService.getIsDestroyed() && IpService.getIsDestroyed() && CameraService.getIsDestroyed()) {
                 sendToast("WatchdogThred stopped");
+                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
+                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
+                synchronized (this) {
+                    if(isInForeground) {
+                        stopForeground(false);
+                        isInForeground = false;
+                    }
+                    if(notificationManager != null) {
+                        notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
+                    }
+                }
                 isDestroyed = true;
                 return;
+            }
+            else{
+                stopSelf();
             }
         }
     };

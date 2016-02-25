@@ -14,6 +14,7 @@ public class CameraService extends Service {
     static final String TAG = "CameraService";
     private CarduinodroidApplication carduino;
     private CameraControl cam;
+    static private boolean isDestroyed = false;
 
     protected CarduinodroidApplication getCarduino(){
 
@@ -35,10 +36,18 @@ public class CameraService extends Service {
         return carduino.dataHandler;
     }
 
+    /**
+     * static return function for the isDestroyed status.
+     *
+     * @return isDestroyed
+     */
+    static synchronized boolean getIsDestroyed(){
+        return isDestroyed;
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 
     @Override
@@ -52,6 +61,7 @@ public class CameraService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         Log.i(TAG, "Camera Service onStartCommand");
+        isDestroyed = false;
 
         if(cam==null) {
             cam = new CameraControl(this);
@@ -74,6 +84,7 @@ public class CameraService extends Service {
         super.onDestroy();
         if(cam != null)
             cam.close();
+        isDestroyed = true;
         Log.i(TAG, "Camera Service has been killed");
     }
 }

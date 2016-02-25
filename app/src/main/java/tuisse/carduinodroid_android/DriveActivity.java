@@ -643,14 +643,9 @@ public class DriveActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
-
-                int width = viewImage.getWidth();
-                int height = viewImage.getHeight();
-
                 byte[] image = getDData().getCameraPicture();
                 Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-
-                viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));
+                viewImage.setImageBitmap(bitmap);
             }catch(Exception e){
                 Log.e(TAG,"Error on setting the Video/Picture on Activity");
             }
@@ -668,12 +663,12 @@ public class DriveActivity extends AppCompatActivity {
             // at compile-time and do nothing on earlier devices.
             viewImage.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                //View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
                 View.SYSTEM_UI_FLAG_FULLSCREEN |
-                //View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | //API 19
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | //API 19
                 View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
         );
         }
@@ -701,8 +696,8 @@ public class DriveActivity extends AppCompatActivity {
     private void showAll() {
         // Show the system bar
         viewImage.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         mHideHandler.removeCallbacks(initSystemUIRunnable);
         mHideHandler.postDelayed(showSystemUIRunable,UI_ANIMATION_DELAY);
         goStop();
