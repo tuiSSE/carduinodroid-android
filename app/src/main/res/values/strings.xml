@@ -161,6 +161,7 @@
     <string name="labelCamQuality">Quality (0-100):</string>
     <string name="labelCamTypeInfo">Activated</string>
     <string name="labelCamDegreeHint">Rotation Degree</string>
+    <string name="labelAlert">A Resolution above 640x480 can cause memory leaks and crashes on old devices!</string>
 
     <!-- Arduino versions -->
     <string name="arduino_uno">Arduino Uno</string>

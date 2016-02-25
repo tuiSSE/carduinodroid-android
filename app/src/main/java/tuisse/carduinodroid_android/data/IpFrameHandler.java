@@ -357,7 +357,7 @@ public class IpFrameHandler implements IpFrameIF{
             }catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            //carduinoDroidData.setCameraResolutionID(count-1);
             return values;
         }
 

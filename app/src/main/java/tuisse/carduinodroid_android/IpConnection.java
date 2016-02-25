@@ -51,9 +51,11 @@ public class IpConnection {
 
     CameraSupportedResolutionReceiver cameraSupportedResolutionReceiver;
     CameraSettingsChangedReceiver cameraSettingsChangedReceiver;
+    SoundSettingChangedReceiver soundSettingChangedReceiver;
 
     IntentFilter cameraSupportedResolutionFilter;
     IntentFilter cameraSettingsChangedFilter;
+    IntentFilter soundSettingChangedFilter;
 
     protected boolean isClient;
 
@@ -70,12 +72,15 @@ public class IpConnection {
 
         cameraSupportedResolutionReceiver = new CameraSupportedResolutionReceiver();
         cameraSettingsChangedReceiver = new CameraSettingsChangedReceiver();
+        soundSettingChangedReceiver = new SoundSettingChangedReceiver();
 
         cameraSupportedResolutionFilter = new IntentFilter(Constants.EVENT.CAMERA_SUPPORTED_RESOLUTION);
         cameraSettingsChangedFilter = new IntentFilter(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
+        soundSettingChangedFilter = new IntentFilter(Constants.EVENT.SOUND_PLAY_CHANGED);
 
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSupportedResolutionReceiver, cameraSupportedResolutionFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver,soundSettingChangedFilter);
 
         reset();
     }
@@ -270,6 +275,7 @@ public class IpConnection {
 
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSupportedResolutionReceiver);
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSettingsChangedReceiver);
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(soundSettingChangedReceiver);
             }
         }, "StopIpConnection").start();
     }
@@ -684,7 +690,7 @@ public class IpConnection {
                             e.printStackTrace();
                         }
                 }
-            }, "CameraUpdateThread").start();
+            }, "CameraSupportedSizesThread").start();
         }
     }
 
@@ -701,7 +707,24 @@ public class IpConnection {
                             e.printStackTrace();
                         }
                 }
-            }, "CameraUpdateThread").start();
+            }, "CameraSettingsUpdateThread").start();
+        }
+    }
+
+    private class SoundSettingChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
+                            e.printStackTrace();
+                        }
+                }
+            }, "SoundPlayUpdateThread").start();
         }
     }
 

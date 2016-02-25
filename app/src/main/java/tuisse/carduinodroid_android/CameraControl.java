@@ -205,10 +205,12 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             previewHeight = supportedPreviewSizes.get(ID).height;
             previewWidth = supportedPreviewSizes.get(ID).width;
             previewResolutionID = ID;
+            getDData().setCameraResolutionID(previewResolutionID);
         }else if(ID == -1) {
             previewHeight = supportedPreviewSizes.get(supportedPreviewSizes.size()-1).height;
             previewWidth = supportedPreviewSizes.get(supportedPreviewSizes.size()-1).width;
             previewResolutionID = supportedPreviewSizes.size()-1;
+            getDData().setCameraResolutionID(previewResolutionID);
         }else{
             Log.e(TAG,"Error on Setting a Resolution - ID is not in the expected Range");
         }

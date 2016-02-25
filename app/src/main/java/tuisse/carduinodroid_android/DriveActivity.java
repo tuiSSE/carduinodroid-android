@@ -86,6 +86,7 @@ public class DriveActivity extends AppCompatActivity {
 
     private  boolean statusLedState = false;
     private  boolean frontLightState = false;
+    private  boolean isSettingImage = false;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -281,11 +282,12 @@ public class DriveActivity extends AppCompatActivity {
                 itemsDegree = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
                 itemsResolution = getDData().getCameraSupportedSizes();
 
-                ArrayAdapter<String> adapterResolution;
-                adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
-                spinnerResolution.setAdapter(adapterResolution);
-
-                spinnerResolution.setSelection(getCameraResolutionID());
+                if(itemsResolution != null){
+                    ArrayAdapter<String> adapterResolution;
+                    adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
+                    spinnerResolution.setAdapter(adapterResolution);
+                    spinnerResolution.setSelection(getCameraResolutionID(itemsResolution.length));
+                }
 
                 if (getDData().getCameraType() == 0) checkBoxCameraType.setChecked(false);
                 else checkBoxCameraType.setChecked(true);
@@ -311,12 +313,15 @@ public class DriveActivity extends AppCompatActivity {
                 dialogButtonOK.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
 
+                    if(carduino.dataHandler.getControlMode().isRemote()){
                         setCameraResolutionID(spinnerResolution.getSelectedItemPosition());
                         setCameraType(checkBoxCameraType.isChecked());
                         setCameraDegree(spinnerDegree.getSelectedItem().toString());
                         setCameraQuality(editQuality.getText().toString());
+                        sendCameraSettingChanged();
+                    }
 
-                        dialogCamSettings.dismiss();
+                    dialogCamSettings.dismiss();
                     }
                 });
 
@@ -412,7 +417,8 @@ public class DriveActivity extends AppCompatActivity {
                                     sound.horn();
                                     break;
                                 case REMOTE:
-                                    //// TODO: 26.01.2016 implement
+                                    getDData().setSoundPlay(1);
+                                    sendPlaySoundChanged();
                                     break;
                                 default:
                                     sound.horn();
@@ -427,7 +433,8 @@ public class DriveActivity extends AppCompatActivity {
                                     sound.stop();
                                     break;
                                 case REMOTE:
-                                    //// TODO: 26.01.2016 implement
+                                    getDData().setSoundPlay(0);
+                                    sendPlaySoundChanged();
                                     break;
                                 default:
                                     sound.stop();
@@ -516,6 +523,8 @@ public class DriveActivity extends AppCompatActivity {
             carduino = (CarduinodroidApplication) getApplication();
             driveLandscape();
 
+            isSettingImage = false;
+
             sound = new Sound();
 
             communicationStatusChangeReceiver = new CommunicationStatusChangeReceiver();
@@ -541,6 +550,7 @@ public class DriveActivity extends AppCompatActivity {
     @Override
     protected void onResume(){
         super.onResume();
+        isSettingImage = false;
         LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
@@ -565,7 +575,52 @@ public class DriveActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent){
             setClientValues();
-            //refresh();
+
+            //Commented Version is first Try and is Working on low Resolution very well
+            if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
+
+                try {
+                    byte[] image = getDData().getCameraPicture();
+
+                    //Here no Matrix Conversion - Problems with old devices
+                    //-> Conversion in Thread on Remote Side found by CameraControl processImages
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                    viewImage.setImageBitmap(bitmap);
+
+                    int degree = getDData().getCameraDegree();
+                    viewImage.setRotation(degree);
+
+                    //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
+                    //after it rotated 90/270 degree
+                    if(degree == 90 || degree == 270){
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
+
+                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        viewImage.setScaleX((float) height/width);
+                        viewImage.setScaleY((float) height/width);
+                    }else{
+
+                        viewImage.setScaleX(1);
+                        viewImage.setScaleY(1);
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
+                }
+            }
+
+            //Second Version tries to limit the number of Updates for the ImageView depending on the
+            //amount of time for totation and loading the bitmap into it
+            /*if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()) {
+                if (!isSettingImage)
+                    new Thread(new Runnable() {
+                        public void run() {
+                            isSettingImage = true;
+                            setImageViewBitmap();
+                            isSettingImage = false;
+                        }
+                    }, "ImageViewUpdateThread").start();
+            }*/
         }
     }
 
@@ -855,11 +910,20 @@ public class DriveActivity extends AppCompatActivity {
 
         int speed = getData().getSpeed();
         int steering = getData().getSteer();
+        int horn = getDData().getSoundPlay();
+        int light = getData().getFrontLight();
+        int statusLed = getData().getStatusLed();
 
         textViewSpeed.setText(String.format(getString(R.string.driveSpeed), speed));
         seekBarSpeed.setProgress(speed + CarduinoIF.SPEED_MAX);
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
         seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
+        if(horn == 1) buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
+        else buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
+        if(light == 1) buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
+        else buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
+        if(statusLed == 1) buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
+        else buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
     }
 
     private void setCameraQuality(String quality){
@@ -903,8 +967,60 @@ public class DriveActivity extends AppCompatActivity {
         getDData().setCameraResolutionID(ID);
     }
 
-    private int getCameraResolutionID(){
+    private int getCameraResolutionID(int itemsNumber){
 
-        return getDData().getCameraResolutionID();
+        int itemsID = getDData().getCameraResolutionID();
+        if(itemsID == -1)
+            return itemsNumber-1;
+        else
+            return getDData().getCameraResolutionID();
+    }
+
+    private void sendCameraSettingChanged(){
+
+        Intent onCameraSettingsChanged = new Intent(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(onCameraSettingsChanged);
+    }
+
+    private void sendPlaySoundChanged(){
+
+        Intent onSoundPlayChanged = new Intent(Constants.EVENT.SOUND_PLAY_CHANGED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(onSoundPlayChanged);
+    }
+
+    /**** Test for changing Image on Thread - Problem with setting Data up (only getting first picture) ****/
+    private void setImageViewBitmap(){
+
+        if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
+
+            try {
+                byte[] image = getDData().getCameraPicture();
+
+                //Here no Matrix Conversion - Problems with old devices
+                //-> Conversion in Thread on Remote Side found by CameraControl processImages
+                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                viewImage.setImageBitmap(bitmap);
+
+                int degree = getDData().getCameraDegree();
+                viewImage.setRotation(degree);
+
+                //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
+                //after it rotated 90/270 degree
+                if(degree == 90 || degree == 270){
+                    int width = bitmap.getWidth();
+                    int height = bitmap.getHeight();
+
+                    viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    viewImage.setScaleX((float) height/width);
+                    viewImage.setScaleY((float) height/width);
+                }else{
+
+                    viewImage.setScaleX(1);
+                    viewImage.setScaleY(1);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error on setting the Video/Picture on Activity");
+            }
+        }
     }
 }

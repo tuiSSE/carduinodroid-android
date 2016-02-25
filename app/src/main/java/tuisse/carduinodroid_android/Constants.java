@@ -20,6 +20,7 @@ public class Constants {
         String CAMERA_DATA_RECEIVED = "tuisse.carduinodroid_android.event.camera_data_received";
         String CAMERA_SUPPORTED_RESOLUTION = "tuisse.carduinodroid_android.event.camera_supported_resolution";
         String CAMERA_SETTINGS_CHANGED = "tuisse.carduinodroid_android.event.camera_settings_changed";
+        String SOUND_PLAY_CHANGED = "tuisse.carduinodroid_android.event.sound_play_changed";
     }
 
     public interface PERMISSION{
