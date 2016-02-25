@@ -15,7 +15,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +39,7 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.CarduinoIF;
 import tuisse.carduinodroid_android.data.DataHandler;
 
-public class DriveActivity extends AppCompatActivity {
+public class DriveActivity extends AppCompatActivity{
     private static final String TAG = "CarduinoDriveActivity";
 
     private CarduinodroidApplication carduino;
@@ -243,6 +242,7 @@ public class DriveActivity extends AppCompatActivity {
         viewImage = (ImageView) findViewById(R.id.fullscreen_content_video);
         viewDistance = findViewById(R.id.fullscreen_content_distance);
         viewStop = findViewById(R.id.fullscreen_content_stop);
+
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDebug.getLayoutParams();
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
@@ -367,40 +367,48 @@ public class DriveActivity extends AppCompatActivity {
         buttonStatusLed.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        statusLedState = !statusLedState;
-                        if (statusLedState) {
-                            getData().setStatusLed(1);
-                            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
-                        } else {
-                            getData().setStatusLed(0);
-                            buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
-                        }
-                        return true;
-                    default:
-                        return false;
+                if (!carduino.dataHandler.getControlMode().isTransceiver()) {
+                    //if Remote or Direct mode
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            statusLedState = !statusLedState;
+                            if (statusLedState) {
+                                getData().setStatusLed(1);
+                                buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
+                            } else {
+                                getData().setStatusLed(0);
+                                buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
+                            }
+                            return true;
+                        default:
+                            return false;
+                    }
                 }
+                return false;
             }
         });
 
         buttonFrontLight.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        frontLightState = !frontLightState;
-                        if (frontLightState) {
-                            getData().setFrontLight(1);
-                            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
-                        } else {
-                            getData().setFrontLight(0);
-                            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
-                        }
-                        return true;
-                    default:
-                        return false;
+                if (!carduino.dataHandler.getControlMode().isTransceiver()) {
+                    //if Remote or Direct mode
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            frontLightState = !frontLightState;
+                            if (frontLightState) {
+                                getData().setFrontLight(1);
+                                buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
+                            } else {
+                                getData().setFrontLight(0);
+                                buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
+                            }
+                            return true;
+                        default:
+                            return false;
+                    }
                 }
+                return false;
             }
         });
 
@@ -451,11 +459,18 @@ public class DriveActivity extends AppCompatActivity {
 
         checkBoxDebug.setChecked(carduino.dataHandler.getDebugView());
         checkBoxDebug.setOnClickListener(new CheckBox.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 int val = carduino.dataHandler.toggleDebugView();
                 Utils.setIntPref(getString(R.string.pref_key_debug_view), val);
+                if(carduino.dataHandler.getControlMode().isTransceiver()){
+                    if(val == 0){
+                        viewDebug.setVisibility(View.GONE);
+                    }
+                    else{
+                        viewDebug.setVisibility(View.VISIBLE);
+                    }
+                }
             }
         });
         checkBoxFailsafeStop.setChecked(carduino.dataHandler.getFailSafeStopPref());
@@ -482,10 +497,12 @@ public class DriveActivity extends AppCompatActivity {
                 } else {
                     drivePortrait();
                 }
+                /*
                 if (rotation == Surface.ROTATION_0) {
                     rs = getString(R.string.orientationPortrait);
                 }
                 checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), rs));
+                */
             }
         });
 
@@ -500,7 +517,6 @@ public class DriveActivity extends AppCompatActivity {
         initView();
         rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationLandscape)));
-        initUI();
         goStop();
         reset();
     }
@@ -510,7 +526,6 @@ public class DriveActivity extends AppCompatActivity {
         initView();
         rotation = Utils.setScreenOrientation(DriveActivity.this, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         checkBoxOrientation.setText(String.format(getString(R.string.driveOrientation), getString(R.string.orientationPortrait)));
-        initUI();
         goStop();
         reset();
     }
@@ -616,34 +631,6 @@ public class DriveActivity extends AppCompatActivity {
             }
         }
     }
-
-    private final Runnable initSystemUIRunnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat).
-            // It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            viewImage.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
-                View.SYSTEM_UI_FLAG_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | //API 19
-                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
-        );
-        }
-    };
-    private final Runnable showSystemUIRunable = (new Runnable() {
-        @Override
-        public void run() {
-            showSystem();
-        }
-    });
     private final Runnable goStopRunnable = new Runnable() {
         @Override
         public void run() {
@@ -656,48 +643,25 @@ public class DriveActivity extends AppCompatActivity {
             uiDrive();
         }
     };
-
-    @SuppressLint("InlinedApi")
-    private void showAll() {
-        // Show the system bar
-        viewImage.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mHideHandler.removeCallbacks(initSystemUIRunnable);
-        mHideHandler.postDelayed(showSystemUIRunable,UI_ANIMATION_DELAY);
-        goStop();
-    }
-
-    private void showSystem(){
-        // Delayed display of UI elements
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-        }
-        uiStop();
-    }
-
-    private void initUI() {
-        // Hide UI first
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
-        goDrive();
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(goStopRunnable);
-        mHideHandler.postDelayed(initSystemUIRunnable, UI_ANIMATION_DELAY);
-    }
-
     private void goDrive() {
         mHideHandler.removeCallbacks(goStopRunnable);
         mHideHandler.postDelayed(goDriveRunnable, UI_ANIMATION_DELAY);
     }
 
+    private void goStop() {
+        // Schedule a runnable to display UI elements after a delay
+        mHideHandler.removeCallbacks(goDriveRunnable);
+        mHideHandler.postDelayed(goStopRunnable, UI_ANIMATION_DELAY);
+    }
+
     private void uiStop(){
+        uiInitSystem();
         if(!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
             viewDebug.setVisibility(View.GONE);
+        }
+        else if(carduino.dataHandler.getDebugView()){
+            viewDebug.setVisibility(View.VISIBLE);
         }
         viewStop.setVisibility(View.VISIBLE);
         buttonDrive.setAlpha(1.0f);
@@ -707,6 +671,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonCameraSettings.setAlpha(1.0f);
     }
     private void uiDrive(){
+        uiInitSystem();
         viewStop.setVisibility(View.GONE);
         if(checkBoxDebug.isChecked()) {
             viewDebug.setVisibility(View.VISIBLE);
@@ -720,10 +685,22 @@ public class DriveActivity extends AppCompatActivity {
         }
     }
 
-    private void goStop() {
-        // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(goDriveRunnable);
-        mHideHandler.postDelayed(showSystemUIRunable, UI_ANIMATION_DELAY);
+    private void uiInitSystem(){
+        // Delayed removal of status and navigation bar
+        // Note that some of these constants are new as of API 16 (Jelly Bean)
+        // and API 19 (KitKat).
+        // It is safe to use them, as they are inlined
+        // at compile-time and do nothing on earlier devices.
+        viewImage.setSystemUiVisibility(
+            //View.SYSTEM_UI_FLAG_LAYOUT_STABLE | //dont resize view
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+            View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
+            View.SYSTEM_UI_FLAG_FULLSCREEN |
+            View.SYSTEM_UI_FLAG_IMMERSIVE | //API 19
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
+        );
     }
 
     private float restrictAngle(float tmpAngle){
