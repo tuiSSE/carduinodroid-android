@@ -2,8 +2,8 @@
     <dimen name="insetBorder">16dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fabMargin">16dp</dimen>
-    <dimen name="fabSize">56dp</dimen>
+    <dimen name="fabMargin">12dp</dimen>
+    <dimen name="fabSize">44dp</dimen>
     <dimen name="seekBarHeight">24dp</dimen>
     <dimen name="distanceBarHeight">100dp</dimen>
 
@@ -19,6 +19,4 @@
     <dimen name="imageMargin">5dp</dimen>
     <dimen name="imageSize">60dp</dimen>
     <dimen name="imageScreensaverSize">120dp</dimen>
-
-    <dimen name="driveActivityPadding">60dp</dimen>
 </resources>

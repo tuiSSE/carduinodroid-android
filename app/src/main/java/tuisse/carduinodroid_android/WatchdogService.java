@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import tuisse.carduinodroid_android.data.CarduinoData;
@@ -195,8 +196,8 @@ public class WatchdogService extends Service {
     protected void updateNotification() {
         notificationBuilder
                 .setWhen(System.currentTimeMillis())
-                .setTicker(getData().getSerialState().getStateName())
-                .setContentText(getData().getSerialState().getStateName());
+                .setTicker(getDataHandler().getCommunicationStatusString())
+                .setContentText(getDataHandler().getCommunicationStatusString());
         if (notificationManager != null) {
             notificationManager.notify(Constants.NOTIFICATION_ID.WATCHDOG, notificationBuilder.build());
         }
@@ -337,7 +338,6 @@ public class WatchdogService extends Service {
     private class SerialStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onSerialStatusChangeReceiverReceive");
             if(renewCommunicationStatus()){
                 updateNotification();
             }
@@ -372,6 +372,7 @@ public class WatchdogService extends Service {
             public void run() {
                 Toast toast = Toast.makeText(WatchdogService.this, message, Toast.LENGTH_LONG);
                 toast.setDuration(Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER_HORIZONTAL, toast.getXOffset(), toast.getYOffset());
                 toast.show();
             }
         });

@@ -8,12 +8,32 @@ import tuisse.carduinodroid_android.R;
 /**
  * Created by keX on 21.12.2015.
  */
+/**
+ * @author Till Max Schwikal
+ * @date 21.12.2015
+ *
+ * Class which abstractly codes the status of a connection service (ip or serial).
+ *
+ * @see ConnectionEnum
+ */
 
 public class ConnectionState {
     private final String TAG = "CarduinoConnectionState";
+
+    /**
+     * ConnectionEnum variable holds the actual state.
+     */
     private ConnectionEnum state;
+
+    /**
+     * Error string which holds a description of the error.
+     */
     private String error;
 
+    /**
+     * primitive constructor of the class
+     * @param s new connection enum
+     */
     public ConnectionState(ConnectionEnum s) {
         state = s;
         if(isError()) {
@@ -23,6 +43,13 @@ public class ConnectionState {
             error = "";
         }
     }
+
+    /**
+     * Constructor with extra error message string.
+     *
+     * @param s new connection enum
+     * @param e new error description
+     */
     public ConnectionState(ConnectionEnum s, String e) {
         state = s;
         if(isError()) {
@@ -32,14 +59,28 @@ public class ConnectionState {
             error = "";
         }
     }
+
+    /**
+     * Getter of the state
+     *
+     * @return current state
+     */
     public synchronized ConnectionEnum getState(){
         return state;
     }
 
+    /**
+     * Getter of the error/description string
+     * @return
+     */
     public synchronized String getError(){
         return error;
     }
 
+    /**
+     * Getter of the state names for the UI.
+     * @return state name
+     */
     public synchronized String getStateName(){
         String s = "";
         switch (state){
@@ -81,37 +122,83 @@ public class ConnectionState {
         return s;
     }
 
+    /**
+     * Boolean state test function.
+     * @return true if state is IDLE
+     */
     public synchronized boolean isIdle(){
         return state == ConnectionEnum.IDLE;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is TRYFIND
+     */
     public synchronized boolean isTryFind(){
         return state == ConnectionEnum.TRYFIND;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is FOUND
+     */
     public synchronized boolean isFound(){
         return state == ConnectionEnum.FOUND;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is TRYCONNECT
+     */
     public synchronized boolean isTryConnect(){
         return state == ConnectionEnum.TRYCONNECT;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is CONNECTED
+     */
     public synchronized boolean isConnected(){
         return state == ConnectionEnum.CONNECTED;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is RUNNING
+     */
     public synchronized boolean isRunning(){
         return state == ConnectionEnum.RUNNING;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is ERROR, STREAMERROR, TRYCONNECTERROR
+     */
     public synchronized boolean isError(){
         return state == ConnectionEnum.ERROR || state == ConnectionEnum.STREAMERROR || state == ConnectionEnum.TRYCONNECTERROR;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is UNKNOWN
+     */
     public synchronized boolean isUnknown(){
         return state == ConnectionEnum.UNKNOWN;
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is TRYFIND, FOUND, TRYCONNECT, CONNECTED, RUNNING
+     */
     public synchronized boolean isStarted(){
-        return !(this.isUnknown() || this.isError() || this.isIdle());
+        return this.isTryFind() || this.isFound() || this.isTryConnect() || this.isConnected() || this.isRunning();
     }
+
+    /**
+     * Boolean state test function.
+     * @return true if state is IDLE, ERROR, STREAMERROR, TRYCONNECTERROR
+     */
     public synchronized boolean isIdleError(){
         return this.isError() || this.isIdle();
-    }
-    public synchronized boolean isNotEqual(ConnectionState s){
-        return this != s;
     }
 }

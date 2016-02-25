@@ -86,8 +86,8 @@ public class IpConnection {
         dataSocketServer = null;
         ctrlSocket = null;
         dataSocket = null;
-
         intentWriter = null;
+        ///TODO: Lars: state hier ändern? damit du sicher in idle nach einem reset bist...
     }
 
     protected DataHandler getDataHandler(){
@@ -163,6 +163,7 @@ public class IpConnection {
         }
         else {
             setIpState(ConnectionEnum.ERROR);
+            //TODO: Lars: besser: Log.e bei fehler :)
             Log.d(TAG, "Data/Ctrl Socket nicht da");
         }
     }
@@ -228,8 +229,12 @@ public class IpConnection {
                                 Thread.sleep(5);
                                 //Protect Against endless Loop if its disconnected while RUNNING
                                 counter++;
-                                if(counter>=5) dataSocketServerDisconnected=true;
+                                if(counter==5){
+                                    dataSocketServerDisconnected=true;
+                                    Log.d(TAG,"counter expired");
+                                }
                             } catch (InterruptedException e) {
+                                ///TODO: Lars: warum i??? e!
                                 Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
                                 setIpState(ConnectionEnum.ERROR);
@@ -280,7 +285,9 @@ public class IpConnection {
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
 
         if(transmit != null){
-            Log.d(TAG,  "OUT: " +  transmit.toString());
+            if(Constants.LOG.IP) {
+                Log.d(TAG,  "OUT: " +  transmit.toString());
+            }
             outData.write(transmit.toString());
             outData.newLine();
             outData.flush();
@@ -431,6 +438,8 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
+					
+					/// TODO: Lars: information string erstellen auslagern!
                     information = "";
 
                     if(!isClient){ //Data from Transceiver to Remote
@@ -456,6 +465,7 @@ public class IpConnection {
 
                     Thread.sleep(Constants.DELAY.IP);
                     timer++;
+					
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
@@ -492,6 +502,7 @@ public class IpConnection {
             ctrlSocketServerDisconnected = false;
 
             // Stay Rdy for Request of Transmission over Control Server Socket
+            //TODO Lars: meinst du isStarted()?
             while (isRunning()||isTryFind()||isConnected()) {
                 ctrlSocket = null;
 
@@ -559,6 +570,7 @@ public class IpConnection {
 
             inData = null;
             outData = null;
+            //TODO: Lars: hat mich vom namen total verwirrt. Vorschlag: deviceConnected, isUsed... hat weniger etwas mit dem ipstate zu tun.
             isConnectedRunning = true;
         }
 
@@ -630,7 +642,7 @@ public class IpConnection {
                                 e.printStackTrace();
                             }
                         }
-                    }else{
+                    } else{
                         Log.d(TAG, "Client is already running");
                     }
                 }
@@ -656,7 +668,6 @@ public class IpConnection {
     }
 
     private void saveActualBufferedWriter(BufferedWriter writer) {
-
         intentWriter = writer;
     }
 
@@ -709,17 +720,22 @@ public class IpConnection {
         getDData().setMyIp(ip);
     }
 
-    protected boolean isIdle() { return getDData().getIpState().isIdle();}
-    protected boolean isTryFind() { return getDData().getIpState().isTryFind();}
-    protected boolean isFound() { return getDData().getIpState().isFound();}
-    protected boolean isTryConnect() { return getDData().getIpState().isTryConnect(); }
-    protected boolean isConnected() { return getDData().getIpState().isConnected();}
-    protected boolean isRunning() { return getDData().getIpState().isRunning();}
-    protected boolean isError() { return getDData().getIpState().isError();}
-    protected boolean isUnknown() { return getDData().getIpState().isUnknown();}
+	protected boolean isIdle() { return getDData().getIpState().isIdle();}
+	protected boolean isTryFind() { return getDData().getIpState().isTryFind();}
+	protected boolean isFound() { return getDData().getIpState().isFound();}
+	protected boolean isTryConnect() { return getDData().getIpState().isTryConnect(); }
+	protected boolean isConnected() { return getDData().getIpState().isConnected();}
+	protected boolean isRunning() { return getDData().getIpState().isRunning();}
+	protected boolean isError() { return getDData().getIpState().isError();}
 
-    protected synchronized void setIpState(ConnectionEnum state){
+	
+	protected synchronized void setIpState(ConnectionEnum state){
         setIpState(state, "");
+	}
+	
+    //TODO: Lars: diese funktion solltest du dann nutzen: :)
+    protected synchronized void setIpState(ConnectionEnum state, int error){
+        setIpState(state, ipService.getString(error));
     }
 
     protected synchronized void setIpState(ConnectionEnum state, String error){

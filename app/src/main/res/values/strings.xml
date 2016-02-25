@@ -6,11 +6,11 @@
 
     <!-- activity names and button labels -->
     <string name="titleSettings">Settings</string>
-    <string name="titleChooseBtActivity">Choose Bluetooth Device</string>
     <string name="titleDriveActivity">Drive</string>
     <string name="closeApp">Close</string>
     <string name="exitApp">Exit</string>
     <string name="drive">Drive</string>
+    <string name="monitore">Monitore Data</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
     <string name="titleActivitySettings">Settings</string>
@@ -28,10 +28,11 @@
     <string name="imageViewDeviceArduinoDesc">describes the arduino device</string>
     <string name="imageViewGoDrive">forwards to the drive view</string>
 
-    <string name="imageViewDriveDesc">push to drive the car in direct or remote mode</string>
-    <string name="imageViewHornDesc">push to play the horn sound</string>
-    <string name="imageViewFrontLightDesc">push to toggle the front lights</string>
-    <string name="imageViewStatusLedDesc">push to toggle the status led</string>
+    <string name="buttonDriveDesc">push to drive the car in direct or remote mode</string>
+    <string name="buttonHornDesc">push to play the horn sound</string>
+    <string name="buttonFrontLightDesc">push to toggle the front lights</string>
+    <string name="buttonStatusLedDesc">push to toggle the status led</string>
+    <string name="buttonCameraSettingsDesc">camera settings</string>
 
 
 
@@ -113,6 +114,10 @@
     <!-- serial connection -->
     <string name="serialDefaultBluetoothDeviceName">HC</string>
     <string name="serialBluetoothEnable">enabled Bluetooth</string>
+    <string name="serialBluetoothDisable">disabled Bluetooth</string>
+    <string name="serialBluetoothPaired">bluetooth device paired: %1$s</string>
+    <string name="serialCarduinoPaired">carduinodroid device paired: %1$s</string>
+    <string name="serialCarduinoAddress">carduinodroid device address: %1$s</string>
     <string name="serialErrorNoBluetoothDevicePaired">no bluetooth paired</string>
     <string name="serialErrorNoBluetoothDeviceChosen">choose bluetooth device</string>
     <string name="serialErrorNoCarduinoBluetoothDeviceFound">%1$d paired, "%2$s" not found</string>

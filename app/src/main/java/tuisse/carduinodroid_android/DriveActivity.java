@@ -7,18 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Image;
-import android.os.Build;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -131,7 +126,7 @@ public class DriveActivity extends AppCompatActivity {
     private Button buttonHorn;
     private Button buttonFrontLight;
     private Button buttonStatusLed;
-    private Button buttonCamSettings;
+    private Button buttonCameraSettings;
 
     private CarduinoData getData(){
         return getDataHandler().getData();
@@ -224,7 +219,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn                  = (Button) findViewById(R.id.buttonHorn);
         buttonFrontLight            = (Button) findViewById(R.id.buttonFrontLight);
         buttonStatusLed             = (Button) findViewById(R.id.buttonStatusLed);
-        buttonCamSettings           = (Button) findViewById(R.id.buttonSettings);
+        buttonCameraSettings        = (Button) findViewById(R.id.buttonCameraSettings);
 
         if (!carduino.dataHandler.getControlMode().isTransceiver()) {
             //if Remote or Direct mode
@@ -233,14 +228,14 @@ public class DriveActivity extends AppCompatActivity {
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led));
-            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings));
+            buttonCameraSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings_camera));
         } else {
             //if Transceiver mode
             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_drive));
             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
             buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
             buttonStatusLed.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
-            buttonCamSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_settings));
+            buttonCameraSettings.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_settings_camera));
         }
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
@@ -263,7 +258,7 @@ public class DriveActivity extends AppCompatActivity {
         }
         viewDebug.setLayoutParams(params);
 
-        buttonCamSettings.setOnClickListener(new View.OnClickListener() {
+        buttonCameraSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -286,14 +281,13 @@ public class DriveActivity extends AppCompatActivity {
                 itemsDegree = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
                 itemsResolution = getDData().getCameraSupportedSizes();
 
-                if(itemsResolution != null){
-                    ArrayAdapter<String> adapterResolution;
-                    adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
-                    spinnerResolution.setAdapter(adapterResolution);
-                    spinnerResolution.setSelection(getCameraResolutionID());
-                }
+                ArrayAdapter<String> adapterResolution;
+                adapterResolution = new ArrayAdapter<String>(DriveActivity.this, android.R.layout.simple_spinner_dropdown_item, itemsResolution);
+                spinnerResolution.setAdapter(adapterResolution);
 
-                if(getDData().getCameraType()==0)checkBoxCameraType.setChecked(false);
+                spinnerResolution.setSelection(getCameraResolutionID());
+
+                if (getDData().getCameraType() == 0) checkBoxCameraType.setChecked(false);
                 else checkBoxCameraType.setChecked(true);
 
                 ArrayAdapter<String> adapterDegree;
@@ -301,7 +295,8 @@ public class DriveActivity extends AppCompatActivity {
                 spinnerDegree.setAdapter(adapterDegree);
 
                 cameraDegreeID = getCameraDegreeID();
-                if(cameraDegreeID < 0) Log.e(TAG, "Error while checking the Custom Camera Orientation Degree");
+                if (cameraDegreeID < 0)
+                    Log.e(TAG, "Error while checking the Custom Camera Orientation Degree");
                 else spinnerDegree.setSelection(cameraDegreeID);
 
                 editQuality.setText(String.valueOf(getDData().getCameraQuality()));
@@ -320,8 +315,6 @@ public class DriveActivity extends AppCompatActivity {
                         setCameraType(checkBoxCameraType.isChecked());
                         setCameraDegree(spinnerDegree.getSelectedItem().toString());
                         setCameraQuality(editQuality.getText().toString());
-
-                        sendCameraSettingChanged();
 
                         dialogCamSettings.dismiss();
                     }
@@ -350,6 +343,7 @@ public class DriveActivity extends AppCompatActivity {
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
                             return true;
                         case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive));
                             sensorManager.unregisterListener(magnetometerListener);
                             sensorManager.unregisterListener(accelerometerListener);
@@ -426,6 +420,7 @@ public class DriveActivity extends AppCompatActivity {
                             }
                             return true;
                         case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
                             buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn));
                             switch (carduino.dataHandler.getControlMode()) {
                                 case DIRECT:
@@ -513,6 +508,7 @@ public class DriveActivity extends AppCompatActivity {
         reset();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -562,44 +558,14 @@ public class DriveActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataRxReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraDataReceiver);
+        reset();
     }
 
     private class IpDataRxReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, Intent intent){
             setClientValues();
-            //TODO Future: Find a solution that is high quality and usable on old devices too
-            if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
-
-                try {
-                    byte[] image = getDData().getCameraPicture();
-
-                    //Here no Matrix Conversion - Problems with old devices
-                    //-> Conversion in Thread on Remote Side found by CameraControl processImages
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                    viewImage.setImageBitmap(bitmap);
-
-                    int degree = getDData().getCameraDegree();
-                    viewImage.setRotation(degree);
-
-                    //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
-                    //after it rotated 90/270 degree
-                    if(degree == 90 || degree == 270){
-                        int width = bitmap.getWidth();
-                        int height = bitmap.getHeight();
-
-                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                        viewImage.setScaleX((float) height/width);
-                        viewImage.setScaleY((float) height/width);
-                    }else{
-
-                        viewImage.setScaleX(1);
-                        viewImage.setScaleY(1);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
-                }
-            }
+            //refresh();
         }
     }
 
@@ -621,19 +587,17 @@ public class DriveActivity extends AppCompatActivity {
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
+            try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
 
-            if (carduino.dataHandler.getControlMode().isTransceiver() && checkBoxDebug.isChecked()){
+                int width = viewImage.getWidth();
+                int height = viewImage.getHeight();
 
-                try {
+                byte[] image = getDData().getCameraPicture();
+                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
 
-                    byte[] image = getDData().getCameraPicture();
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                    viewImage.setImageBitmap(bitmap);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
-                }
-            }else if(carduino.dataHandler.getControlMode().isTransceiver() && !checkBoxDebug.isChecked()){
-                viewImage.setImageDrawable(null);
+                viewImage.setImageBitmap(bitmap.createScaledBitmap(bitmap, width, height, false));
+            }catch(Exception e){
+                Log.e(TAG,"Error on setting the Video/Picture on Activity");
             }
         }
     }
@@ -725,7 +689,7 @@ public class DriveActivity extends AppCompatActivity {
         buttonHorn.setAlpha(1.0f);
         buttonFrontLight.setAlpha(1.0f);
         buttonStatusLed.setAlpha(1.0f);
-        buttonCamSettings.setAlpha(1.0f);
+        buttonCameraSettings.setAlpha(1.0f);
     }
     private void uiDrive(){
         viewStop.setVisibility(View.GONE);
@@ -736,7 +700,7 @@ public class DriveActivity extends AppCompatActivity {
                 buttonHorn.setAlpha(0.6f);
                 buttonFrontLight.setAlpha(0.6f);
                 buttonStatusLed.setAlpha(0.6f);
-                buttonCamSettings.setAlpha(0.6f);
+                buttonCameraSettings.setAlpha(0.6f);
             }
         }
     }
@@ -942,11 +906,5 @@ public class DriveActivity extends AppCompatActivity {
     private int getCameraResolutionID(){
 
         return getDData().getCameraResolutionID();
-    }
-
-    private void sendCameraSettingChanged(){
-
-        Intent onCameraSettingsChanged = new Intent(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(onCameraSettingsChanged);
     }
 }

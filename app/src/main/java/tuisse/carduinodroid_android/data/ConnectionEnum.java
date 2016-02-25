@@ -5,23 +5,69 @@ package tuisse.carduinodroid_android.data;
  * @date 12.01.2016
  *
  * Enumeration which abstractly codes the status of a connection service.
- *
- * The state are a global definition of the service states. They can be devided in four groups:
- * service is idle (IDLE)
- * service establishes connection (TRYFIND, FOUND, TRYCONNECT, CONNECTED)
- * service is running (RUNNING)
- * service has a error (ERROR, STREAMERROR, TRYCONNECTERROR, UNKNOWN)
- *
- * @param ILDE:
- *      No connection is tried to establish. IpService and SerialService are in idle state.
  */
 public enum ConnectionEnum {
 
+    /// Group: Idle
+    /**
+     * No connection is tried to establish.
+     */
     IDLE(0),
-    TRYFIND(1), FOUND(2), TRYCONNECT(3), CONNECTED(4),
+
+    /// Group: establishing connection
+    /**
+     * A communication partner is tried to find.
+     */
+    TRYFIND(1),
+    /**
+     * A communication partner is found.
+     */
+    FOUND(2),
+    /**
+     * A connection with is tried to establish.
+     */
+    TRYCONNECT(3),
+    /**
+     * A connection is established.
+     */
+    CONNECTED(4),
+
+    /// Group: Running
+    /**
+     * Thread to send and receive data is running.
+     */
     RUNNING(5),
-    ERROR(-1), STREAMERROR(-2), TRYCONNECTERROR(-3),UNKNOWN(-4);
+
+    /// Group: Error
+    /**
+     * A Error occured.
+     */
+    ERROR(-1),
+    /**
+     * A streamerror occured.
+     */
+    STREAMERROR(-2),
+    /**
+     * A Error while connection establishment occured
+     */
+    TRYCONNECTERROR(-3),
+
+    /// Group: third party state
+    /**
+     * State is currently not known by this device.
+     */
+    UNKNOWN(-4);
+
+    /**
+     * private intern connection state.
+     */
     private int state;
+
+    /**
+     * Constructor of ConnectionEnum
+     *
+     * @param s
+     */
     ConnectionEnum(int s) {
         state = s;
     }
