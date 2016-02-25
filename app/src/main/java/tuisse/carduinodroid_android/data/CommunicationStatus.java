@@ -1,46 +1,71 @@
 package tuisse.carduinodroid_android.data;
 
 /**
- * @AUTOR Till Max Schwikal
- * @DATE 04.01.2016
+ * @author Till Max Schwikal
+ * @date 04.01.2016
  *
  * Enumeration which codes the communication status of the application.
- *
- * The enumeration boolean functions which generalize the actual state.
- *
- * @param ILDE:
- *      No connection is tried to establish. IpService and SerialService are in idle state.
- * @param SERIAL_CONNECTING:
- *      Only the SerialService is trying to connect to a Carduino-Arduino-Board
- *      IpService is already running (ControlMode.Transceiver).
- * @param IP_CONNECTING:
- *      Only the IpService is trying to connect
- *          to a Transceiver Android in ControlMode.Remote or
- *          to a Remote Android/Desktop device in ControlMode.Transceiver
- *      SerialService is already running (ControlMode.Transceiver).
- * @param BOTH_CONNECTING:
- *      Both, IpService and SerialService are trying to connect to therir partners.
- * @param OK:
- *      The whole connection chain is established. The Carduinodroid is ready to be driven.
- * @param Error:
- *      A general error occured.
- * @param IP_ERROR:
- *      A error in IpService occured.
- *      SerialService state is not known.
- * @param SERIAL_ERROR:
- *      A error in SerialService occured.
- *      IpService state is not known.
- * @param BOTH_ERROR:
- *      IpService and SerialService got a error.
  *
  * @see ConnectionState
  * @see ControlMode
  * @see DataHandler
- * @see WatchdogService
  */
 
 public enum CommunicationStatus {
-    IDLE(0), SERIAL_CONNECTING(1), IP_CONNECTING(2), BOTH_CONNECTING(3), OK(4), ERROR(-1), IP_ERROR(-2), SERIAL_ERROR(-3), BOTH_ERROR(-4);
+    /// Group: Idle
+    /**
+     * No connection is tried to establish. IpService and SerialService are in idle state.
+     */
+    IDLE(0),
+
+    /// Group: Connecting
+    /**
+     * Only the SerialService is trying to connect to a
+     * Carduino-Arduino-Board IpService is already running (ControlMode.Transceiver).
+     */
+    SERIAL_CONNECTING(1),
+    /**
+     * Only the IpService is trying to connect
+     * to a Transceiver Android in ControlMode.Remote or
+     * to a Remote Android/Desktop device in ControlMode.Transceiver
+     * SerialService is already running (ControlMode.Transceiver).
+     */
+    IP_CONNECTING(2),
+    /**
+     * Both, IpService and SerialService are trying to connect to therir partners.
+     */
+    BOTH_CONNECTING(3),
+
+    /// Group: Ok
+    /**
+     * The whole connection chain is established. The Carduinodroid is ready to be driven.
+     */
+    OK(4),
+
+    /// Group: Error
+    /**
+     * A general error occured.
+     */
+    ERROR(-1),
+    /**
+     * A error in IpService occured.
+     * SerialService state is not known.
+     */
+    IP_ERROR(-2),
+    /**
+     * A error in SerialService occured.
+     * IpService state is not known.
+     */
+    SERIAL_ERROR(-3),
+    /**
+     * IpService and SerialService got a error.
+     */
+    BOTH_ERROR(-4);
+
+    /**
+     * constructor for CommunicationStatus
+     * @param s
+     */
     CommunicationStatus(int s){
         status = s;
     }

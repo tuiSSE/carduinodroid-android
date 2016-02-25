@@ -337,7 +337,6 @@ public class WatchdogService extends Service {
     private class SerialStatusChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onSerialStatusChangeReceiverReceive");
             if(renewCommunicationStatus()){
                 updateNotification();
             }
