@@ -574,53 +574,13 @@ public class DriveActivity extends AppCompatActivity {
     private class IpDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent){
-            setClientValues();
 
-            //Commented Version is first Try and is Working on low Resolution very well
-            if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
-
-                try {
-                    byte[] image = getDData().getCameraPicture();
-
-                    //Here no Matrix Conversion - Problems with old devices
-                    //-> Conversion in Thread on Remote Side found by CameraControl processImages
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                    viewImage.setImageBitmap(bitmap);
-
-                    int degree = getDData().getCameraDegree();
-                    viewImage.setRotation(degree);
-
-                    //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
-                    //after it rotated 90/270 degree
-                    if(degree == 90 || degree == 270){
-                        int width = bitmap.getWidth();
-                        int height = bitmap.getHeight();
-
-                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                        viewImage.setScaleX((float) height/width);
-                        viewImage.setScaleY((float) height/width);
-                    }else{
-
-                        viewImage.setScaleX(1);
-                        viewImage.setScaleY(1);
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
-                }
+            if(carduino.dataHandler.getControlMode().isRemote()){
+                setImageViewBitmap();
+                refresh();
+            }else if(carduino.dataHandler.getControlMode().isTransceiver()){
+                setClientValues();
             }
-
-            //Second Version tries to limit the number of Updates for the ImageView depending on the
-            //amount of time for totation and loading the bitmap into it
-            /*if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()) {
-                if (!isSettingImage)
-                    new Thread(new Runnable() {
-                        public void run() {
-                            isSettingImage = true;
-                            setImageViewBitmap();
-                            isSettingImage = false;
-                        }
-                    }, "ImageViewUpdateThread").start();
-            }*/
         }
     }
 
@@ -642,12 +602,17 @@ public class DriveActivity extends AppCompatActivity {
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
-            try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
-                byte[] image = getDData().getCameraPicture();
-                Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-                viewImage.setImageBitmap(bitmap);
-            }catch(Exception e){
-                Log.e(TAG,"Error on setting the Video/Picture on Activity");
+
+            if (carduino.dataHandler.getControlMode().isTransceiver() && checkBoxDebug.isChecked()) {
+                try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
+                    byte[] image = getDData().getCameraPicture();
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
+                    viewImage.setImageBitmap(bitmap);
+                } catch (Exception e) {
+                    Log.e(TAG, "Error on setting the Video/Picture on Activity");
+                }
+            }else if(carduino.dataHandler.getControlMode().isTransceiver() && !checkBoxDebug.isChecked()){
+                viewImage.setImageDrawable(null);
             }
         }
     }
@@ -1001,17 +966,32 @@ public class DriveActivity extends AppCompatActivity {
 
                 //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
                 //after it rotated 90/270 degree
-                if(degree == 90 || degree == 270){
-                    int width = bitmap.getWidth();
-                    int height = bitmap.getHeight();
+                if (checkBoxOrientation.isChecked()) {
+                    if (degree == 90 || degree == 270) {
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
 
-                    viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                    viewImage.setScaleX((float) height/width);
-                    viewImage.setScaleY((float) height/width);
+                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        viewImage.setScaleX((float) height / width);
+                        viewImage.setScaleY((float) height / width);
+                    } else {
+
+                        viewImage.setScaleX(1);
+                        viewImage.setScaleY(1);
+                    }
                 }else{
+                    if (degree == 90 || degree == 270) {
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
 
-                    viewImage.setScaleX(1);
-                    viewImage.setScaleY(1);
+                        viewImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        viewImage.setScaleX((float) width / height);
+                        viewImage.setScaleY((float) width / height);
+                    } else {
+
+                        viewImage.setScaleX(1);
+                        viewImage.setScaleY(1);
+                    }
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error on setting the Video/Picture on Activity");

@@ -234,7 +234,7 @@ public class IpConnection {
                                 Thread.sleep(5);
                                 //Protect Against endless Loop if its disconnected while RUNNING
                                 counter++;
-                                if(counter==5){
+                                if(counter>=5){
                                     dataSocketServerDisconnected=true;
                                     Log.d(TAG,"counter expired");
                                 }
@@ -450,20 +450,22 @@ public class IpConnection {
 
                     if(!isClient){ //Data from Transceiver to Remote
                         //every 50 ms = DELAY.IP(check Constants)
-                        information = information + Constants.JSON_OBJECT.NUM_VIDEO;
+                        information +=
+                                Constants.JSON_OBJECT.NUM_VIDEO;
                         //every 2 * 50 ms = 100 ms
-                        if(timer % 2 == 0){
+                        if((timer = timer % 2) == 0){
 
-                            information = information +
+                            information +=
                                     Constants.JSON_OBJECT.NUM_CAR +
                                     Constants.JSON_OBJECT.NUM_MOBILITY;
                         }
                     }
                     else{ //Data from Remote to Transceiver
                         //every 2 * 50 ms = 100 ms
-                        if(timer % 2 == 0){
+                        if((timer = timer % 2) == 0){
 
-                            information = information +  Constants.JSON_OBJECT.NUM_CONTROL;
+                            information +=
+                                    Constants.JSON_OBJECT.NUM_CONTROL;
                         }
                     }
                     //Check if the information is empty - so no need to send
