@@ -25,6 +25,20 @@ import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
+
+/**
+ * @author Till Max Schwikal
+ *
+ * This activity is the main activity of the carduinodroid application.
+ *
+ * The activity starts the WatchdogService and displays the connection status of the communication
+ * services. Also this activity provides buttons to start the DriveActivity, have some settings or
+ * go to the settings page. It is also possible to exit the application properly with the exit button.
+ *
+ * In several TextViews and ImageViews the connection status of IpService and SerialService,
+ * dependent on the ControlMode, is displayed.
+ * In ControlMode Transceiver the ScreensaverAcitivity is launched, after a editable time.
+ */
 public class StatusActivity extends AppCompatActivity {
 
     private static final String TAG = "CarduinoStatusActivity";
@@ -70,7 +84,8 @@ public class StatusActivity extends AppCompatActivity {
     private ImageView imageViewSwitchModeNext;
     private TextView  textviewSwitchMode;
     //druve button toolbar
-    private Toolbar driveButton;
+    private Toolbar   driveButton;
+    private TextView  textViewDrive;
 
     private CarduinodroidApplication carduino;
 
@@ -143,17 +158,9 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModeNext =           (ImageView) findViewById(R.id.imageViewSwitchModeNext);
         textviewSwitchMode      =           (TextView ) findViewById(R.id.textviewSwitchMode);
 
-        statusActivityView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view,MotionEvent event) {
-                checkRestartScreensaver();
-                return true;
-
-            }
-        });
-
         //drive button toolbar
         driveButton =                       (Toolbar  ) findViewById(R.id.driveButton);
+        textViewDrive =                     (TextView ) findViewById(R.id.textViewDrive);
 
         setSupportActionBar(topToolbar);
         LayerDrawable settingsIcon = Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_settings);
@@ -162,6 +169,14 @@ public class StatusActivity extends AppCompatActivity {
 
         updateControlMode();
 
+        statusActivityView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                checkRestartScreensaver();
+                return true;
+
+            }
+        });
         imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,6 +187,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 stopServices();
                 startActivity(new Intent(StatusActivity.this, SettingsActivity.class));
                 Log.d(TAG, "onClickSettings");
@@ -181,6 +197,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettingsBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 stopServices();
                 Intent intentOpenBluetoothSettings = new Intent();
                 intentOpenBluetoothSettings.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
@@ -192,6 +209,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettingsTransceiver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 stopServices();
                 Log.d(TAG, "onClickSettingsTransceiver");
             }
@@ -200,6 +218,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModePrev.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 Utils.setIntPref(getString(R.string.pref_key_control_mode), getDataHandler().setControlModePrev());
                 Intent updateControlModeIntent = new Intent(StatusActivity.this, WatchdogService.class);
                 updateControlModeIntent.setAction(Constants.ACTION.CONTROL_MODE_CHANGED);
@@ -212,6 +231,7 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSwitchModeNext.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 Utils.setIntPref(getString(R.string.pref_key_control_mode), getDataHandler().setControlModeNext());
                 Intent updateControlModeIntent = new Intent(StatusActivity.this, WatchdogService.class);
                 updateControlModeIntent.setAction(Constants.ACTION.CONTROL_MODE_CHANGED);
@@ -224,6 +244,7 @@ public class StatusActivity extends AppCompatActivity {
         driveButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+                abortScreensaver();
                 startActivity(new Intent(StatusActivity.this, DriveActivity.class));
                 Log.d(TAG, "onClickDrive");
             }
@@ -233,6 +254,7 @@ public class StatusActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // dont start Watchdog service, if program should shut down due to notification intent
         if(!onExit) {
             LocalBroadcastManager.getInstance(this).registerReceiver(serialStatusChangeReceiver, serialStatusChangeFilter);
             LocalBroadcastManager.getInstance(this).registerReceiver(ipStatusChangeReceiver, ipStatusChangeFilter);
@@ -298,6 +320,7 @@ public class StatusActivity extends AppCompatActivity {
 
         switch (carduino.dataHandler.getControlMode()){
             case TRANSCEIVER:
+                textViewDrive.setText(R.string.monitore);
                 textviewSwitchMode.setText(R.string.controlModeTransceiver);
                 imageViewDeviceRemoteIp.setImageResource(R.drawable.device_remote);
                 textViewDeviceRemoteIpName.setText(R.string.labelIpRemote);
@@ -313,6 +336,7 @@ public class StatusActivity extends AppCompatActivity {
                 updateIp();
                 break;
             case REMOTE:
+                textViewDrive.setText(R.string.drive);
                 imageViewSettingsTransceiver.setVisibility(View.VISIBLE);
                 textviewSwitchMode.setText(R.string.controlModeRC);
                 imageViewDeviceRemoteIp.setImageResource(R.drawable.device_mobile_send);
@@ -323,6 +347,7 @@ public class StatusActivity extends AppCompatActivity {
                 updateIp();
                 break;
             default://DIRECT
+                textViewDrive.setText(R.string.drive);
                 textviewSwitchMode.setText(R.string.controlModeDirect);
                 //always visible
                 imageViewSettingsBluetooth.setVisibility(View.VISIBLE);
@@ -358,31 +383,27 @@ public class StatusActivity extends AppCompatActivity {
             textViewSerialConnectionError.setSelected(true);
         }
 
-        switch (getDataHandler().getControlMode()){
-            case DIRECT:
-                //ip connection
-                imageViewIpConnection.setImageDrawable(Utils.assembleDrawables(R.drawable.status_no_ip_device));
-                textViewIpConnection.setText("");
-                textViewIpConnectionStatus.setText("");
-                textViewIpConnectionError.setText("");
-                break;
-            default:
-                //ip connection
-                try {
-                    textViewIpConnection.setText(R.string.ipConnection);
-                    imageViewIpConnection.setImageDrawable((getDData()).getIpConnLogoId());
-                    textViewIpConnectionStatus.setText(getDData().getIpState().getStateName());
-                    textViewIpConnectionError.setText(getDData().getIpState().getError());
-                    if (!getDData().getIpState().getError().equals("")) {
-                        //set focus for marquee
-                        textViewIpConnectionError.setSelected(true);
-                    }
-                }catch (Exception e){
-                    Log.e(TAG, e.toString());
+        if(getDataHandler().getControlMode().isDirect()) {
+            //ip connection
+            imageViewIpConnection.setImageDrawable(Utils.assembleDrawables(R.drawable.status_no_ip_device));
+            textViewIpConnection.setText("");
+            textViewIpConnectionStatus.setText("");
+            textViewIpConnectionError.setText("");
+        }else{
+            //ip connection
+            try {
+                textViewIpConnection.setText(R.string.ipConnection);
+                imageViewIpConnection.setImageDrawable((getDData()).getIpConnLogoId());
+                textViewIpConnectionStatus.setText(getDData().getIpState().getStateName());
+                textViewIpConnectionError.setText(getDData().getIpState().getError());
+                if (!getDData().getIpState().getError().equals("")) {
+                    //set focus for marquee
+                    textViewIpConnectionError.setSelected(true);
                 }
-                updateIp();
-
-                break;
+            }catch (Exception e){
+                Log.e(TAG, e.toString());
+            }
+            updateIp();
         }
     }
 
@@ -453,18 +474,15 @@ public class StatusActivity extends AppCompatActivity {
     private final Runnable triggerScreensaverRunnable = new Runnable() {
         @Override
         public void run() {
-            abortScreensaver();
             startActivity(new Intent(StatusActivity.this,ScreensaverActivity.class));
         }
     };
     private void abortScreensaver() {
         screensaverHandler.removeCallbacks(triggerScreensaverRunnable);
-        //Log.d(TAG, "screensaverCounter stopped");
     }
     private void triggerScreensaver(){
         if(getDataHandler().getScreensaver() >=0) {
             screensaverHandler.postDelayed(triggerScreensaverRunnable, getDataHandler().getScreensaver());
-            //Log.d(TAG, "screensaverCounter started");
         }
     }
     private void restartScreensaver(){

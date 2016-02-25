@@ -61,6 +61,7 @@ public class IpConnection {
         dataSocketServer = null;
         ctrlSocket = null;
         dataSocket = null;
+        ///TODO: Lars: state ändern?
     }
 
     protected DataHandler getDataHandler(){
@@ -131,6 +132,7 @@ public class IpConnection {
         }
         else {
             setIpState(ConnectionEnum.ERROR);
+            //TODO: Lars: besser: Log.e bei fehler :)
             Log.d(TAG, "Data/Ctrl Socket nicht da");
         }
     }
@@ -197,8 +199,12 @@ public class IpConnection {
                                 Thread.sleep(5);
                                 //Protect Against endless Loop if its disconnected while RUNNING
                                 counter++;
-                                if(counter==5) dataSocketServerDisconnected=true;
+                                if(counter==5){
+                                    dataSocketServerDisconnected=true;
+                                    Log.d(TAG,"counter expired");
+                                }
                             } catch (InterruptedException e) {
+                                //TODO: warum i??? e!
                                 Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
                                 setIpState(ConnectionEnum.ERROR);
@@ -393,6 +399,7 @@ public class IpConnection {
             ctrlSocketServerDisconnected = false;
 
             // Stay Rdy for Request of Transmission over Control Server Socket
+            //TODO Lars: meinst du isStarted()?
             while (isRunning()||isTryFind()||isConnected()) {
                 ctrlSocket = null;
 
@@ -461,6 +468,7 @@ public class IpConnection {
             this.address = ipAddress;
             inData = null;
             outData = null;
+            //TODO: Lars: hat mich vom namen total verwirrt. Vorschlag: deviceConnected, isUsed... hat weniger etwas mit dem ipstate zu tun.
             isConnectedRunning = true;
         }
 
@@ -482,6 +490,8 @@ public class IpConnection {
                         if (isConnectedRunning == true) {
 
                             Log.d(TAG, "Data Server is already in use - No Connection has been established");
+
+                            //TODO denk mal über die nächste zeile nach :)
                         } else if (isConnectedRunning == false) {
 
                             Log.d(TAG, "Data Server is free - Try to build up a Connection");
@@ -507,6 +517,7 @@ public class IpConnection {
                     Log.d(TAG, "Client cant connect to Ctrl Server Socket");
                     e.printStackTrace();
                 }
+                //TODO: Lars: klingt auch hier viel besser :)
             }else if(isConnected()||isRunning()){
                 Log.d(TAG, "Client is already connected");
             }
@@ -524,6 +535,11 @@ public class IpConnection {
 
     protected synchronized void setIpState(ConnectionEnum state){
         setIpState(state, "");
+    }
+
+    //TODO: Lars: diese funktion solltest du dann nutzen: :)
+    protected synchronized void setIpState(ConnectionEnum state, int error){
+        setIpState(state, ipService.getString(error));
     }
 
     protected synchronized void setIpState(ConnectionEnum state, String error){

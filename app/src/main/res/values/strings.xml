@@ -11,6 +11,7 @@
     <string name="closeApp">Close</string>
     <string name="exitApp">Exit</string>
     <string name="drive">Drive</string>
+    <string name="monitore">Monitore Data</string>
     <string name="startSerialService">Start Serial</string>
     <string name="stopSerialService">Stop Serial</string>
     <string name="titleActivitySettings">Settings</string>
