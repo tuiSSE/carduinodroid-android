@@ -82,7 +82,8 @@ public class IpFrameHandler implements IpFrameIF{
                         if(isHardware){
                             JSONObject JsonObjectHardware = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE);
                             //TODO give all the Resolutions to show whats possible and the ID of the actual chosen one
-                            //carduinoDroidData.setCameraSupportedSizes(JsonObjectHardware.getJSONArray(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION));
+                            carduinoDroidData.setCameraSupportedSizes(getSupportedSizedValues(JsonObjectHardware.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION),
+                                    JsonObjectHardware.getInt(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM)));
                         }
                         if(isHardware){
                             //TO-DO ? Maybe we can leave it out in this app because i see no value out of it
@@ -241,8 +242,10 @@ public class IpFrameHandler implements IpFrameIF{
 
                 JSONObject JsonObjectHardwareInformation = new JSONObject();
 
-                JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolutionID());
-
+                if(carduinoDroidData.getCameraSupportedSizes() != null) {
+                    JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM, carduinoDroidData.getCameraSupportedSizes().length);
+                    JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, setSupportedSizesObject());
+                }
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_HARDWARE, JsonObjectHardwareInformation);
                 isMaskTypeServer = true;
             }
@@ -320,5 +323,44 @@ public class IpFrameHandler implements IpFrameIF{
         if(dataTypeMask.contains(Type)){
             return true;
         }else{ return false;}
+    }
+
+    private synchronized JSONObject setSupportedSizesObject(){
+
+        JSONObject JsonObjectCameraSizes = new JSONObject();
+
+        String[] resolutionSizes = carduinoDroidData.getCameraSupportedSizes();
+        if(resolutionSizes != null) {
+
+            int numValues = resolutionSizes.length;
+            try {
+                for (int i = 0; i < numValues; i++) {
+
+                    JsonObjectCameraSizes.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM + i,resolutionSizes[i]);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return JsonObjectCameraSizes;
+    }
+
+    private synchronized String[] getSupportedSizedValues(JSONObject JsonObjectCameraSizes, int count){
+
+        if(count > 0){
+            String[] values = new String[count];
+            try {
+                for (int i = 0; i < count; i++) {
+                    values[i] = JsonObjectCameraSizes.getString(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM+i);
+                }
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return values;
+        }
+
+        return null;
     }
 }

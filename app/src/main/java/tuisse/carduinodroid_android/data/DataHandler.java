@@ -207,10 +207,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                                 break;
                             case REMOTE:
                                 cd = new CarduinoData();
+
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 //ccd = new CarduinoDroidData();
                                 break;
                             default://DIRECT
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 //cd stays the same
                                 //ccd = null;
@@ -222,6 +225,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                         switch (cm) {
                             case TRANSCEIVER:
                                 cd = new CarduinoData();
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 //ccd = new CarduinoDroidData();
                                 break;
@@ -230,6 +234,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                                 break;
                             default://DIRECT
                                 cd = new CarduinoData();
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 //ccd = null;
                                 break;
@@ -241,11 +246,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
                             case TRANSCEIVER:
                                 //cd stays the same
                                 //ccd = new CarduinoDroidData();
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 break;
                             case REMOTE:
                                 cd = new CarduinoData();
                                 //ccd = new CarduinoDroidData();
+                                getDData().resetValues();
                                 ccd.setIpState(new ConnectionState(ConnectionEnum.IDLE));
                                 break;
                             default://DIRECT

@@ -1,8 +1,10 @@
 package tuisse.carduinodroid_android;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -45,6 +47,14 @@ public class IpConnection {
     Socket remoteCtrlSocket;
     Socket remoteDataSocket;
 
+    BufferedWriter intentWriter;
+
+    CameraSupportedResolutionReceiver cameraSupportedResolutionReceiver;
+    CameraSettingsChangedReceiver cameraSettingsChangedReceiver;
+
+    IntentFilter cameraSupportedResolutionFilter;
+    IntentFilter cameraSettingsChangedFilter;
+
     protected boolean isClient;
 
     protected boolean ctrlSocketServerDisconnected;
@@ -58,6 +68,15 @@ public class IpConnection {
 
         ipService = s;
 
+        cameraSupportedResolutionReceiver = new CameraSupportedResolutionReceiver();
+        cameraSettingsChangedReceiver = new CameraSettingsChangedReceiver();
+
+        cameraSupportedResolutionFilter = new IntentFilter(Constants.EVENT.CAMERA_SUPPORTED_RESOLUTION);
+        cameraSettingsChangedFilter = new IntentFilter(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
+
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSupportedResolutionReceiver, cameraSupportedResolutionFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
+
         reset();
     }
 
@@ -67,6 +86,8 @@ public class IpConnection {
         dataSocketServer = null;
         ctrlSocket = null;
         dataSocket = null;
+
+        intentWriter = null;
     }
 
     protected DataHandler getDataHandler(){
@@ -241,6 +262,9 @@ public class IpConnection {
                     e.printStackTrace();
                 }
                 ipService.setIsClosing(false);
+
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSupportedResolutionReceiver);
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSettingsChangedReceiver);
             }
         }, "StopIpConnection").start();
     }
@@ -251,7 +275,7 @@ public class IpConnection {
         return (isRunning()||isConnected());
     }
 
-    private void sendData(BufferedWriter outData, String dataTypeMask) throws IOException{
+    private synchronized void sendData(BufferedWriter outData, String dataTypeMask) throws IOException{
 
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
 
@@ -322,6 +346,8 @@ public class IpConnection {
 
                             new IpDataSendThread(outData).start();
                             new IpDataReceiveThread(inData).start();
+
+                            saveActualBufferedWriter(outData);
                         } catch (IOException e) {
                             Log.d(TAG, "BufferedReader/Writer Initialization Error");
                             setIpState(ConnectionEnum.ERROR);
@@ -376,6 +402,7 @@ public class IpConnection {
                         setIpState(ConnectionEnum.TRYFIND);
                         setRemoteIP("Not Connected");
                     }
+                    break;
                 } catch (IOException e) {
                     Log.d(TAG, "Already Connection Lost before send");
                     setIpState(ConnectionEnum.ERROR);
@@ -383,6 +410,8 @@ public class IpConnection {
                     break;
                 }
             }
+            //Reset Values if Connection is lost and maybe got back to Setup lowest Quality for Safety
+            getDData().resetValues();
             dataReceiveDisconnected = true;
         }
     }//IpDataReceiveThread
@@ -390,7 +419,8 @@ public class IpConnection {
     protected class IpDataSendThread extends Thread {
 
         BufferedWriter outData;
-
+        int timer = 0;
+        String information;
         public IpDataSendThread(BufferedWriter writer) {
             //super("IpConnection-IpDataSendThread");
             this.outData = writer;
@@ -401,12 +431,31 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-                    if(!isClient)
-                        sendData(outData, "Video");
-                    else
-                        sendData(outData, "Camera,Control");
-                    //Real time trigger to set up with Max
+                    information = "";
+
+                    if(!isClient){ //Data from Transceiver to Remote
+                        //every 50 ms = DELAY.IP(check Constants)
+                        information = information + Constants.JSON_OBJECT.NUM_VIDEO;
+                        //every 2 * 50 ms = 100 ms
+                        if(timer % 2 == 0){
+
+                            information = information +
+                                    Constants.JSON_OBJECT.NUM_CAR +
+                                    Constants.JSON_OBJECT.NUM_MOBILITY;
+                        }
+                    }
+                    else{ //Data from Remote to Transceiver
+                        //every 2 * 50 ms = 100 ms
+                        if(timer % 2 == 0){
+
+                            information = information +  Constants.JSON_OBJECT.NUM_CONTROL;
+                        }
+                    }
+                    //Check if the information is empty - so no need to send
+                    if(!information.equals("")) sendData(outData,information);
+
                     Thread.sleep(Constants.DELAY.IP);
+                    timer++;
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
@@ -419,12 +468,15 @@ public class IpConnection {
                         setRemoteIP("Not Connected");
                     }
                     e.printStackTrace();
+                    break;
                 } catch (InterruptedException e) {
                     setIpState(ConnectionEnum.ERROR);
                     e.printStackTrace();
                     break;
                 }
             }
+            //Reset Values if Connection is lost and maybe got back to Setup lowest Quality for Safety
+            getDData().resetValues();
             dataSendDisconnected = true;
         }
     }//IpDataSendThread
@@ -544,6 +596,8 @@ public class IpConnection {
 
                                 new IpDataSendThread(outData).start();
                                 new IpDataReceiveThread(inData).start();
+                                // Here for intent Sending on Remote side
+                                saveActualBufferedWriter(outData);
                             }
                         } catch (IOException e) {
                             setIpState(ConnectionEnum.TRYCONNECTERROR);
@@ -599,6 +653,45 @@ public class IpConnection {
         String ip = Formatter.formatIpAddress(wifiInfo.getIpAddress());
 
         return ip;
+    }
+
+    private void saveActualBufferedWriter(BufferedWriter writer) {
+
+        intentWriter = writer;
+    }
+
+    private class CameraSupportedResolutionReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_HARDWARE);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Supported Resolutions");
+                            e.printStackTrace();
+                        }
+                }
+            }, "CameraUpdateThread").start();
+        }
+    }
+
+    private class CameraSettingsChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_CAMERA);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
+                            e.printStackTrace();
+                        }
+                }
+            }, "CameraUpdateThread").start();
+        }
     }
 
     protected void setRemoteIP(String ip){

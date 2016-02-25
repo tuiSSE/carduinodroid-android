@@ -255,6 +255,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             previewResolution[i] = String.valueOf(width) + " x " + String.valueOf(height);
         }
         getDData().setCameraSupportedSizes(previewResolution);
+        //Signal the IP Connection that we can send the resolution possibilties of transceiver
+        Intent onSupportedResolutions = new Intent(Constants.EVENT.CAMERA_SUPPORTED_RESOLUTION);
+        LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onSupportedResolutions);
     }
 
     private int getFrontFacingCameraID() {

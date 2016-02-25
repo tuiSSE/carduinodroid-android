@@ -71,6 +71,19 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setWlanAvailable(0);
     }
 
+    public synchronized void resetValues(){
+
+        setCameraSupportedSizes(null);
+        setCameraType(1);
+        setCameraResolutionID(-1);
+        setCameraFlashlight(0);
+        setCameraQuality(50);
+        setCameraDegree(90);
+
+        setSoundPlay(0);
+        setSoundRecord(0);
+    }
+
     public synchronized LayerDrawable getIpConnLogoId(){
         int status;
         int type;

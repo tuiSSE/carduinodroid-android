@@ -321,6 +321,8 @@ public class DriveActivity extends AppCompatActivity {
                         setCameraDegree(spinnerDegree.getSelectedItem().toString());
                         setCameraQuality(editQuality.getText().toString());
 
+                        sendCameraSettingChanged();
+
                         dialogCamSettings.dismiss();
                     }
                 });
@@ -511,7 +513,6 @@ public class DriveActivity extends AppCompatActivity {
         reset();
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -567,7 +568,7 @@ public class DriveActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             setClientValues();
-
+            //TODO Future: Find a solution that is high quality and usable on old devices too
             if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
 
                 try {
@@ -582,6 +583,7 @@ public class DriveActivity extends AppCompatActivity {
                     viewImage.setRotation(degree);
 
                     //Since API 14 its Possible to use a rotation function but you need to rescale Bitmap
+                    //after it rotated 90/270 degree
                     if(degree == 90 || degree == 270){
                         int width = bitmap.getWidth();
                         int height = bitmap.getHeight();
@@ -615,7 +617,6 @@ public class DriveActivity extends AppCompatActivity {
             setBackgroundColor();
         }
     }
-
 
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
@@ -941,5 +942,11 @@ public class DriveActivity extends AppCompatActivity {
     private int getCameraResolutionID(){
 
         return getDData().getCameraResolutionID();
+    }
+
+    private void sendCameraSettingChanged(){
+
+        Intent onCameraSettingsChanged = new Intent(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(onCameraSettingsChanged);
     }
 }

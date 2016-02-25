@@ -16,6 +16,8 @@ public interface CarduinoDroidIF{
     void setIpState(ConnectionState is);
     void setIpType(IpType it);
 
+    void resetValues();
+
     int getCameraType();
     int getCameraResolutionID();
     String[] getCameraSupportedSizes();
@@ -52,5 +54,7 @@ public interface CarduinoDroidIF{
     void setMobileActive(int _mobileActive);
     void setWlanAvailable(int _wlanAvailable);
     void setWlanActive(int _wlanActive);
+
+
 
 }

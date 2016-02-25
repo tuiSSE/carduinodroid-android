@@ -18,6 +18,8 @@ public class Constants {
         String SERIAL_DATA_RECEIVED = "tuisse.carduinodroid_android.event.serial_data_received";
         String IP_DATA_RECEIVED = "tuisse.carduinodroid_android.event.ip_data_received";
         String CAMERA_DATA_RECEIVED = "tuisse.carduinodroid_android.event.camera_data_received";
+        String CAMERA_SUPPORTED_RESOLUTION = "tuisse.carduinodroid_android.event.camera_supported_resolution";
+        String CAMERA_SETTINGS_CHANGED = "tuisse.carduinodroid_android.event.camera_settings_changed";
     }
 
     public interface PERMISSION{
@@ -114,6 +116,7 @@ public class Constants {
         String NUM_NETWORK = "Network";
 
         String TAG_HARDWARE_CAMERA_RESOLUTION = "Camera Resolution";
+        String TAG_HARDWARE_CAMERA_RESOLUTION_NUM = "Camera Resolution Numbers";
         String TAG_HARDWARE = "Hardware Information";
         String NUM_HARDWARE = "Hardware";
 
