@@ -691,16 +691,30 @@ public class DriveActivity extends AppCompatActivity{
         // and API 19 (KitKat).
         // It is safe to use them, as they are inlined
         // at compile-time and do nothing on earlier devices.
-        viewImage.setSystemUiVisibility(
-            //View.SYSTEM_UI_FLAG_LAYOUT_STABLE | //dont resize view
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-            View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
-            View.SYSTEM_UI_FLAG_FULLSCREEN |
-            View.SYSTEM_UI_FLAG_IMMERSIVE | //API 19
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
-        );
+        if(!carduino.dataHandler.getControlMode().isTransceiver()){
+            viewImage.setSystemUiVisibility(
+                //View.SYSTEM_UI_FLAG_LAYOUT_STABLE | //dont resize view
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_IMMERSIVE | //API 19
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
+            );
+        }else{
+            viewImage.setSystemUiVisibility(
+                //View.SYSTEM_UI_FLAG_LAYOUT_STABLE | //dont resize view
+                //View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                //View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE | //hide status bar
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_IMMERSIVE | //API 19
+                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR //API 32
+            );
+        }
+
     }
 
     private float restrictAngle(float tmpAngle){
