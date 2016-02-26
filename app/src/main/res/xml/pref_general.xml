@@ -63,5 +63,12 @@
         android:title="@string/pref_title_screensaver"
         android:icon="@drawable/pref_icon_screensaver"/>
 
-
+    <!--
+    <Preference
+        android:title="@string/pref_title_ip_data"
+        android:key="@string/pref_key_ip_data"
+        android:defaultValue="0"
+        android:summary="@string/pref_sub_ip_data_kb"
+        android:icon="@drawable/pref_icon_ip_data" />
+    -->
 </PreferenceScreen>

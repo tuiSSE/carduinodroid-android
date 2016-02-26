@@ -292,4 +292,9 @@
         <item>1</item>
     </string-array>
 
+    <string name="pref_title_ip_data">Ip data consumption</string>
+    <string name="pref_key_ip_data">pref_key_ip_data</string>
+    <string name="pref_sub_ip_data_kb">%1$sKb data transmitted</string>
+    <string name="pref_sub_ip_data_mb">%1$sMb data transmitted</string>
+
 </resources>
