@@ -651,7 +651,7 @@ public class DriveActivity extends AppCompatActivity{
         public void onReceive(Context context, Intent intent) {
 
             if (carduino.dataHandler.getControlMode().isTransceiver() && checkBoxDebug.isChecked()) {
-                try {//TODO: Anzeige nur bei Remote und bei Debug-On, Absicherung wenn Activity zu spät an ist
+                try {
                     byte[] image = getDData().getCameraPicture();
                     Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
                     viewImage.setImageBitmap(bitmap);

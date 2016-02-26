@@ -53,10 +53,12 @@ public class IpConnection {
     CameraSupportedResolutionReceiver cameraSupportedResolutionReceiver;
     CameraSettingsChangedReceiver cameraSettingsChangedReceiver;
     SoundSettingChangedReceiver soundSettingChangedReceiver;
+    SerialStatusChangedReceiver serialStatusChangedReceiver;
 
     IntentFilter cameraSupportedResolutionFilter;
     IntentFilter cameraSettingsChangedFilter;
     IntentFilter soundSettingChangedFilter;
+    IntentFilter serialStatusChangedFilter;
 
     protected boolean isClient;
 
@@ -74,14 +76,17 @@ public class IpConnection {
         cameraSupportedResolutionReceiver = new CameraSupportedResolutionReceiver();
         cameraSettingsChangedReceiver = new CameraSettingsChangedReceiver();
         soundSettingChangedReceiver = new SoundSettingChangedReceiver();
+        serialStatusChangedReceiver = new SerialStatusChangedReceiver();
 
         cameraSupportedResolutionFilter = new IntentFilter(Constants.EVENT.CAMERA_SUPPORTED_RESOLUTION);
         cameraSettingsChangedFilter = new IntentFilter(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
         soundSettingChangedFilter = new IntentFilter(Constants.EVENT.SOUND_PLAY_CHANGED);
+        serialStatusChangedFilter = new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
 
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSupportedResolutionReceiver, cameraSupportedResolutionFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
-        LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver,soundSettingChangedFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver, soundSettingChangedFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(serialStatusChangedReceiver, serialStatusChangedFilter);
 
         reset();
     }
@@ -271,6 +276,7 @@ public class IpConnection {
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSupportedResolutionReceiver);
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSettingsChangedReceiver);
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(soundSettingChangedReceiver);
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(serialStatusChangedReceiver);
             }
         }, "StopIpConnection").start();
     }
@@ -304,8 +310,18 @@ public class IpConnection {
         if(Constants.LOG.RECEIVER) {
             Log.i(TAG, "IN: " + dataPacket.toString());
         }
+
+        ///TODO:1 LARS: return parseJSON boolean->string (DataMask)
+        ///TODO:2 LARS: specific intents (take care of control message)
+
         Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
         LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
+
+        if(getDataHandler().getControlMode().isRemote()){//rework with implemented TODO1 & TODO2
+            Intent onSerialStatusIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
+            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onSerialStatusIntent);
+        }
+
     }
 
     protected boolean receiveCtrl(String dataPacket) throws IOException{
@@ -713,6 +729,23 @@ public class IpConnection {
                     if(intentWriter != null)
                         try {
                             sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
+                            e.printStackTrace();
+                        }
+                }
+            }, "SoundPlayUpdateThread").start();
+        }
+    }
+
+    private class SerialStatusChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_SERIAL);
                         } catch (IOException e) {
                             Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
                             e.printStackTrace();

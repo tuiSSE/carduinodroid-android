@@ -102,7 +102,13 @@ public class IpFrameHandler implements IpFrameIF{
                         if(isSerial){
                             JSONObject JsonObjectSerial = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SERIAL);
 
-                            //carduinoData.setSerialState(JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_STATUS));
+                            carduinoData.setSerialState(new ConnectionState(
+                                    ConnectionEnum.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_STATUS)),
+                                    JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_ERROR)));
+                            carduinoData.setSerialName(
+                                    JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_NAME));
+                            carduinoData.setSerialType(
+                                    SerialType.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_TYPE)));
                         }
                         return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else{
@@ -266,7 +272,10 @@ public class IpFrameHandler implements IpFrameIF{
 
                 JSONObject JsonObjectSerialInformation = new JSONObject();
 
-                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_STATUS, carduinoData.getSerialState().toString());
+                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_STATUS, carduinoData.getSerialState().getState());
+                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_ERROR, carduinoData.getSerialState().getError());
+                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_NAME, carduinoData.getSerialName());
+                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_TYPE, SerialType.toInteger(carduinoData.getSerialType()));
 
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_SERIAL, JsonObjectSerialInformation);
                 isMaskTypeServer = true;

@@ -275,7 +275,6 @@ public class StatusActivity extends AppCompatActivity {
         imageViewSettingsTransceiver.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                //TODO: Integrieren DialogBox für IP Eingabe mit Eingabe und DropDown
                 autoCompleteCounter = 0;
                 final Dialog dialogTransceiverIp = new Dialog(StatusActivity.this);
 
@@ -510,7 +509,6 @@ public class StatusActivity extends AppCompatActivity {
     }
 
     private void updateIp(){
-        //// TODO: 12.01.201 implement
         try{
             switch(getDataHandler().getControlMode()){
                 case REMOTE:

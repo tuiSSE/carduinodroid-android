@@ -1,5 +1,7 @@
 package tuisse.carduinodroid_android.data;
 
+import android.util.Log;
+
 /**
  * @author Till Max Schwikal
  * @date 12.01.2016
@@ -64,11 +66,82 @@ public enum ConnectionEnum {
     private int state;
 
     /**
+     * private TAG for Log
+     */
+    private static String TAG = "CarduinoConnectionEnum";
+
+    /**
      * Constructor of ConnectionEnum
      *
      * @param s
      */
     ConnectionEnum(int s) {
         state = s;
+    }
+
+    /**
+     * @brief conversion Function Integer to ConnectionEnum
+     *
+     * @return always a valid ConnectionEnum
+     */
+    public static ConnectionEnum fromInteger(int x) {
+        switch(x) {
+            case 0:
+                return IDLE;
+            case 1:
+                return TRYFIND;
+            case 2:
+                return FOUND;
+            case 3:
+                return TRYCONNECT;
+            case 4:
+                return CONNECTED;
+            case 5:
+                return RUNNING;
+            case -1:
+                return ERROR;
+            case -2:
+                return STREAMERROR;
+            case -3:
+                return TRYCONNECTERROR;
+            case -4:
+                return UNKNOWN;
+            default:
+                Log.e(TAG, "no valid conversion. Took IDLE");
+                return IDLE;
+        }
+    }
+
+    /**
+     * @brief conversion Function ConnectionEnum to Integer
+     *
+     * @return always a valid ConnectionEnum-Integer
+     */
+    public static Integer toInteger(ConnectionEnum ce){
+        switch (ce){
+            case IDLE:
+                return 0;
+            case TRYFIND:
+                return 1;
+            case FOUND:
+                return 2;
+            case TRYCONNECT:
+                return 3;
+            case CONNECTED:
+                return 4;
+            case RUNNING:
+                return 5;
+            case ERROR:
+                return -1;
+            case STREAMERROR:
+                return -2;
+            case TRYCONNECTERROR:
+                return -3;
+            case UNKNOWN:
+                return -4;
+            default:
+                Log.e(TAG, "no valid conversion. Took AUTO");
+                return 0;
+        }
     }
 }

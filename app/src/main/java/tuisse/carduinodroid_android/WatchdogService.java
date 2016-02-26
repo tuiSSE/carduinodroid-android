@@ -238,10 +238,6 @@ public class WatchdogService extends Service {
                 if(!SerialService.getIsDestroyed()){
                     stopService(new Intent(WatchdogService.this, SerialService.class));
                 }
-                if(getData().getSerialState().isUnknown()){
-                    //request for serial State status
-                    //TODO implement
-                }
                 break;
             case TRANSCEIVER:
                 if(getData().getSerialState().isIdleError()){

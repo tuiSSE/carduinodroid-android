@@ -60,7 +60,6 @@ public class Constants {
     }
 
     public interface FACTORS{
-
         float DATA      = 1024;
         float TIME      = 1000;
     }
@@ -140,6 +139,9 @@ public class Constants {
         String NUM_VIDEO = "Video";
 
         String TAG_SERIAL_STATUS = "Serial State";
+        String TAG_SERIAL_ERROR = "Serial Error";
+        String TAG_SERIAL_NAME = "Serial Name";
+        String TAG_SERIAL_TYPE = "Serial Type";
         String TAG_SERIAL = "Serial Status";
         String NUM_SERIAL = "Serial";
 
