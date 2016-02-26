@@ -57,6 +57,12 @@ public class Constants {
         int CAMERA      = 100;  //*DELAY.CAMERA
     }
 
+    public interface FACTORS{
+
+        float DATA      = 1024;
+        float TIME      = 1000;
+    }
+
     public interface GESTURE_ANGLE{
         int STEER = 20;//°
         int SPEED = 20;//°
@@ -154,5 +160,10 @@ public class Constants {
 
     public interface CAMERA_VALUES{
         String[] ORIENTATION_DEGREES = {"0","90","180","270"};
+        String TAG_PREF_ORIENTATION = "Orientation Camera";
+        String ORIENTATION_FRONT = "Orientation Front";
+        String ORIENTATION_BACK = "Orientation Back";
+        int ORIENTATION_FRONT_INIT = 90;
+        int ORIENTATION_BACK_INIT = 270;
     }
 }

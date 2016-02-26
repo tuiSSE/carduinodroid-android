@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.TrafficStats;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -47,6 +48,10 @@ public class IpConnection {
     Socket remoteCtrlSocket;
     Socket remoteDataSocket;
 
+    protected int applicationUID;
+    protected long rxDataApp;
+    protected long txDataApp;
+
     BufferedWriter intentWriter;
 
     CameraSupportedResolutionReceiver cameraSupportedResolutionReceiver;
@@ -81,6 +86,11 @@ public class IpConnection {
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSupportedResolutionReceiver, cameraSupportedResolutionFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver,soundSettingChangedFilter);
+
+        //Getting the specific UID of this App and the traffic since the last reboot of this device
+        applicationUID = ipService.getApplication().getApplicationInfo().uid;
+        txDataApp = TrafficStats.getUidTxBytes(applicationUID);
+        rxDataApp = TrafficStats.getUidRxBytes(applicationUID);
 
         reset();
     }

@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import tuisse.carduinodroid_android.Constants;
+import tuisse.carduinodroid_android.Sound;
 
 /**
  * Created by mate on 02.02.2016.
@@ -17,6 +18,7 @@ public class IpFrameHandler implements IpFrameIF{
     private final String TAG = "CarduinoIpFrame";
     private CarduinoDroidData carduinoDroidData;
     private CarduinoData carduinoData;
+    private Sound sound;
 
     private JSONObject JsonObjectData;
     private boolean isMaskTypeServer;
@@ -36,6 +38,7 @@ public class IpFrameHandler implements IpFrameIF{
     public IpFrameHandler(CarduinoData cd, CarduinoDroidData cdd){
         carduinoDroidData = cdd;
         carduinoData = cd;
+        sound = new Sound();
         //setClientVersion(0);
     }
 
@@ -120,6 +123,8 @@ public class IpFrameHandler implements IpFrameIF{
 
                             carduinoDroidData.setSoundPlay(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_PLAY));
                             carduinoDroidData.setSoundRecord(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_RECORD));
+
+                            if(carduinoDroidData.getSoundPlay() == 1) sound.horn(); else sound.stop();
                         }
                         return true;
                     }
@@ -282,7 +287,7 @@ public class IpFrameHandler implements IpFrameIF{
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION, carduinoDroidData.getCameraResolutionID());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT, carduinoDroidData.getCameraFlashlight());
                     JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY, carduinoDroidData.getCameraQuality());
-                    JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_ORIENTATION, carduinoDroidData.getCameraDegree());
+                    //JsonObjectCameraInformation.put(Constants.JSON_OBJECT.TAG_CAMERA_ORIENTATION, carduinoDroidData.getCameraDegree());
 
                     JsonObjectData.put(Constants.JSON_OBJECT.TAG_CAMERA, JsonObjectCameraInformation);
                 }

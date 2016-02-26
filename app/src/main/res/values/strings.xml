@@ -95,6 +95,7 @@
     <string name="driveRelativeBattery">%1$4.1f Relative Battery [%%]</string>
     <string name="driveAbsoluteBattery">%1$4.1f Absolute Battery [mAh]</string>
     <string name="driveTemperature">%1$4.1f Temperature [°C]</string>
+    <string name="driveBandwidth">%1$4.1f Bandwidth [kB/s]</string>
 
     <string name="driveAngle0">%1$04d\trel Azimut [°]</string>
     <string name="driveAngle1">%1$04d\trel Pitch [°]</string>

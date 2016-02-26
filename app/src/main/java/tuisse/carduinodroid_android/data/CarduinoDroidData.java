@@ -9,6 +9,7 @@ import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.Constants;
 
 import tuisse.carduinodroid_android.R;
+import tuisse.carduinodroid_android.Sound;
 
 /**
  * Created by mate on 02.02.2016.
@@ -24,7 +25,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private int cameraResolutionID; // Defines position of the resolution out of an String-Array with all supported ones
     private int cameraFlashlight; // On=1 - Off=0;
     private int cameraQuality; // Value between 0(low) to 100 (high)
-    private int cameraDegree;
 
     private int soundPlay; // Play a horn sound=1 - No horn sound=0;
     private int soundRecord; // Start Recording=1 - Stop Recording=0;
@@ -45,6 +45,7 @@ public class CarduinoDroidData implements CarduinoDroidIF{
 
     public CarduinoDroidData(){
         super();
+
         setIpState(new ConnectionState(ConnectionEnum.IDLE));
         setIpType(IpType.WLAN);
 
@@ -56,7 +57,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setCameraResolutionID(-1);
         setCameraFlashlight(0);
         setCameraQuality(50);
-        setCameraDegree(90);
 
         setSoundPlay(0);
         setSoundRecord(0);
@@ -78,7 +78,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setCameraResolutionID(-1);
         setCameraFlashlight(0);
         setCameraQuality(50);
-        setCameraDegree(90);
 
         setSoundPlay(0);
         setSoundRecord(0);
@@ -179,7 +178,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     public synchronized int getCameraQuality(){
         return cameraQuality;
     }
-    public synchronized int getCameraDegree() { return cameraDegree; }
 
     public synchronized int getSoundPlay(){
         return soundPlay;
@@ -200,9 +198,6 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     }
     public synchronized void setCameraQuality(int _cameraQuality) {
         cameraQuality = _cameraQuality;
-    }
-    public synchronized void setCameraDegree(int _cameraDegree) {
-        cameraDegree = _cameraDegree;
     }
     public synchronized void setSoundPlay(int _soundPlay) {
         soundPlay = _soundPlay;

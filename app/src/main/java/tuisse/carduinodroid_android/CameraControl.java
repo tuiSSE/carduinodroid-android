@@ -57,7 +57,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
     private int previewResolutionID;
     private int previewQuality;
-    private int previewOrtientation;
     private int previewFlashLight;
     private int previewCamType;
 
@@ -85,7 +84,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         previewResolutionID = -1;
         previewQuality = 50;
-        previewOrtientation = 90;
         previewFlashLight = 0;
         previewCamType = 1;
     }
@@ -96,7 +94,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         previewResolutionID = getDData().getCameraResolutionID();
         previewQuality = getDData().getCameraQuality();
-        previewOrtientation = getDData().getCameraDegree();
         previewFlashLight = getDData().getCameraFlashlight();
         previewCamType = getDData().getCameraType();
     }
@@ -138,9 +135,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                     setFlash(previewFlashLight);
 
                     setCameraResolution(previewResolutionID);
-                    setOrientation(previewOrtientation);
 
-                    parameters.setRotation(previewOrtientation);
                     parameters.setPreviewSize(previewWidth, previewHeight);
 
                     camera.setParameters(parameters);
@@ -216,26 +211,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
-    private void setOrientation(int degree){
-
-        String[] degreeValues = Constants.CAMERA_VALUES.ORIENTATION_DEGREES;
-        int numValues = degreeValues.length;
-        boolean isValue = false;
-
-        for(int i = 0; i < numValues; i++){
-            if(Integer.parseInt(degreeValues[i])==degree){
-                isValue = true;
-            }
-        }
-
-        if(isValue){
-            previewOrtientation = degree;
-        }else{
-            Log.e(TAG, "Error on Setting Orientation Value of Camera - It's not allowed Value");
-            previewOrtientation = 90;
-        }
-    }
-
     private void setCompressQuality(int quality){
 
         if(quality > 100) previewQuality = 100;
@@ -304,7 +279,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         int _resolutionID = getDData().getCameraResolutionID(); //Width and Height
         int _cameraType = getDData().getCameraType();
-        int _cameraDegree = getDData().getCameraDegree();
         int _flashLight = getDData().getCameraFlashlight();
         int _cameraQuality = getDData().getCameraQuality();
 
@@ -313,7 +287,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
                 isUpdated = true;
             }
         }
-        if(_cameraDegree != previewOrtientation) isUpdated = true;
+
         if(_cameraType != previewCamType) isUpdated = true;
 
         if(isUpdated){
@@ -332,7 +306,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     public void onPreviewFrame(byte[] data, Camera camera) {
 
         isRunning = true;
-        new processImages(camera, data, previewOrtientation).start();
+        new processImages(camera, data).start();
     }
 
     private class IpDataRxReceiver extends BroadcastReceiver {
@@ -375,13 +349,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         protected Camera camera;
         protected byte[] data;
-        protected int degree;
 
-        public processImages(Camera _camera, byte[] _data, int _degree) {
+        public processImages(Camera _camera, byte[] _data) {
 
             camera = _camera;
             data = _data;
-            degree = _degree;
         }
 
         public void run() {

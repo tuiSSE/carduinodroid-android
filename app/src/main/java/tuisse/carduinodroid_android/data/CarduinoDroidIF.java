@@ -24,7 +24,6 @@ public interface CarduinoDroidIF{
     int getCameraFlashlight();
     int getCameraQuality();
     byte[] getCameraPicture();
-    int getCameraDegree();
 
     int getSoundPlay();
     int getSoundRecord();
@@ -35,7 +34,6 @@ public interface CarduinoDroidIF{
     void setCameraFlashlight(int _cameraFlashlight);
     void setCameraQuality(int _cameraQuality);
     void setCameraPicture(byte[] _cameraPicture);
-    void setCameraDegree(int _cameraDegree);
 
     void setSoundPlay(int _soundPlay);
     void setSoundRecord(int _soundRecord);

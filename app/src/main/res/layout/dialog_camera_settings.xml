@@ -6,11 +6,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/labelAlert"
         android:id="@+id/textViewAlert"
         android:layout_marginLeft="5dp"
-        android:textColor="#ff0000" />
+        android:textColor="#ff0000"
+        android:textAlignment="center" />
 
     <TableLayout
         android:layout_width="match_parent"
@@ -25,7 +26,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/labelCamResolution"
                 android:id="@+id/textView"
                 android:layout_weight="1"
@@ -34,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/labelCamType"
                 android:id="@+id/textView2"
                 android:layout_weight="1"
@@ -71,7 +72,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/labelCamRotation"
             android:id="@+id/textView3"
             android:layout_weight="1"
@@ -80,7 +81,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="@string/labelCamQuality"
             android:id="@+id/textView4"
             android:layout_weight="1"

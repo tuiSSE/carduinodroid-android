@@ -171,6 +171,7 @@
                 android:id="@+id/textViewTemperature"
                 android:layout_marginLeft="@dimen/textMargin"
                 android:layout_marginStart="@dimen/textMargin"/>
+
         </LinearLayout>
 
         <LinearLayout
@@ -220,6 +221,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/driveAngle2"
                 android:id="@+id/textViewAngle2"
+                android:layout_marginLeft="@dimen/textMargin"
+                android:layout_marginStart="@dimen/textMargin"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/driveBandwidth"
+                android:id="@+id/textViewBandwidth"
                 android:layout_marginLeft="@dimen/textMargin"
                 android:layout_marginStart="@dimen/textMargin"/>
         </LinearLayout>
@@ -275,7 +283,7 @@
         <Button
             android:drawable="@drawable/icon_status_led"
             android:gravity="center"
-            android:id="@+id/buttonStatusLed"
+            android:id="@+id/buttonFlashLight"
             android:background="@color/colorTransparent"
             android:layout_width="@dimen/fabSize"
             android:layout_height="@dimen/fabSize"
@@ -301,7 +309,7 @@
             android:layout_marginBottom="@dimen/fabMargin"
             android:layout_marginStart="@dimen/fabMargin"
             android:layout_marginLeft="@dimen/fabMargin"
-            android:layout_above="@+id/buttonStatusLed"
+            android:layout_above="@+id/buttonFlashLight"
             style="?android:attr/borderlessButtonStyle"/>
 
     </RelativeLayout>
