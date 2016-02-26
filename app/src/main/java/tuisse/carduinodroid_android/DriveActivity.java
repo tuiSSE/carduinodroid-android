@@ -374,6 +374,10 @@ public class DriveActivity extends AppCompatActivity{
                                     magnetSensor,
                                     SensorManager.SENSOR_DELAY_GAME);
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
+
+                            txDataApp = TrafficStats.getUidTxBytes(applicationUID);
+                            rxDataApp = TrafficStats.getUidRxBytes(applicationUID);
+                            measuringStartTime = System.currentTimeMillis();
                             return true;
                         case MotionEvent.ACTION_UP:
                         case MotionEvent.ACTION_CANCEL:
@@ -602,10 +606,6 @@ public class DriveActivity extends AppCompatActivity{
         if(getData().getSerialState().isRunning()) {
             refresh();
         }
-
-        txDataApp = TrafficStats.getUidTxBytes(applicationUID);
-        rxDataApp = TrafficStats.getUidRxBytes(applicationUID);
-        measuringStartTime = System.currentTimeMillis();
     }
 
     @Override

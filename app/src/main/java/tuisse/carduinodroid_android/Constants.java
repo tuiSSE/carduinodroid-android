@@ -42,6 +42,8 @@ public class Constants {
         int SERIAL      = 100;      //ms
         int IP          = 50;       //ms
         int CONNECTIONTRY = 3000;   //ms
+        int FACTOR_CONTROL = 2;     //2 * IP Delay
+        int FACTOR_CAR = 2;         //2 * IP Delay
     }
 
     public interface TIMEOUT{
@@ -136,6 +138,10 @@ public class Constants {
         String TAG_VIDEO_SOURCE = "Video Source Data";
         String TAG_VIDEO = "Video Data";
         String NUM_VIDEO = "Video";
+
+        String TAG_SERIAL_STATUS = "Serial State";
+        String TAG_SERIAL = "Serial Status";
+        String NUM_SERIAL = "Serial";
 
         String TAG_CONTROL_SPEED = "Car Control Speed";
         String TAG_CONTROL_STEER = "Car Control Steer";

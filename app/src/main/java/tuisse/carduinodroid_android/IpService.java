@@ -84,13 +84,13 @@ public class IpService extends Service {
         isDestroyed = false;
 
         if (getDData().getIpState().isUnknown()) {
-            Log.i(TAG, "Fatal Error - There should be no IP Service started");
+            Log.e(TAG, "Fatal Error - There should be no IP Service started");
             stopSelf();
             return START_STICKY;
         }
 
         if (getDData().getIpState().isError()) {
-            Log.i(TAG, "Error - Service has started with an Error. Try to reset");
+            Log.e(TAG, "Error - Service has started with an Error. Try to reset");
             if (ip != null) {
                 ip.close();
                 ip = null;
@@ -98,7 +98,7 @@ public class IpService extends Service {
         }
 
         if (getDData().getIpState().isFound()) {
-            Log.i(TAG, "Error - Service should no be in this State. Try to reset");
+            Log.e(TAG, "Error - Service should not be in this State. Try to reset");
             if (ip != null) {
                 ip.close();
                 ip = null;
@@ -107,10 +107,10 @@ public class IpService extends Service {
 
         if (!getDData().getIpState().isIdle()) {
             if (ip != null) {
-                Log.i(TAG, "Service has been already started");
+                Log.e(TAG, "Service has been already started");
                 return START_STICKY;
             } else {
-                Log.i(TAG, "Emergency - IP Connection has no object but a state as if it runs");
+                Log.e(TAG, "Emergency - IP Connection has no object but a state as if it runs");
                 getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
             }
         }
@@ -168,7 +168,7 @@ public class IpService extends Service {
                     try {
                         Thread.sleep(5);
                     } catch (InterruptedException e) {
-                        Log.i(TAG, "Error while Sleeping during the Starting Sequence");
+                        Log.e(TAG, "Error while Sleeping during the Starting Sequence");
                         e.printStackTrace();
                         getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
                         break;
@@ -214,7 +214,7 @@ public class IpService extends Service {
                     try {
                         Thread.sleep(5);
                     } catch (InterruptedException e) {
-                        Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
+                        Log.e(TAG, "Error while Sleeping during the Stopping Sequence");
                         e.printStackTrace();
                         getDData().setIpState(new ConnectionState(ConnectionEnum.ERROR));
                         break;

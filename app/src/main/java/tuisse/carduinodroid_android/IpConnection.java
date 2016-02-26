@@ -48,10 +48,6 @@ public class IpConnection {
     Socket remoteCtrlSocket;
     Socket remoteDataSocket;
 
-    protected int applicationUID;
-    protected long rxDataApp;
-    protected long txDataApp;
-
     BufferedWriter intentWriter;
 
     CameraSupportedResolutionReceiver cameraSupportedResolutionReceiver;
@@ -87,11 +83,6 @@ public class IpConnection {
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver,soundSettingChangedFilter);
 
-        //Getting the specific UID of this App and the traffic since the last reboot of this device
-        applicationUID = ipService.getApplication().getApplicationInfo().uid;
-        txDataApp = TrafficStats.getUidTxBytes(applicationUID);
-        rxDataApp = TrafficStats.getUidRxBytes(applicationUID);
-
         reset();
     }
 
@@ -102,7 +93,6 @@ public class IpConnection {
         ctrlSocket = null;
         dataSocket = null;
         intentWriter = null;
-        ///TODO: Lars: state hier ändern? damit du sicher in idle nach einem reset bist...
     }
 
     protected DataHandler getDataHandler(){
@@ -123,8 +113,8 @@ public class IpConnection {
             createSocketServer(Constants.IP_CONNECTION.TAG_CTRLPORT);
             createSocketServer(Constants.IP_CONNECTION.TAG_DATAPORT);
         } catch (IOException e) {
-            Log.d(TAG, "Problem with Setup of DATA or CONTROL Server Socket");
-            setIpState(ConnectionEnum.ERROR);
+            Log.e(TAG, "Problem with Setup of DATA or CONTROL Server Socket");
+            setIpState(ConnectionEnum.ERROR, "SocketServer Setup Failure");
             e.printStackTrace();
         }
     }
@@ -136,27 +126,27 @@ public class IpConnection {
         {
             if(dataSocketServer==null){
 
-                Log.d(TAG, "Create Data Server Socket");
+                Log.i(TAG, "Create Data Server Socket");
                 dataSocketServer = new ServerSocket();
                 dataSocketServer.setReuseAddress(true);
                 dataSocketServer.bind(new InetSocketAddress(Constants.IP_CONNECTION.DATAPORT));
 
-                Log.d(TAG, "Created Data Server Socket");
-            }else{Log.d(TAG, "Data Server Socket already initialized");}
+                Log.i(TAG, "Created Data Server Socket");
+            }else{Log.i(TAG, "Data Server Socket was already initialized");}
 
         }else if(socketType.toLowerCase().equals(Constants.IP_CONNECTION.TAG_CTRLPORT.toLowerCase()))
         {
             if(ctrlSocketServer==null) {
 
-                Log.d(TAG, "Create Ctrl Server Socket");
+                Log.i(TAG, "Create Ctrl Server Socket");
                 ctrlSocketServer = new ServerSocket();
                 ctrlSocketServer.setReuseAddress(true);
                 ctrlSocketServer.bind(new InetSocketAddress(Constants.IP_CONNECTION.CTRLPORT));
-                Log.d(TAG, "Created Ctrl Server Socket");
-            }else{Log.d(TAG, "Ctrl Server Socket already initialized");}
+                Log.i(TAG, "Created Ctrl Server Socket");
+            }else{Log.i(TAG, "Ctrl Server Socket was already initialized");}
 
         }else{
-            Log.d(TAG, "Server Socket has the wrong type");
+            Log.e(TAG, "Server Socket has the wrong type");
             return false;
         }
 
@@ -177,9 +167,8 @@ public class IpConnection {
             if(!ipDataConnectionServerThread.isAlive()) ipDataConnectionServerThread.start();
         }
         else {
-            setIpState(ConnectionEnum.ERROR);
-            //TODO: Lars: besser: Log.e bei fehler :)
-            Log.d(TAG, "Data/Ctrl Socket nicht da");
+            setIpState(ConnectionEnum.ERROR, "Data or Ctrl Socket not Available");
+            Log.e(TAG, "Data/Ctrl Socket not available");
         }
     }
 
@@ -189,8 +178,6 @@ public class IpConnection {
         setMyIp(getLocalIpAddress());
 
         setIpState(ConnectionEnum.TRYCONNECT);
-        // Thread einrichten der mit einem Delay immer prüft, ob man sich in Remote verbunden hat und
-        // falls kein Connected/Running ist, dann wird wieder ein Verbindungsversuch angetriggert
     }
 
     protected void startClientThread(){
@@ -200,8 +187,7 @@ public class IpConnection {
 
     protected void close(){
 
-        Log.d(TAG, "Closing IP Connection Service");
-        //ipService.setIsClosing(true);
+        Log.i(TAG, "Closing IP Connection Service");
 
         new Thread(new Runnable() {
 
@@ -209,8 +195,8 @@ public class IpConnection {
 
             public void run() {
                 try {
-                    //hard work around for client.accept to cancel them without exception and do not miss used expetion
-
+                    //hard work around for client.accept to cancel them without exception -
+                    //to not miss use an important exception while waiting for connection
                     if(ctrlSocketServer!=null){
                         if(!ctrlSocketServer.isClosed()/* && isTryFind()*/){
 
@@ -223,9 +209,9 @@ public class IpConnection {
                             try {
                                 Thread.sleep(5);
                             } catch (InterruptedException e) {
-                                Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
+                                Log.e(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
-                                setIpState(ConnectionEnum.ERROR);
+                                setIpState(ConnectionEnum.ERROR, "Sleeping Error Ctrl while Stopping");
                                 break;
                             }
                         }
@@ -246,13 +232,12 @@ public class IpConnection {
                                 counter++;
                                 if(counter>=5){
                                     dataSocketServerDisconnected=true;
-                                    Log.d(TAG,"counter expired");
+                                    Log.i(TAG,"Data Socket disconnect Counter expired");
                                 }
                             } catch (InterruptedException e) {
-                                ///TODO: Lars: warum i??? e!
-                                Log.i(TAG, "Error while Sleeping during the Stopping Sequence");
+                                Log.e(TAG, "Error while Sleeping during the Stopping Sequence");
                                 e.printStackTrace();
-                                setIpState(ConnectionEnum.ERROR);
+                                setIpState(ConnectionEnum.ERROR, "Sleeping Error Data while Stopping");
                                 break;
                             }
                         }
@@ -270,15 +255,15 @@ public class IpConnection {
                                 e.printStackTrace();
                             }
                         }
-                        Log.d(TAG, "Client Threads Closed");
+                        Log.i(TAG, "Client Threads Closed");
                         if(!remoteDataSocket.isClosed())remoteDataSocket.close();
                     }
 
-                    Log.d(TAG, "Closed IP Connection Service");
+                    Log.i(TAG, "Closed IP Connection Service");
 
                 } catch (IOException e) {
-                    Log.d(TAG, "Error on closing IP Connection Service");
-                    setIpState(ConnectionEnum.ERROR);
+                    Log.e(TAG, "Error on closing IP Connection Service");
+                    setIpState(ConnectionEnum.ERROR, "IP Connection Service Closing Failure");
                     e.printStackTrace();
                 }
                 ipService.setIsClosing(false);
@@ -302,29 +287,29 @@ public class IpConnection {
 
         if(transmit != null){
             if(Constants.LOG.IP) {
-                Log.d(TAG,  "OUT: " +  transmit.toString());
+                Log.i(TAG,  "OUT: " +  transmit.toString());
             }
             outData.write(transmit.toString());
             outData.newLine();
             outData.flush();
         }else{
-            Log.d(TAG,"Error while Creating JSON Object on Handler");
-            setIpState(ConnectionEnum.ERROR);
+            Log.e(TAG,"Error while Creating JSON Object on Handler");
+            setIpState(ConnectionEnum.ERROR, "Data sending Failure");
         }
     }
 
     protected void receiveData(String dataPacket) throws IOException{
 
         getDataHandler().parseJson(dataPacket);
-        Log.d(TAG, "IN: " + dataPacket.toString());
-
+        if(Constants.LOG.RECEIVER) {
+            Log.i(TAG, "IN: " + dataPacket.toString());
+        }
         Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
         LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
     }
 
     protected boolean receiveCtrl(String dataPacket) throws IOException{
 
-        //Log.d(TAG, dataPacket);
         return getDataHandler().parseJson(dataPacket);
     }
 
@@ -350,10 +335,10 @@ public class IpConnection {
 
                 try {
 
-                    Log.d(TAG, "Waiting for Data Connection Accept");
+                    Log.i(TAG, "Waiting for Data Connection Accept");
                     dataSocket = dataSocketServer.accept();
                 } catch (IOException e) {
-                    setIpState(ConnectionEnum.ERROR);
+                    setIpState(ConnectionEnum.ERROR, "Error on Accept Remote Data Connection");
                     e.printStackTrace();
                 }
 
@@ -372,8 +357,8 @@ public class IpConnection {
 
                             saveActualBufferedWriter(outData);
                         } catch (IOException e) {
-                            Log.d(TAG, "BufferedReader/Writer Initialization Error");
-                            setIpState(ConnectionEnum.ERROR);
+                            Log.e(TAG, "BufferedReader/Writer Initialization Error");
+                            setIpState(ConnectionEnum.ERROR, "BufferedReader/Writer Init Error");
                             e.printStackTrace();
                             break;
                         }
@@ -390,7 +375,7 @@ public class IpConnection {
                         Thread.sleep(5);
                         if(dataSocketServerDisconnected) break;
                     } catch (InterruptedException e) {
-                        setIpState(ConnectionEnum.ERROR);
+                        setIpState(ConnectionEnum.ERROR, "Error on Data SocketServer Sleep");
                         e.printStackTrace();
                     }
                 }
@@ -427,8 +412,8 @@ public class IpConnection {
                     }
                     break;
                 } catch (IOException e) {
-                    Log.d(TAG, "Already Connection Lost before send");
-                    setIpState(ConnectionEnum.ERROR);
+                    Log.e(TAG, "Already Connection Lost before send");
+                    setIpState(ConnectionEnum.ERROR, "Receive Thread Error");
                     e.printStackTrace();
                     break;
                 }
@@ -445,7 +430,6 @@ public class IpConnection {
         int timer = 0;
         String information;
         public IpDataSendThread(BufferedWriter writer) {
-            //super("IpConnection-IpDataSendThread");
             this.outData = writer;
         }
         @Override
@@ -454,8 +438,7 @@ public class IpConnection {
             while(isRunning())
             {
                 try {
-					
-					/// TODO: Lars: information string erstellen auslagern!
+
                     information = "";
 
                     if(!isClient){ //Data from Transceiver to Remote
@@ -463,7 +446,7 @@ public class IpConnection {
                         information +=
                                 Constants.JSON_OBJECT.NUM_VIDEO;
                         //every 2 * 50 ms = 100 ms
-                        if((timer = timer % 2) == 0){
+                        if((timer = timer % Constants.DELAY.FACTOR_CAR) == 0){
 
                             information +=
                                     Constants.JSON_OBJECT.NUM_CAR +
@@ -472,7 +455,7 @@ public class IpConnection {
                     }
                     else{ //Data from Remote to Transceiver
                         //every 2 * 50 ms = 100 ms
-                        if((timer = timer % 2) == 0){
+                        if((timer = timer % Constants.DELAY.FACTOR_CONTROL) == 0){
 
                             information +=
                                     Constants.JSON_OBJECT.NUM_CONTROL;
@@ -487,7 +470,7 @@ public class IpConnection {
                     if(dataSocketServerDisconnected) break;
                 } catch (IOException e) {
                     //This Error will be created be Closing Connection while sleeping
-                    Log.d(TAG, "Already Connection Lost before send");
+                    Log.i(TAG, "Already Connection Lost before send");
                     if(isClient){
                         setIpState(ConnectionEnum.TRYCONNECT);
                     }
@@ -498,7 +481,7 @@ public class IpConnection {
                     e.printStackTrace();
                     break;
                 } catch (InterruptedException e) {
-                    setIpState(ConnectionEnum.ERROR);
+                    setIpState(ConnectionEnum.ERROR, "Receive Thread Sleep Error");
                     e.printStackTrace();
                     break;
                 }
@@ -520,17 +503,16 @@ public class IpConnection {
             ctrlSocketServerDisconnected = false;
 
             // Stay Rdy for Request of Transmission over Control Server Socket
-            //TODO Lars: meinst du isStarted()?
             while (isRunning()||isTryFind()||isConnected()) {
                 ctrlSocket = null;
 
                 try {
-                    Log.d(TAG, "Waiting for Ctrl Connection Accept");
+                    Log.i(TAG, "Waiting for Ctrl Connection Accept");
                     ctrlSocket = ctrlSocketServer.accept();
                     // new thread for each client request
                 } catch (IOException e) {
-                    Log.d(TAG, "Error on Ctrl Connection Accept");
-                    setIpState(ConnectionEnum.TRYCONNECTERROR);
+                    Log.e(TAG, "Error on Ctrl Connection Accept");
+                    setIpState(ConnectionEnum.TRYCONNECTERROR, "Error on Accept Remote Ctrl Connection");
                     e.printStackTrace();
                 }
 
@@ -542,8 +524,8 @@ public class IpConnection {
                         break;
                     }
                 }else{
-                    Log.d(TAG, "Ctrl Socket is null");
-                    setIpState(ConnectionEnum.ERROR);
+                    Log.e(TAG, "Ctrl Socket is null");
+                    setIpState(ConnectionEnum.ERROR, "Ctrl Socket already Null");
                 }
             }
         }
@@ -568,10 +550,11 @@ public class IpConnection {
                     socket.close();
                 }
             } catch (IOException e) {
-                setIpState(ConnectionEnum.TRYCONNECTERROR);
+                Log.e(TAG, "Ctrl Msg wasnt send");
+                setIpState(ConnectionEnum.TRYCONNECTERROR, "Error on Sending Ctrl Message");
                 e.printStackTrace();
             } catch (InterruptedException e) {
-                setIpState(ConnectionEnum.ERROR);
+                setIpState(ConnectionEnum.ERROR, "Error on Ctrl Message Sleep");
                 e.printStackTrace();
             }
         }
@@ -582,14 +565,13 @@ public class IpConnection {
         protected String address;
         protected BufferedReader inData;
         protected BufferedWriter outData;
-        protected boolean isConnectedRunning;
+        protected boolean isTargetDataSocketInUse;
 
         public ClientConnection(){
 
             inData = null;
             outData = null;
-            //TODO: Lars: hat mich vom namen total verwirrt. Vorschlag: deviceConnected, isUsed... hat weniger etwas mit dem ipstate zu tun.
-            isConnectedRunning = true;
+            isTargetDataSocketInUse = true;
         }
 
         public void run(){
@@ -604,19 +586,19 @@ public class IpConnection {
                         while ((incomingDataMsg = reader.readLine()) != null) {
                             receiveData(incomingDataMsg);
 
-                            if (receiveCtrl(incomingDataMsg)) isConnectedRunning = true;
-                            else isConnectedRunning = false;
+                            if (receiveCtrl(incomingDataMsg)) isTargetDataSocketInUse = true;
+                            else isTargetDataSocketInUse = false;
                         }
 
                         remoteCtrlSocket.close();
 
                         try {
-                            if (isConnectedRunning) {
+                            if (isTargetDataSocketInUse) {
 
-                                Log.d(TAG, "Data Server is already in use - No Connection has been established");
-                            } else if (!isConnectedRunning) {
+                                Log.i(TAG, "Data Server is already in use - No Connection has been established");
+                            } else if (!isTargetDataSocketInUse) {
 
-                                Log.d(TAG, "Data Server is free - Try to build up a Connection");
+                                Log.i(TAG, "Data Server is free - Try to build up a Connection");
                                 setIpState(ConnectionEnum.CONNECTED);
                                 remoteDataSocket = new Socket(address, Constants.IP_CONNECTION.DATAPORT);
 
@@ -630,14 +612,14 @@ public class IpConnection {
                                 saveActualBufferedWriter(outData);
                             }
                         } catch (IOException e) {
-                            setIpState(ConnectionEnum.TRYCONNECTERROR);
-                            Log.d(TAG, "Client cant connect to Data Server Socket");
+                            setIpState(ConnectionEnum.TRYCONNECTERROR, "Client can't connect to Data");
+                            Log.e(TAG, "Client cant connect to Data Server Socket");
                             e.printStackTrace();
                         }
 
                     } catch (IOException e) {
-                        setIpState(ConnectionEnum.ERROR);
-                        Log.d(TAG, "Client cant connect to Ctrl Server Socket");
+                        setIpState(ConnectionEnum.ERROR, "Client can't connect to Ctrl");
+                        Log.e(TAG, "Client cant connect to Ctrl Server Socket");
                         e.printStackTrace();
                     }
                 } else if (isConnected() || isRunning()) {
@@ -653,15 +635,15 @@ public class IpConnection {
                                     e.printStackTrace();
                                 }
                             }
-                            Log.d(TAG, "Client Threads Closed");
+                            Log.i(TAG, "Client Threads Closed");
                             if(!remoteDataSocket.isClosed()) try {
                                 remoteDataSocket.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
-                    } else{
-                        Log.d(TAG, "Client is already running");
+                    } else {
+                        Log.e(TAG, "Client is already running");
                     }
                 }
 
@@ -679,7 +661,7 @@ public class IpConnection {
 
         WifiManager wifiMgr = (WifiManager) ipService.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        //TODO: Find a better Solution then Formatter
+
         String ip = Formatter.formatIpAddress(wifiInfo.getIpAddress());
 
         return ip;
@@ -740,6 +722,7 @@ public class IpConnection {
         }
     }
 
+
     protected void setRemoteIP(String ip){
         getDData().setRemoteIp(ip);
     }
@@ -767,8 +750,7 @@ public class IpConnection {
 	protected synchronized void setIpState(ConnectionEnum state){
         setIpState(state, "");
 	}
-	
-    //TODO: Lars: diese funktion solltest du dann nutzen: :)
+
     protected synchronized void setIpState(ConnectionEnum state, int error){
         setIpState(state, ipService.getString(error));
     }

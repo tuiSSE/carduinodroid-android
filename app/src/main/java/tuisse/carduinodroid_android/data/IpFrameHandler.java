@@ -31,6 +31,7 @@ public class IpFrameHandler implements IpFrameIF{
     private boolean isControl;
     private boolean isCamera;
     private boolean isSound;
+    private boolean isSerial;
 
     private boolean isForClient;
     private boolean isForServer;
@@ -98,6 +99,11 @@ public class IpFrameHandler implements IpFrameIF{
                             byte[] PictureFrameBase64Decoded = Base64.decode(PictureFrameBase64Encoded, Base64.DEFAULT);
                             carduinoDroidData.setCameraPicture(PictureFrameBase64Decoded);
                         }
+                        if(isSerial){
+                            JSONObject JsonObjectSerial = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SERIAL);
+
+                            //carduinoData.setSerialState(JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_STATUS));
+                        }
                         return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else{
                         //Parsing all the information given from a Client to the Server
@@ -150,8 +156,9 @@ public class IpFrameHandler implements IpFrameIF{
         isControl = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CONTROL);
         isCamera = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAMERA);
         isSound = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SOUND);
+        isSerial = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SERIAL);
 
-        isForClient = (isCar || isMobility || isNetwork || isHardware || isVideo);
+        isForClient = (isCar || isMobility || isNetwork || isHardware || isVideo || isSerial);
         isForServer = (isControl || isCamera ||isSound);
 
         return !(isForClient&&isForServer);
@@ -252,6 +259,16 @@ public class IpFrameHandler implements IpFrameIF{
                     JsonObjectHardwareInformation.put(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION, setSupportedSizesObject());
                 }
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_HARDWARE, JsonObjectHardwareInformation);
+                isMaskTypeServer = true;
+            }
+
+            if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_SERIAL)) {
+
+                JSONObject JsonObjectSerialInformation = new JSONObject();
+
+                JsonObjectSerialInformation.put(Constants.JSON_OBJECT.TAG_SERIAL_STATUS, carduinoData.getSerialState().toString());
+
+                JsonObjectData.put(Constants.JSON_OBJECT.TAG_SERIAL, JsonObjectSerialInformation);
                 isMaskTypeServer = true;
             }
 
