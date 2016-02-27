@@ -9,7 +9,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import tuisse.carduinodroid_android.Constants;
-import tuisse.carduinodroid_android.Sound;
 
 /**
  * Created by mate on 02.02.2016.
@@ -18,7 +17,6 @@ public class IpFrameHandler implements IpFrameIF{
     private final String TAG = "CarduinoIpFrame";
     private CarduinoDroidData carduinoDroidData;
     private CarduinoData carduinoData;
-    private Sound sound;
 
     private JSONObject JsonObjectData;
     private boolean isMaskTypeServer;
@@ -39,13 +37,12 @@ public class IpFrameHandler implements IpFrameIF{
     public IpFrameHandler(CarduinoData cd, CarduinoDroidData cdd){
         carduinoDroidData = cdd;
         carduinoData = cd;
-        sound = new Sound();
         //setClientVersion(0);
     }
 
     // translate a received JSON object to get all the send information out of it and set it to
     // their variables
-    public synchronized boolean parseJson(String jsonObjectRxData) {
+    public synchronized String parseJson(String jsonObjectRxData) {
         // return isConnectedRunning = true if Data Server is already connected/running or if there
         // are some errors occurring
         try {
@@ -55,15 +52,16 @@ public class IpFrameHandler implements IpFrameIF{
             //First Check if both sides (Remote & Transceiver) using the same JSON Version
             if(JsonObjectHeader.getInt(Constants.JSON_OBJECT.TAG_HEADER_VERSION) != Constants.JSON_OBJECT.MY_VERSION) {
                 Log.e(TAG, "Wrong JSON Version between Transmitter and Receiver");
-                return true;
+                return "true";
             }else{
                 String mask = JsonObjectHeader.getString(Constants.JSON_OBJECT.TAG_HEADER_INFORMATION_TYPE);
                 if(isMaskLogic(mask)){
                     //Define the Type for the right Parsing
-                    Log.i(TAG, String.valueOf(JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS)));
+                    //Log.i(TAG, String.valueOf(JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS)));
                     if(!isForServer&&!isForClient){
                         //Ctrl Server Socket Data: Information about Data Server Socket Status as feedback
-                        return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
+                        //test if a boolean value will be shown as String
+                        return JsonObjectHeader.getString(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
                     }else if(isForClient){
                         //Parsing all the information given from a Server to the Client
                         if(isCar){
@@ -110,7 +108,7 @@ public class IpFrameHandler implements IpFrameIF{
                             carduinoData.setSerialType(
                                     SerialType.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_TYPE)));
                         }
-                        return JsonObjectHeader.getBoolean(Constants.JSON_OBJECT.TAG_HEADER_DATA_SERVER_STATUS);
+                        return mask;
                     }else{
                         //Parsing all the information given from a Client to the Server
                         if(isControl){
@@ -135,20 +133,18 @@ public class IpFrameHandler implements IpFrameIF{
 
                             carduinoDroidData.setSoundPlay(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_PLAY));
                             carduinoDroidData.setSoundRecord(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_RECORD));
-
-                            if(carduinoDroidData.getSoundPlay() == 1) sound.horn(); else sound.stop();
                         }
-                        return true;
+                        return mask;
                     }
                 }else{
                     Log.e(TAG, "Error on JSON Parsing by mixed up Data inclusion (Both Client and Server Data)");
-                    return true;
+                    return "true";
                 }
             }
         } catch (JSONException e) {
             Log.e(TAG, "Error on JSON Parsing by missing information)");
             e.printStackTrace();
-            return true;
+            return "true";
         }
     }
 

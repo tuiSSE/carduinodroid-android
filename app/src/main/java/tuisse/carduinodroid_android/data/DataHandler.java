@@ -410,9 +410,9 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
-    public synchronized boolean parseJson(String jsonObjectRxData) {
+    public synchronized String parseJson(String jsonObjectRxData) {
         if(controlMode.isDirect()){
-            return false;
+            return "false";
         }
         return ipFrameHandler.parseJson(jsonObjectRxData);
     }

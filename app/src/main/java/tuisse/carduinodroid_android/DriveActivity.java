@@ -48,13 +48,17 @@ public class DriveActivity extends AppCompatActivity{
 
     private SerialDataRxReceiver serialDataRxReceiver;
     private CommunicationStatusChangeReceiver communicationStatusChangeReceiver;
-    private IpDataRxReceiver ipDataRxReceiver;
     private CameraDataReceiver cameraDataReceiver;
+    private IpDataCarReceiver ipDataCarReceiver;
+    private IpDataVideoReceiver ipDataVideoReceiver;
+    private IpDataControlReceiver ipDataControlReceiver;
 
     private IntentFilter serialDataRxFilter;
     private IntentFilter communicationStatusChangeFilter;
-    private IntentFilter ipDataRxFilter;
     private IntentFilter cameraDataFilter;
+    private IntentFilter ipDataCarFilter;
+    private IntentFilter ipDataVideoFilter;
+    private IntentFilter ipDataControlFilter;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -581,8 +585,14 @@ public class DriveActivity extends AppCompatActivity{
             serialDataRxReceiver = new SerialDataRxReceiver();
             serialDataRxFilter = new IntentFilter(Constants.EVENT.SERIAL_DATA_RECEIVED);
 
-            ipDataRxReceiver = new IpDataRxReceiver();
-            ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
+            ipDataCarReceiver = new IpDataCarReceiver();
+            ipDataCarFilter = new IntentFilter(Constants.EVENT.IP_DATA_CAR);
+
+            ipDataVideoReceiver = new IpDataVideoReceiver();
+            ipDataVideoFilter = new IntentFilter(Constants.EVENT.IP_DATA_VIDEO);
+
+            ipDataControlReceiver = new IpDataControlReceiver();
+            ipDataControlFilter = new IntentFilter(Constants.EVENT.IP_DATA_CONTROL);
 
             cameraDataReceiver = new CameraDataReceiver();
             cameraDataFilter = new IntentFilter(Constants.EVENT.CAMERA_DATA_RECEIVED);
@@ -600,7 +610,9 @@ public class DriveActivity extends AppCompatActivity{
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(communicationStatusChangeReceiver, communicationStatusChangeFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(serialDataRxReceiver, serialDataRxFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataCarReceiver, ipDataCarFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataControlReceiver, ipDataControlFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataVideoReceiver, ipDataVideoFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(cameraDataReceiver, cameraDataFilter);
         setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
@@ -613,21 +625,34 @@ public class DriveActivity extends AppCompatActivity{
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(communicationStatusChangeReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(serialDataRxReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataRxReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataCarReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataControlReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataVideoReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraDataReceiver);
         reset();
     }
 
-    private class IpDataRxReceiver extends BroadcastReceiver {
+    private class IpDataVideoReceiver extends BroadcastReceiver {
         @Override
-        public void onReceive(Context context, Intent intent){
+        public void onReceive(Context context, Intent intent) {
 
-            if(carduino.dataHandler.getControlMode().isRemote()){
-                setImageViewBitmap();
-                refresh();
-            }else if(carduino.dataHandler.getControlMode().isTransceiver()){
-                setClientValues();
-            }
+            setImageViewBitmap();
+        }
+    }
+    /// AUFPASSEN HIER EINTEILEN GLEICH
+    private class IpDataCarReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            refresh();
+        }
+    }
+
+    private class IpDataControlReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            setClientValues();
         }
     }
 
@@ -645,7 +670,7 @@ public class DriveActivity extends AppCompatActivity{
             setBackgroundColor();
         }
     }
-
+    //Direct taken by the camera
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {

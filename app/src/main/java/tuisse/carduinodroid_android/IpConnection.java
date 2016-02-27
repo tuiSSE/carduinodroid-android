@@ -28,6 +28,7 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
+import tuisse.carduinodroid_android.Sound;
 
 /**
  * Created by keX on 04.01.2016.
@@ -39,6 +40,8 @@ public class IpConnection {
     protected IpCtrlSendServerThread       ipCtrlSendServerThread;
 
     static final String TAG = "CarduinoIpConnection";
+
+    Sound sound;
 
     ServerSocket ctrlSocketServer;
     ServerSocket dataSocketServer;
@@ -72,6 +75,8 @@ public class IpConnection {
     IpConnection(IpService s){
 
         ipService = s;
+
+        sound = new Sound();
 
         cameraSupportedResolutionReceiver = new CameraSupportedResolutionReceiver();
         cameraSettingsChangedReceiver = new CameraSettingsChangedReceiver();
@@ -289,7 +294,7 @@ public class IpConnection {
 
     private synchronized void sendData(BufferedWriter outData, String dataTypeMask) throws IOException{
 
-        JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask,requestDataStatus());
+        JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask, requestDataStatus());
 
         if(transmit != null){
             if(Constants.LOG.IP) {
@@ -306,25 +311,41 @@ public class IpConnection {
 
     protected void receiveData(String dataPacket) throws IOException{
 
-        getDataHandler().parseJson(dataPacket);
+        String mask = getDataHandler().parseJson(dataPacket);
         if(Constants.LOG.RECEIVER) {
             Log.i(TAG, "IN: " + dataPacket.toString());
         }
 
-        ///TODO:1 LARS: return parseJSON boolean->string (DataMask)
-        ///TODO:2 LARS: specific intents (take care of control message)
+        if(mask.contains(Constants.JSON_OBJECT.NUM_CAR)){
+            Intent onIpDataCar = new Intent(Constants.EVENT.IP_DATA_CAR);
+            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataCar);
+        }
 
-        Intent onIpDataRxIntent = new Intent(Constants.EVENT.IP_DATA_RECEIVED);
-        LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataRxIntent);
+        if(mask.contains(Constants.JSON_OBJECT.NUM_VIDEO)){
+            Intent onIpDataVideo = new Intent(Constants.EVENT.IP_DATA_VIDEO);
+            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataVideo);
+        }
 
-        if(getDataHandler().getControlMode().isRemote()){//rework with implemented TODO1 & TODO2
+        if(mask.contains(Constants.JSON_OBJECT.NUM_SERIAL)){
             Intent onSerialStatusIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
             LocalBroadcastManager.getInstance(ipService).sendBroadcast(onSerialStatusIntent);
         }
 
+        if(mask.contains(Constants.JSON_OBJECT.NUM_CONTROL)){
+            Intent onIpDataControl = new Intent(Constants.EVENT.IP_DATA_CONTROL);
+            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataControl);
+        }
+
+        if(mask.contains(Constants.JSON_OBJECT.NUM_CAMERA)){
+            Intent onIpDataCamera = new Intent(Constants.EVENT.IP_DATA_CAMERA);
+            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataCamera);}
+
+        if(mask.contains(Constants.JSON_OBJECT.NUM_SOUND)){
+            if(getDData().getSoundPlay() == 1) sound.horn(); else sound.stop();
+        }
     }
 
-    protected boolean receiveCtrl(String dataPacket) throws IOException{
+    protected String receiveCtrl(String dataPacket) throws IOException{
 
         return getDataHandler().parseJson(dataPacket);
     }
@@ -602,8 +623,8 @@ public class IpConnection {
                         while ((incomingDataMsg = reader.readLine()) != null) {
                             receiveData(incomingDataMsg);
 
-                            if (receiveCtrl(incomingDataMsg)) isTargetDataSocketInUse = true;
-                            else isTargetDataSocketInUse = false;
+                            if (receiveCtrl(incomingDataMsg).equals("false")) isTargetDataSocketInUse = false;
+                            else isTargetDataSocketInUse = true;
                         }
 
                         remoteCtrlSocket.close();

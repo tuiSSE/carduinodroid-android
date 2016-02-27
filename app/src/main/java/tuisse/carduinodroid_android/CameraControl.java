@@ -46,8 +46,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     protected List<Camera.Size> supportedPreviewSizes;
     protected int numSupportedPrevSizes;
 
-    private IntentFilter ipDataRxFilter;
-    private IpDataRxReceiver ipDataRxReceiver;
+    private IntentFilter ipDataCameraFilter;
+    private IpDataCameraReceiver ipDataCameraReceiver;
 
     private int cameraID;
 
@@ -72,8 +72,8 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         super(s);
         cameraService = s;
 
-        ipDataRxReceiver = new IpDataRxReceiver();
-        ipDataRxFilter = new IntentFilter(Constants.EVENT.IP_DATA_RECEIVED);
+        ipDataCameraReceiver = new IpDataCameraReceiver();
+        ipDataCameraFilter = new IntentFilter(Constants.EVENT.IP_DATA_CAMERA);
     }
 
     protected void init(){
@@ -102,7 +102,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         packageManager = cameraService.getPackageManager();
 
-        LocalBroadcastManager.getInstance(cameraService).registerReceiver(ipDataRxReceiver, ipDataRxFilter);
+        LocalBroadcastManager.getInstance(cameraService).registerReceiver(ipDataCameraReceiver, ipDataCameraFilter);
 
         if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)){
 
@@ -154,7 +154,7 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
 
         isRunning = false;
 
-        LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataRxReceiver);
+        LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataCameraReceiver);
 
         releaseCamera();
         camera = null;
@@ -309,18 +309,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         new processImages(camera, data).start();
     }
 
-    private class IpDataRxReceiver extends BroadcastReceiver {
+    private class IpDataCameraReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (isRunning)
-
-                new Thread(new Runnable() {
-                    public void run() {
-
-                        updateCameraData();
-                    }
-                }, "CameraUpdateThread").start();
+            updateCameraData();
         }
     }
 
