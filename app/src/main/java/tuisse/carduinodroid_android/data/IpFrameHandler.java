@@ -67,46 +67,54 @@ public class IpFrameHandler implements IpFrameIF{
                         if(isCar){
                             JSONObject JsonObjectCarInfo = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CAR);
 
-                            carduinoData.setCurrent(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_CURRENT));
-                            carduinoData.setAbsBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_ABSOLUTE));
-                            carduinoData.setRelBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_PERCENTAGE));
-                            carduinoData.setVoltage(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_VOLTAGE));
-                            carduinoData.setTemperature(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_TEMPERATURE));
-                            carduinoData.setUltrasoundFront(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_FRONT));
-                            carduinoData.setUltrasoundBack(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_BACK));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_CURRENT))
+                                carduinoData.setCurrent(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_CURRENT));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_BATTERY_ABSOLUTE))
+                                carduinoData.setAbsBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_ABSOLUTE));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_BATTERY_PERCENTAGE))
+                                carduinoData.setRelBattCap(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_BATTERY_PERCENTAGE));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_VOLTAGE))
+                                carduinoData.setVoltage(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_VOLTAGE));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_TEMPERATURE))
+                                carduinoData.setTemperature(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_TEMPERATURE));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_FRONT))
+                                carduinoData.setUltrasoundFront(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_FRONT));
+                            if(!JsonObjectCarInfo.isNull(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_BACK))
+                                carduinoData.setUltrasoundBack(JsonObjectCarInfo.getInt(Constants.JSON_OBJECT.TAG_CAR_ULTRASONIC_BACK));
                         }
                         if(isMobility){
                             JSONObject JsonObjectMobility = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_MOBILITY);
 
-                            carduinoDroidData.setGpsData(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_GPS));
-                            carduinoDroidData.setVibration(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_GPS))
+                                carduinoDroidData.setGpsData(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_GPS));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION))
+                                carduinoDroidData.setVibration(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION));
                         }
                         if(isHardware){
                             JSONObject JsonObjectHardware = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE);
-                            //TODO give all the Resolutions to show whats possible and the ID of the actual chosen one
+
+                            if(!JsonObjectHardware.isNull(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM) && !JsonObjectHardware.isNull(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION))
                             carduinoDroidData.setCameraSupportedSizes(getSupportedSizedValues(JsonObjectHardware.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION),
                                     JsonObjectHardware.getInt(Constants.JSON_OBJECT.TAG_HARDWARE_CAMERA_RESOLUTION_NUM)));
-                        }
-                        if(isHardware){
-                            //TO-DO ? Maybe we can leave it out in this app because i see no value out of it
                         }
                         if(isVideo){
                             JSONObject JsonObjectVideo = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_VIDEO);
 
-                            String PictureFrameBase64Encoded = JsonObjectVideo.getString(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE);
-                            byte[] PictureFrameBase64Decoded = Base64.decode(PictureFrameBase64Encoded, Base64.DEFAULT);
-                            carduinoDroidData.setCameraPicture(PictureFrameBase64Decoded);
+                            if(!JsonObjectVideo.isNull(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE)){
+                                String PictureFrameBase64Encoded = JsonObjectVideo.getString(Constants.JSON_OBJECT.TAG_VIDEO_SOURCE);
+                                byte[] PictureFrameBase64Decoded = Base64.decode(PictureFrameBase64Encoded, Base64.DEFAULT);
+                                carduinoDroidData.setCameraPicture(PictureFrameBase64Decoded);}
                         }
                         if(isSerial){
                             JSONObject JsonObjectSerial = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SERIAL);
 
-                            carduinoData.setSerialState(new ConnectionState(
-                                    ConnectionEnum.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_STATUS)),
+                            if(!JsonObjectSerial.isNull(Constants.JSON_OBJECT.TAG_SERIAL_STATUS) && !JsonObjectSerial.isNull(Constants.JSON_OBJECT.TAG_SERIAL_ERROR))
+                                carduinoData.setSerialState(new ConnectionState(ConnectionEnum.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_STATUS)),
                                     JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_ERROR)));
-                            carduinoData.setSerialName(
-                                    JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_NAME));
-                            carduinoData.setSerialType(
-                                    SerialType.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_TYPE)));
+                            if(!JsonObjectSerial.isNull(Constants.JSON_OBJECT.TAG_SERIAL_NAME))
+                                carduinoData.setSerialName(JsonObjectSerial.getString(Constants.JSON_OBJECT.TAG_SERIAL_NAME));
+                            if(!JsonObjectSerial.isNull(Constants.JSON_OBJECT.TAG_SERIAL_TYPE))
+                                carduinoData.setSerialType(SerialType.fromInteger(JsonObjectSerial.getInt(Constants.JSON_OBJECT.TAG_SERIAL_TYPE)));
                         }
                         return mask;
                     }else{
@@ -114,25 +122,35 @@ public class IpFrameHandler implements IpFrameIF{
                         if(isControl){
                             JSONObject JsonObjectControl = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CONTROL);
 
-                            carduinoData.setSpeed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_SPEED));
-                            carduinoData.setSteer(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STEER));
-                            carduinoData.setFrontLight(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_FRONT_LIGHT));
-                            carduinoData.setStatusLed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STATUS_LED));
+                            if(!JsonObjectControl.isNull(Constants.JSON_OBJECT.TAG_CONTROL_SPEED))
+                                carduinoData.setSpeed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_SPEED));
+                            if(!JsonObjectControl.isNull(Constants.JSON_OBJECT.TAG_CONTROL_STEER))
+                                carduinoData.setSteer(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STEER));
+                            if(!JsonObjectControl.isNull(Constants.JSON_OBJECT.TAG_CONTROL_FRONT_LIGHT))
+                                carduinoData.setFrontLight(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_FRONT_LIGHT));
+                            if(!JsonObjectControl.isNull(Constants.JSON_OBJECT.TAG_CONTROL_STATUS_LED))
+                                carduinoData.setStatusLed(JsonObjectControl.getInt(Constants.JSON_OBJECT.TAG_CONTROL_STATUS_LED));
                         }
                         if(isCamera){
                             JSONObject JsonObjectCamera = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_CAMERA);
 
-                            carduinoDroidData.setCameraType(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_TYPE));
-                            carduinoDroidData.setCameraResolutionID(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
-                            carduinoDroidData.setCameraFlashlight(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT));
-                            carduinoDroidData.setCameraQuality(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY));
+                            if(!JsonObjectCamera.isNull(Constants.JSON_OBJECT.TAG_CAMERA_TYPE))
+                                carduinoDroidData.setCameraType(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_TYPE));
+                            if(!JsonObjectCamera.isNull(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION))
+                                carduinoDroidData.setCameraResolutionID(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_RESOLUTION));
+                            if(!JsonObjectCamera.isNull(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT))
+                                carduinoDroidData.setCameraFlashlight(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_LIGHT));
+                            if(!JsonObjectCamera.isNull(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY))
+                                carduinoDroidData.setCameraQuality(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_QUALITY));
                             //carduinoDroidData.setCameraDegree(JsonObjectCamera.getInt(Constants.JSON_OBJECT.TAG_CAMERA_ORIENTATION));
                         }
                         if(isSound){
                             JSONObject JsonObjectSound = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_SOUND);
 
-                            carduinoDroidData.setSoundPlay(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_PLAY));
-                            carduinoDroidData.setSoundRecord(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_RECORD));
+                            if(!JsonObjectSound.isNull(Constants.JSON_OBJECT.TAG_SOUND_PLAY))
+                                carduinoDroidData.setSoundPlay(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_PLAY));
+                            if(!JsonObjectSound.isNull(Constants.JSON_OBJECT.TAG_SOUND_RECORD))
+                                carduinoDroidData.setSoundRecord(JsonObjectSound.getInt(Constants.JSON_OBJECT.TAG_SOUND_RECORD));
                         }
                         return mask;
                     }
