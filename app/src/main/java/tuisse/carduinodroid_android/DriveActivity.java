@@ -52,6 +52,7 @@ public class DriveActivity extends AppCompatActivity{
     private IpDataCarReceiver ipDataCarReceiver;
     private IpDataVideoReceiver ipDataVideoReceiver;
     private IpDataControlReceiver ipDataControlReceiver;
+    private IpDataCameraReceiver ipDataCameraReceiver;
 
     private IntentFilter serialDataRxFilter;
     private IntentFilter communicationStatusChangeFilter;
@@ -59,6 +60,7 @@ public class DriveActivity extends AppCompatActivity{
     private IntentFilter ipDataCarFilter;
     private IntentFilter ipDataVideoFilter;
     private IntentFilter ipDataControlFilter;
+    private IntentFilter ipDataCameraFilter;
 
     private SensorManager sensorManager;
     private Sensor magnetSensor;
@@ -594,6 +596,9 @@ public class DriveActivity extends AppCompatActivity{
             ipDataControlReceiver = new IpDataControlReceiver();
             ipDataControlFilter = new IntentFilter(Constants.EVENT.IP_DATA_CONTROL);
 
+            ipDataCameraReceiver = new IpDataCameraReceiver();
+            ipDataCameraFilter = new IntentFilter(Constants.EVENT.IP_DATA_CAMERA);
+
             cameraDataReceiver = new CameraDataReceiver();
             cameraDataFilter = new IntentFilter(Constants.EVENT.CAMERA_DATA_RECEIVED);
 
@@ -613,6 +618,7 @@ public class DriveActivity extends AppCompatActivity{
         LocalBroadcastManager.getInstance(this).registerReceiver(ipDataCarReceiver, ipDataCarFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(ipDataControlReceiver, ipDataControlFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(ipDataVideoReceiver, ipDataVideoFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(ipDataCameraReceiver, ipDataCameraFilter);
         LocalBroadcastManager.getInstance(this).registerReceiver(cameraDataReceiver, cameraDataFilter);
         setBackgroundColor();
         if(getData().getSerialState().isRunning()) {
@@ -628,6 +634,7 @@ public class DriveActivity extends AppCompatActivity{
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataCarReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataControlReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataVideoReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(ipDataCameraReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(cameraDataReceiver);
         reset();
     }
@@ -653,6 +660,17 @@ public class DriveActivity extends AppCompatActivity{
         public void onReceive(Context context, Intent intent) {
 
             setClientValues();
+        }
+    }
+
+    private class IpDataCameraReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            int flashLight = getDData().getCameraFlashlight();
+
+            if(flashLight == 1) buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
+            else buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
         }
     }
 
@@ -916,13 +934,12 @@ public class DriveActivity extends AppCompatActivity{
         viewImage.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
     }
 
-    private void setClientValues(){
+    private void setClientValues() {
 
         int speed = getData().getSpeed();
         int steering = getData().getSteer();
         int horn = getDData().getSoundPlay();
         int light = getData().getFrontLight();
-        int statusLed = getData().getStatusLed();
 
         textViewSpeed.setText(String.format(getString(R.string.driveSpeed), speed));
         seekBarSpeed.setProgress(speed + CarduinoIF.SPEED_MAX);
@@ -932,8 +949,6 @@ public class DriveActivity extends AppCompatActivity{
         else buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
         if(light == 1) buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
         else buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
-        if(statusLed == 1) buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
-        else buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
     }
 
     private void setCameraQuality(String quality){
