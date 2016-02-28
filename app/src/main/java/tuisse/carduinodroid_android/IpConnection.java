@@ -239,8 +239,8 @@ public class IpConnection {
                                 break;
                             }
                         }
-                        ctrlSocket.close();
-                        ctrlSocketServer.close();
+                        if(ctrlSocket!=null)ctrlSocket.close();
+                        if(ctrlSocketServer!=null)ctrlSocketServer.close();
                     }
                     if(dataSocketServer!=null){
                         if(!dataSocketServer.isClosed()){
@@ -265,8 +265,8 @@ public class IpConnection {
                                 break;
                             }
                         }
-                        dataSocket.close();
-                        dataSocketServer.close();
+                        if(dataSocket!=null)dataSocket.close();
+                        if(dataSocketServer!=null)dataSocketServer.close();
                     }
 
                     if(remoteDataSocket!=null){
@@ -392,35 +392,35 @@ public class IpConnection {
 
                     Log.i(TAG, "Waiting for Data Connection Accept");
                     dataSocket = dataSocketServer.accept();
+
+                    if(dataSocket!=null) {
+                        if (!String.valueOf(dataSocket.getInetAddress().getHostName()).equals("localhost")){
+                            setIpState(ConnectionEnum.CONNECTED);
+                            setRemoteIP(dataSocket.getInetAddress().getHostAddress());
+
+                            try {
+                                inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+                                outData = new BufferedWriter(new OutputStreamWriter(dataSocket.getOutputStream()));
+                                setIpState(ConnectionEnum.RUNNING);
+
+                                new IpDataSendThread(outData).start();
+                                new IpDataReceiveThread(inData).start();
+
+                                saveActualBufferedWriter(outData);
+                            } catch (IOException e) {
+                                Log.e(TAG, "BufferedReader/Writer Initialization Error");
+                                setIpState(ConnectionEnum.ERROR, "BufferedReader/Writer Init Error");
+                                e.printStackTrace();
+                                break;
+                            }
+                        }else{
+                            dataSocketServerDisconnected=true;
+                            break;
+                        }
+                    }
                 } catch (IOException e) {
                     setIpState(ConnectionEnum.ERROR, "Error on Accept Remote Data Connection");
                     e.printStackTrace();
-                }
-
-                if(dataSocket!=null) {
-                    if (!String.valueOf(dataSocket.getInetAddress().getHostName()).equals("localhost")){
-                        setIpState(ConnectionEnum.CONNECTED);
-                        setRemoteIP(dataSocket.getInetAddress().getHostAddress());
-
-                        try {
-                            inData = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
-                            outData = new BufferedWriter(new OutputStreamWriter(dataSocket.getOutputStream()));
-                            setIpState(ConnectionEnum.RUNNING);
-
-                            new IpDataSendThread(outData).start();
-                            new IpDataReceiveThread(inData).start();
-
-                            saveActualBufferedWriter(outData);
-                        } catch (IOException e) {
-                            Log.e(TAG, "BufferedReader/Writer Initialization Error");
-                            setIpState(ConnectionEnum.ERROR, "BufferedReader/Writer Init Error");
-                            e.printStackTrace();
-                            break;
-                        }
-                    }else{
-                        dataSocketServerDisconnected=true;
-                        break;
-                    }
                 }
 
                 while (isRunning()) {
