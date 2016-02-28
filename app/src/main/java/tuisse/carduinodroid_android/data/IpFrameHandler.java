@@ -23,7 +23,7 @@ public class IpFrameHandler implements IpFrameIF{
 
     private boolean isCar;
     private boolean isMobility;
-    private boolean isNetwork;
+    private boolean isFeature;
     private boolean isHardware;
     private boolean isVideo;
     private boolean isControl;
@@ -86,9 +86,23 @@ public class IpFrameHandler implements IpFrameIF{
                             JSONObject JsonObjectMobility = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_MOBILITY);
 
                             if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_GPS))
-                                carduinoDroidData.setGpsData(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_GPS));
-                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION))
-                                carduinoDroidData.setVibration(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION));
+                                carduinoDroidData.setGpsData(JsonObjectMobility.getString(Constants.JSON_OBJECT.TAG_MOBILITY_GPS));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_AVAILABLE))
+                                carduinoDroidData.setMobileAvailable(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_AVAILABLE));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_ACTIVE))
+                                carduinoDroidData.setMobileActive(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_ACTIVE));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_AVAILABLE))
+                                carduinoDroidData.setWlanAvailable(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_AVAILABLE));
+                            if(!JsonObjectMobility.isNull(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_ACTIVE))
+                                carduinoDroidData.setWlanActive(JsonObjectMobility.getInt(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_ACTIVE));
+                        }
+                        if(isFeature){
+                            JSONObject JsonObjectFeature = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_FEATURES);
+
+                            if(!JsonObjectFeature.isNull(Constants.JSON_OBJECT.TAG_FEATURES_VIBRATION))
+                                carduinoDroidData.setVibration((float) JsonObjectFeature.getDouble(Constants.JSON_OBJECT.TAG_FEATURES_VIBRATION));
+                            if(!JsonObjectFeature.isNull(Constants.JSON_OBJECT.TAG_FEATURES_BATTERY_PHONE))
+                                carduinoDroidData.setBatteryPhone((float) JsonObjectFeature.getDouble(Constants.JSON_OBJECT.TAG_FEATURES_BATTERY_PHONE));
                         }
                         if(isHardware){
                             JSONObject JsonObjectHardware = jsonObject.getJSONObject(Constants.JSON_OBJECT.TAG_HARDWARE);
@@ -170,7 +184,7 @@ public class IpFrameHandler implements IpFrameIF{
 
         isCar = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAR);
         isMobility = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_MOBILITY);
-        isNetwork = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_NETWORK);
+        isFeature = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_FEATURES);
         isHardware = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_HARDWARE);
         isVideo = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_VIDEO);
         isControl = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CONTROL);
@@ -178,7 +192,7 @@ public class IpFrameHandler implements IpFrameIF{
         isSound = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SOUND);
         isSerial = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_SERIAL);
 
-        isForClient = (isCar || isMobility || isNetwork || isHardware || isVideo || isSerial);
+        isForClient = (isCar || isMobility || isFeature || isHardware || isVideo || isSerial);
         isForServer = (isControl || isCamera ||isSound);
 
         return !(isForClient&&isForServer);
@@ -222,14 +236,17 @@ public class IpFrameHandler implements IpFrameIF{
                 isMaskTypeServer = true;
             }
             /**** Including Mobility Information ****/
-            // Collect all the mobility information (GPS,Vibration) for the JSON Object to the
+            // Collect all the mobility information (GPS and available Networks) for the JSON Object to the
             // remote side
             if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_MOBILITY)) {
 
                 JSONObject JsonObjectMobilityInformation = new JSONObject();
 
                 JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_GPS, carduinoDroidData.getGpsData());
-                JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_VIBRATION, carduinoDroidData.getVibration());
+                JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_AVAILABLE, carduinoDroidData.getMobileAvailable());
+                JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_MOBILE_ACTIVE, carduinoDroidData.getMobileAvailable());
+                JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_AVAILABLE, carduinoDroidData.getWLANAvailable());
+                JsonObjectMobilityInformation.put(Constants.JSON_OBJECT.TAG_MOBILITY_WLAN_ACTIVE, carduinoDroidData.getWLANActive());
 
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_MOBILITY, JsonObjectMobilityInformation);
                 isMaskTypeServer = true;
@@ -252,19 +269,17 @@ public class IpFrameHandler implements IpFrameIF{
                 JsonObjectData.put(Constants.JSON_OBJECT.TAG_VIDEO, JsonObjectVideoData);
                 isMaskTypeServer = true;
             }
-            /**** Including Network Information ****/
+            /**** Including extra Features ****/
             // rarely updated information based on changed values like
             // Collect all the network information for the JSON Object to the remote side
-            if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_NETWORK)) {
+            if (checkDataTypeMask(dataTypeMask,Constants.JSON_OBJECT.NUM_FEATURES)) {
 
-                JSONObject JsonObjectNetworkInformation = new JSONObject();
+                JSONObject JsonObjectFeatures = new JSONObject();
 
-                JsonObjectNetworkInformation.put(Constants.JSON_OBJECT.TAG_NETWORK_MOBILE_AVAILABLE, carduinoDroidData.getMobileAvailable());
-                JsonObjectNetworkInformation.put(Constants.JSON_OBJECT.TAG_NETWORK_MOBILE_ACTIVE, carduinoDroidData.getMobileActive());
-                JsonObjectNetworkInformation.put(Constants.JSON_OBJECT.TAG_NETWORK_WLAN_AVAILABLE, carduinoDroidData.getWLANAvailable());
-                JsonObjectNetworkInformation.put(Constants.JSON_OBJECT.TAG_NETWORK_WLAN_ACTIVE, carduinoDroidData.getWLANActive());
+                JsonObjectFeatures.put(Constants.JSON_OBJECT.TAG_FEATURES_VIBRATION, carduinoDroidData.getVibration());
+                JsonObjectFeatures.put(Constants.JSON_OBJECT.TAG_FEATURES_BATTERY_PHONE, carduinoDroidData.getBatteryPhone());
 
-                JsonObjectData.put(Constants.JSON_OBJECT.TAG_NETWORK, JsonObjectNetworkInformation);
+                JsonObjectData.put(Constants.JSON_OBJECT.TAG_FEATURES, JsonObjectFeatures);
                 isMaskTypeServer = true;
             }
             /**** Including Hardware Information ****/

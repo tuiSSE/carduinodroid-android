@@ -29,9 +29,10 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private int soundPlay; // Play a horn sound=1 - No horn sound=0;
     private int soundRecord; // Start Recording=1 - Stop Recording=0;
 
-    private int gpsData;//
-    private int vibration;//
+    private float vibration;//
+    private float batteryPhone;
 
+    private String gpsData;
     private int mobileAvail;//
     private int mobileActive;//
     private int wlanAvail;//
@@ -61,9 +62,10 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         setSoundPlay(0);
         setSoundRecord(0);
 
-        setGpsData(0);
         setVibration(0);
+        setBatteryPhone(100);
 
+        setGpsData("");
         setMobileActive(0);
         setMobileAvailable(0);
 
@@ -81,6 +83,8 @@ public class CarduinoDroidData implements CarduinoDroidIF{
 
         setSoundPlay(0);
         setSoundRecord(0);
+
+        setVibration(0);
     }
 
     public synchronized LayerDrawable getIpConnLogoId(){
@@ -232,18 +236,20 @@ public class CarduinoDroidData implements CarduinoDroidIF{
         return wlanActive;
     }
 
-    public synchronized int getGpsData(){
+    public synchronized String getGpsData(){
         return gpsData;
     }
-    public synchronized int getVibration() {
+    public synchronized float getVibration() {
         return vibration;
     }
-    public synchronized void setGpsData(int _gpsData){
+    public synchronized float getBatteryPhone() { return batteryPhone; }
+    public synchronized void setGpsData(String _gpsData){
         gpsData = _gpsData;
     }
-    public synchronized void setVibration(int _vibration) {
+    public synchronized void setVibration(float _vibration) {
         vibration = _vibration;
     }
+    public synchronized void setBatteryPhone (float _battery) { batteryPhone = _battery;}
 
     public synchronized void setCameraPicture(byte[] _cameraPicture) { cameraPicture = _cameraPicture;}
     public synchronized byte[] getCameraPicture() { return cameraPicture;}

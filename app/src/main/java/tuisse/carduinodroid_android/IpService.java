@@ -181,7 +181,7 @@ public class IpService extends Service {
             if (ip == null) {
                 Log.i(TAG, "Creating IP Connection");
                 ip = new IpConnection(ipService);
-                getDData().setMyIp(ip.getLocalIpAddress());
+                getDData().setMyIp(ip.hardwareInformation.getLocalIpAdress());
                 switch (getDataHandler().getControlMode()) {
                     case REMOTE:
                         ip.initClient();

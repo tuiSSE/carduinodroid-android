@@ -34,6 +34,7 @@ import tuisse.carduinodroid_android.Sound;
  * Created by keX on 04.01.2016.
  */
 public class IpConnection {
+
     protected IpService ipService;
 
     protected IpDataConnectionServerThread ipDataConnectionServerThread;
@@ -41,6 +42,7 @@ public class IpConnection {
 
     static final String TAG = "CarduinoIpConnection";
 
+    HardwareInformation hardwareInformation;
     Sound sound;
 
     ServerSocket ctrlSocketServer;
@@ -57,11 +59,15 @@ public class IpConnection {
     CameraSettingsChangedReceiver cameraSettingsChangedReceiver;
     SoundSettingChangedReceiver soundSettingChangedReceiver;
     SerialStatusChangedReceiver serialStatusChangedReceiver;
+    MobilityGPSChangedReceiver mobilityGPSChangedReceiver;
+    FeatureChangedReceiver featureChangedReceiver;
 
     IntentFilter cameraSupportedResolutionFilter;
     IntentFilter cameraSettingsChangedFilter;
     IntentFilter soundSettingChangedFilter;
     IntentFilter serialStatusChangedFilter;
+    IntentFilter mobilityGpChangedFilter;
+    IntentFilter featureChangedFilter;
 
     protected boolean isClient;
 
@@ -77,21 +83,28 @@ public class IpConnection {
         ipService = s;
 
         sound = new Sound();
+        hardwareInformation = new HardwareInformation(ipService);
 
         cameraSupportedResolutionReceiver = new CameraSupportedResolutionReceiver();
         cameraSettingsChangedReceiver = new CameraSettingsChangedReceiver();
         soundSettingChangedReceiver = new SoundSettingChangedReceiver();
         serialStatusChangedReceiver = new SerialStatusChangedReceiver();
+        mobilityGPSChangedReceiver = new MobilityGPSChangedReceiver();
+        featureChangedReceiver = new FeatureChangedReceiver();
 
         cameraSupportedResolutionFilter = new IntentFilter(Constants.EVENT.CAMERA_SUPPORTED_RESOLUTION);
         cameraSettingsChangedFilter = new IntentFilter(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
         soundSettingChangedFilter = new IntentFilter(Constants.EVENT.SOUND_PLAY_CHANGED);
         serialStatusChangedFilter = new IntentFilter(Constants.EVENT.SERIAL_STATUS_CHANGED);
+        mobilityGpChangedFilter = new IntentFilter(Constants.EVENT.MOBILITY_GPS_CHANGED);
+        featureChangedFilter = new IntentFilter(Constants.EVENT.FEATURES_CHANGED);
 
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSupportedResolutionReceiver, cameraSupportedResolutionFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(cameraSettingsChangedReceiver, cameraSettingsChangedFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(soundSettingChangedReceiver, soundSettingChangedFilter);
         LocalBroadcastManager.getInstance(ipService).registerReceiver(serialStatusChangedReceiver, serialStatusChangedFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(mobilityGPSChangedReceiver, mobilityGpChangedFilter);
+        LocalBroadcastManager.getInstance(ipService).registerReceiver(featureChangedReceiver, featureChangedFilter);
 
         reset();
     }
@@ -113,7 +126,8 @@ public class IpConnection {
     protected void initServer(){
 
         isClient = false;
-        setMyIp(getLocalIpAddress());
+
+        setMyIp(hardwareInformation.getLocalIpAdress());
         setRemoteIP("Not Connected");
 
         ipDataConnectionServerThread = new IpDataConnectionServerThread();
@@ -185,7 +199,7 @@ public class IpConnection {
     protected void initClient(){
 
         isClient = true;
-        setMyIp(getLocalIpAddress());
+        setMyIp(hardwareInformation.getLocalIpAdress());
 
         setIpState(ConnectionEnum.TRYCONNECT);
     }
@@ -282,6 +296,10 @@ public class IpConnection {
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(cameraSettingsChangedReceiver);
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(soundSettingChangedReceiver);
                 LocalBroadcastManager.getInstance(ipService).unregisterReceiver(serialStatusChangedReceiver);
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(mobilityGPSChangedReceiver);
+                LocalBroadcastManager.getInstance(ipService).unregisterReceiver(featureChangedReceiver);
+
+                intentWriter = null;
             }
         }, "StopIpConnection").start();
     }
@@ -416,6 +434,7 @@ public class IpConnection {
                         e.printStackTrace();
                     }
                 }
+                saveActualBufferedWriter(null);
                 if(dataSocketServerDisconnected) break;
             }
         }
@@ -447,6 +466,7 @@ public class IpConnection {
                         setIpState(ConnectionEnum.TRYFIND);
                         setRemoteIP("Not Connected");
                     }
+                    saveActualBufferedWriter(null);
                     break;
                 } catch (IOException e) {
                     Log.e(TAG, "Already Connection Lost before send");
@@ -486,8 +506,7 @@ public class IpConnection {
                         if((timer = timer % Constants.DELAY.FACTOR_CAR) == 0){
 
                             information +=
-                                    Constants.JSON_OBJECT.NUM_CAR +
-                                    Constants.JSON_OBJECT.NUM_MOBILITY;
+                                    Constants.JSON_OBJECT.NUM_CAR;
                         }
                     }
                     else{ //Data from Remote to Transceiver
@@ -525,6 +544,7 @@ public class IpConnection {
             }
             //Reset Values if Connection is lost and maybe got back to Setup lowest Quality for Safety
             getDData().resetValues();
+            saveActualBufferedWriter(null);
             dataSendDisconnected = true;
         }
     }//IpDataSendThread
@@ -694,16 +714,6 @@ public class IpConnection {
         }
     }
 
-    protected String getLocalIpAddress(){
-
-        WifiManager wifiMgr = (WifiManager) ipService.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-
-        String ip = Formatter.formatIpAddress(wifiInfo.getIpAddress());
-
-        return ip;
-    }
-
     private void saveActualBufferedWriter(BufferedWriter writer) {
         intentWriter = writer;
     }
@@ -751,7 +761,7 @@ public class IpConnection {
                         try {
                             sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
                         } catch (IOException e) {
-                            Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
+                            Log.e(TAG,"Error on Using Intent Sending for Sound Settings");
                             e.printStackTrace();
                         }
                 }
@@ -768,11 +778,45 @@ public class IpConnection {
                         try {
                             sendData(intentWriter, Constants.JSON_OBJECT.NUM_SERIAL);
                         } catch (IOException e) {
-                            Log.e(TAG,"Error on Using Intent Sending for Camera Settings");
+                            Log.e(TAG,"Error on Using Intent Sending for Serial Status");
                             e.printStackTrace();
                         }
                 }
-            }, "SoundPlayUpdateThread").start();
+            }, "SerialStatusUpdateThread").start();
+        }
+    }
+
+    private class MobilityGPSChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_MOBILITY);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Mobility Information");
+                            e.printStackTrace();
+                        }
+                }
+            }, "MobilityUpdateThread").start();
+        }
+    }
+
+    private class FeatureChangedReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, final Intent intent) {
+            new Thread(new Runnable() {
+                public void run() {
+                    if(intentWriter != null)
+                        try {
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_FEATURES);
+                        } catch (IOException e) {
+                            Log.e(TAG,"Error on Using Intent Sending for Features Update");
+                            e.printStackTrace();
+                        }
+                }
+            }, "FeatureUpdateThread").start();
         }
     }
 

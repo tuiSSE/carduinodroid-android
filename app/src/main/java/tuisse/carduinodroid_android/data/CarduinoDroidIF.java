@@ -38,16 +38,19 @@ public interface CarduinoDroidIF{
     void setSoundPlay(int _soundPlay);
     void setSoundRecord(int _soundRecord);
 
-    int getGpsData();
-    int getVibration();
+    float getBatteryPhone();
+    String getGpsData();
+    float getVibration();
 
     int getMobileAvailable();
     int getMobileActive();
     int getWLANAvailable();
     int getWLANActive();
 
-    void setGpsData(int _gpsData);
-    void setVibration(int _vibration);
+    void setBatteryPhone (float _battery);
+    void setGpsData(String _gpsData);
+    void setVibration(float _vibration);
+
     void setMobileAvailable(int _mobileAvailable);
     void setMobileActive(int _mobileActive);
     void setWlanAvailable(int _wlanAvailable);

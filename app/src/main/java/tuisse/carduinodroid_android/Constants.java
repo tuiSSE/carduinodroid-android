@@ -25,6 +25,8 @@ public class Constants {
         String IP_DATA_VIDEO = "tuisse.carduinodroid_android.event.ip_data_video";
         String IP_DATA_CONTROL = "tuisse.carduinodroid_android.event.ip_data_control";
         String IP_DATA_CAMERA = "tuisse.carduinodroid_android.event.ip_data_camera";
+        String MOBILITY_GPS_CHANGED = "tuisse.carduinodroid_android.event.mobility_gps_changed";
+        String FEATURES_CHANGED = "tuisse.carduinodroid_android.event.features_changed";
     }
 
     public interface PERMISSION{
@@ -121,16 +123,17 @@ public class Constants {
         String NUM_CAR = "Car";
 
         String TAG_MOBILITY_GPS = "GPS Data";
-        String TAG_MOBILITY_VIBRATION = "Vibration Value";
+        String TAG_MOBILITY_WLAN_AVAILABLE = "WLAN Available";
+        String TAG_MOBILITY_WLAN_ACTIVE = "WLAN Active";
+        String TAG_MOBILITY_MOBILE_AVAILABLE = "Mobile Available";
+        String TAG_MOBILITY_MOBILE_ACTIVE = "Mobile Active";
         String TAG_MOBILITY = "Mobilty Information";
         String NUM_MOBILITY = "Mobility";
 
-        String TAG_NETWORK_WLAN_AVAILABLE = "WLAN Available";
-        String TAG_NETWORK_WLAN_ACTIVE = "WLAN Active";
-        String TAG_NETWORK_MOBILE_AVAILABLE = "Mobile Available";
-        String TAG_NETWORK_MOBILE_ACTIVE = "Mobile Active";
-        String TAG_NETWORK = "Network Information";
-        String NUM_NETWORK = "Network";
+        String TAG_FEATURES_BATTERY_PHONE = "Battery Level Phone";
+        String TAG_FEATURES_VIBRATION = "Vibration Value";
+        String TAG_FEATURES = "Features Data";
+        String NUM_FEATURES = "Features";
 
         String TAG_HARDWARE_CAMERA_RESOLUTION = "Camera Resolution";
         String TAG_HARDWARE_CAMERA_RESOLUTION_NUM = "Camera Resolution Numbers";
