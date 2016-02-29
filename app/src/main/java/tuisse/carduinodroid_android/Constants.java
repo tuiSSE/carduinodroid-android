@@ -34,9 +34,9 @@ public class Constants {
     }
 
     public interface LOG{
-        boolean IP = false;
+        boolean IP_SENDER = false;
         boolean SERIAL = false;
-        boolean RECEIVER = false;
+        boolean IP_RECEIVER = false;
     }
 
     public interface NOTIFICATION_ID{
@@ -45,7 +45,7 @@ public class Constants {
 
     public interface DELAY{
         int WATCHDOG    = 3000;     //ms
-        int SERIAL      = 100;      //ms
+        int SERIAL      = 50;      //ms
         int IP          = 50;       //ms
         int CONNECTIONTRY = 3000;   //ms
         int FACTOR_CONTROL = 2;     //2 * IP Delay
@@ -120,7 +120,7 @@ public class Constants {
         String TAG_CAR_ULTRASONIC_FRONT = "Ultra Sonic Front";
         String TAG_CAR_ULTRASONIC_BACK = "Ultra Sonic Back";
         String TAG_CAR = "Car Information";
-        String NUM_CAR = "Car";
+        String NUM_CAR = "#Car";
 
         String TAG_MOBILITY_GPS = "GPS Data";
         String TAG_MOBILITY_WLAN_AVAILABLE = "WLAN Available";
@@ -128,36 +128,36 @@ public class Constants {
         String TAG_MOBILITY_MOBILE_AVAILABLE = "Mobile Available";
         String TAG_MOBILITY_MOBILE_ACTIVE = "Mobile Active";
         String TAG_MOBILITY = "Mobilty Information";
-        String NUM_MOBILITY = "Mobility";
+        String NUM_MOBILITY = "#Mobility";
 
         String TAG_FEATURES_BATTERY_PHONE = "Battery Level Phone";
         String TAG_FEATURES_VIBRATION = "Vibration Value";
         String TAG_FEATURES = "Features Data";
-        String NUM_FEATURES = "Features";
+        String NUM_FEATURES = "#Features";
 
         String TAG_HARDWARE_CAMERA_RESOLUTION = "Camera Resolution";
         String TAG_HARDWARE_CAMERA_RESOLUTION_NUM = "Camera Resolution Numbers";
         String TAG_HARDWARE = "Hardware Information";
-        String NUM_HARDWARE = "Hardware";
+        String NUM_HARDWARE = "#Hardware";
 
         String TAG_VIDEO_TYPE = "Video Type";
         String TAG_VIDEO_SOURCE = "Video Source Data";
         String TAG_VIDEO = "Video Data";
-        String NUM_VIDEO = "Video";
+        String NUM_VIDEO = "#Video";
 
         String TAG_SERIAL_STATUS = "Serial State";
         String TAG_SERIAL_ERROR = "Serial Error";
         String TAG_SERIAL_NAME = "Serial Name";
         String TAG_SERIAL_TYPE = "Serial Type";
         String TAG_SERIAL = "Serial Status";
-        String NUM_SERIAL = "Serial";
+        String NUM_SERIAL = "#Serial";
 
         String TAG_CONTROL_SPEED = "Car Control Speed";
         String TAG_CONTROL_STEER = "Car Control Steer";
         String TAG_CONTROL_FRONT_LIGHT = "Car Control Light";
         String TAG_CONTROL_STATUS_LED = "Car Control Status LED";
         String TAG_CONTROL = "Car Control";
-        String NUM_CONTROL = "Control";
+        String NUM_CONTROL = "#Control";
 
         String TAG_CAMERA_TYPE = "Camera Type";
         String TAG_CAMERA_RESOLUTION = "Camera Resolution";
@@ -165,12 +165,12 @@ public class Constants {
         String TAG_CAMERA_QUALITY = "Camera Quality";
         String TAG_CAMERA_ORIENTATION = "Camera Orientation";
         String TAG_CAMERA = "Camera Setup";
-        String NUM_CAMERA = "Camera";
+        String NUM_CAMERA = "#Camera";
 
         String TAG_SOUND_PLAY = "Sound Play";
         String TAG_SOUND_RECORD = "Sound Record";
         String TAG_SOUND = "Sound Setup";
-        String NUM_SOUND = "Sound";
+        String NUM_SOUND = "#Sound";
     }
 
     public interface CAMERA_VALUES{

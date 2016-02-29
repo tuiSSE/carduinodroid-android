@@ -23,6 +23,8 @@ import android.widget.Toast;
 import tuisse.carduinodroid_android.data.CarduinoData;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.CommunicationStatus;
+import tuisse.carduinodroid_android.data.ConnectionEnum;
+import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
@@ -153,7 +155,9 @@ public class WatchdogService extends Service {
         if(watchdogThread.isAlive()) {
             watchdogThread.interrupt();
         }
-        stopWatchdogThread.run();
+        if(!stopWatchdogThread.isAlive()) {
+            stopWatchdogThread.run();
+        }
         Log.i(TAG, "onDestroyed");
     }
 
@@ -286,24 +290,31 @@ public class WatchdogService extends Service {
             if (!CameraService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, CameraService.class));
             }
+            Thread.yield();
             if (SerialService.getIsDestroyed() && IpService.getIsDestroyed() && CameraService.getIsDestroyed()) {
                 sendToast("WatchdogThred stopped");
                 LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
                 LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
-                synchronized (this) {
-                    if(isInForeground) {
-                        stopForeground(false);
-                        isInForeground = false;
-                    }
-                    if(notificationManager != null) {
-                        notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
-                    }
+                if(isInForeground) {
+                    stopForeground(false);
+                    isInForeground = false;
+                }
+                if(notificationManager != null) {
+                    notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
                 }
                 isDestroyed = true;
                 return;
             }
             else{
-                stopSelf();
+                try {
+                    sleep(100);
+                }catch (InterruptedException e){
+                    Log.d(TAG, "WatchdogStopThread interrupted");
+                }finally {
+                    stopSelf();
+                }
+
+
             }
         }
     };
@@ -359,6 +370,11 @@ public class WatchdogService extends Service {
             Log.d(TAG, "onIpStatusChangeReceiverReceive");
             if(renewCommunicationStatus()){
                 updateNotification();
+            }
+            if(carduino.dataHandler.getControlMode().isRemote()){
+                if(!carduino.dataHandler.getDData().getIpState().isRunning()){
+                    carduino.dataHandler.getData().setSerialState(new ConnectionState(ConnectionEnum.UNKNOWN,""));
+                }
             }
         }
     }

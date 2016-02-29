@@ -5,11 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.TrafficStats;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.format.Formatter;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -28,7 +24,6 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
-import tuisse.carduinodroid_android.Sound;
 
 /**
  * Created by keX on 04.01.2016.
@@ -315,7 +310,7 @@ public class IpConnection {
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask, requestDataStatus());
 
         if(transmit != null){
-            if(Constants.LOG.IP) {
+            if(Constants.LOG.IP_SENDER) {
                 Log.i(TAG,  "OUT: " +  transmit.toString());
             }
             outData.write(transmit.toString());
@@ -330,7 +325,7 @@ public class IpConnection {
     protected void receiveData(String dataPacket) throws IOException{
 
         String mask = getDataHandler().parseJson(dataPacket);
-        if(Constants.LOG.RECEIVER) {
+        if(Constants.LOG.IP_RECEIVER) {
             Log.i(TAG, "IN: " + dataPacket.toString());
         }
 
@@ -345,8 +340,10 @@ public class IpConnection {
         }
 
         if(mask.contains(Constants.JSON_OBJECT.NUM_SERIAL)){
-            Intent onSerialStatusIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
-            LocalBroadcastManager.getInstance(ipService).sendBroadcast(onSerialStatusIntent);
+            if(isClient){
+                Intent onSerialStatusIntent = new Intent(Constants.EVENT.SERIAL_STATUS_CHANGED);
+                LocalBroadcastManager.getInstance(ipService).sendBroadcast(onSerialStatusIntent);
+            }
         }
 
         if(mask.contains(Constants.JSON_OBJECT.NUM_CONTROL)){
@@ -359,7 +356,11 @@ public class IpConnection {
             LocalBroadcastManager.getInstance(ipService).sendBroadcast(onIpDataCamera);}
 
         if(mask.contains(Constants.JSON_OBJECT.NUM_SOUND)){
-            if(getDData().getSoundPlay() == 1) sound.horn(); else sound.stop();
+            if(getDData().getSoundPlay() == 1){
+                sound.horn();
+            } else{
+                sound.stop();
+            }
         }
     }
 
@@ -492,6 +493,17 @@ public class IpConnection {
         @Override
         public void run() {
             dataSendDisconnected = false;
+            if(!isClient){
+                try{
+                    sendData(outData,Constants.JSON_OBJECT.NUM_SERIAL);
+                }
+                catch (IOException e) {
+                    Log.i(TAG, "Already Connection Lost before send");
+                    setIpState(ConnectionEnum.TRYFIND);
+                    setRemoteIP("Not Connected");
+                    e.printStackTrace();
+                }
+            }
             while(isRunning())
             {
                 try {
@@ -499,7 +511,7 @@ public class IpConnection {
                     information = "";
 
                     if(!isClient){ //Data from Transceiver to Remote
-                        //every 50 ms = DELAY.IP(check Constants)
+                        //every 50 ms = DELAY.IP_SENDER(check Constants)
                         information +=
                                 Constants.JSON_OBJECT.NUM_VIDEO;
                         //every 2 * 50 ms = 100 ms
@@ -680,7 +692,7 @@ public class IpConnection {
                         e.printStackTrace();
                     }
                 } else if (isConnected() || isRunning()) {
-                    if(address!= getTransceiverIP()) {
+                    if(!address.equals(getTransceiverIP())) {
                         address = getTransceiverIP();
                         if(remoteDataSocket!=null){
                             if(!remoteDataSocket.isClosed())
@@ -700,7 +712,7 @@ public class IpConnection {
                             }
                         }
                     } else {
-                        Log.e(TAG, "Client is already running");
+                        //Log.d(TAG, "Client is already running");
                     }
                 }
 
@@ -759,7 +771,9 @@ public class IpConnection {
                 public void run() {
                     if(intentWriter != null)
                         try {
-                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
+                            if(!isClient) {
+                                sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
+                            }
                         } catch (IOException e) {
                             Log.e(TAG,"Error on Using Intent Sending for Sound Settings");
                             e.printStackTrace();
@@ -777,6 +791,7 @@ public class IpConnection {
                     if(intentWriter != null)
                         try {
                             sendData(intentWriter, Constants.JSON_OBJECT.NUM_SERIAL);
+                            Log.d(TAG,"send serial status changed event");
                         } catch (IOException e) {
                             Log.e(TAG,"Error on Using Intent Sending for Serial Status");
                             e.printStackTrace();
@@ -857,7 +872,7 @@ public class IpConnection {
 
         if(getDData().getIpState() != null) {
             getDData().setIpState(new ConnectionState(state, error));
-            Log.d(TAG, "IP State changed: " + getDData().getIpState().getStateName());
+            Log.d(TAG, "IP_SENDER State changed: " + getDData().getIpState().getStateName());
 
             if (!(  state.equals(getDData().getIpState().getState()) &&
                     error.equals(getDData().getIpState().getError()))) {//if not equal
