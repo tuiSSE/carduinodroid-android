@@ -771,9 +771,7 @@ public class IpConnection {
                 public void run() {
                     if(intentWriter != null)
                         try {
-                            if(!isClient) {
-                                sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
-                            }
+                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_SOUND);
                         } catch (IOException e) {
                             Log.e(TAG,"Error on Using Intent Sending for Sound Settings");
                             e.printStackTrace();
@@ -790,8 +788,10 @@ public class IpConnection {
                 public void run() {
                     if(intentWriter != null)
                         try {
-                            sendData(intentWriter, Constants.JSON_OBJECT.NUM_SERIAL);
-                            Log.d(TAG,"send serial status changed event");
+                            if(!isClient) {
+                                sendData(intentWriter, Constants.JSON_OBJECT.NUM_SERIAL);
+                                Log.d(TAG,"send serial status changed event");
+                            }
                         } catch (IOException e) {
                             Log.e(TAG,"Error on Using Intent Sending for Serial Status");
                             e.printStackTrace();
