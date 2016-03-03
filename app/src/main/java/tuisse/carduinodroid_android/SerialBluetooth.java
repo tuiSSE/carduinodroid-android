@@ -254,8 +254,10 @@ public class SerialBluetooth extends SerialConnection {
 
     @Override
     protected void send() throws IOException {
-        //Log.d(TAG, byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
         mmOutputStream.write(getDataHandler().serialFrameAssembleTx());
+        if(Constants.LOG.SERIAL_SENDER){
+            Log.d(TAG, byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
+        }
     }
 
     @Override
@@ -270,7 +272,9 @@ public class SerialBluetooth extends SerialConnection {
                     acceptedFrame++;
                 }
             }
-            //Log.d(TAG, byteArrayToHexString(buffer));
+            if(Constants.LOG.SERIAL_RECEIVER){
+                Log.d(TAG, byteArrayToHexString(buffer));
+            }
         }
         return acceptedFrame;
     }

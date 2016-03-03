@@ -2,17 +2,46 @@ package tuisse.carduinodroid_android.data;
 
 import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
-
 /**
- * Created by keX on 11.01.2016.
+ * @author Till Max Schwikal
+ * @date 11.01.2016
+ *
+ * Enum which codes the control mode of the android device
+ *
+ * @see DataHandler
  */
 public enum ControlMode {
-    TRANSCEIVER(0),REMOTE(1),DIRECT(2);
+    /**
+     * In case the device is in TRANSCEIVER mode, it is conntected to the Arduino mounted on a car
+     * and a Remote PC or another android device in REMOTE mode.
+     * It transmits the data to the Arduino device over serial, collects its own data and transmits
+     * all data to the remote control device. A user cant actively steer a Carduinodroid with an
+     * android device in TRANSCEIVER mode.
+     */
+    TRANSCEIVER(0),
+    /**
+     * In case the device is in REMOTE mode, it is connected only to another android device in
+     * TRANSCEIVER mode. Its gets all data from the TRANSCEIVER mode device. The user steers and
+     * monitors the device in REMOTE mode.
+     */
+    REMOTE(1),
+    /**
+     * In case the device is in DIRECT mode, it is connected only to the Arduino mounted on a car.
+     * It transmitts the data to the Arduino device directly. The user steers and monitors the
+     * device in DIRECT mode.
+     */
+    DIRECT(2);
+
     ControlMode(int m){
         mode = m;
     }
     private int mode;
 
+    /**
+     * conversion functions for control mode
+     * @param x
+     * @return control mode (ControlMode)
+     */
     public static ControlMode fromInteger(int x) {
         ControlMode m;
         switch(x) {
@@ -30,6 +59,12 @@ public enum ControlMode {
         }
         return m;
     }
+
+    /**
+     * conversion functions for control mode
+     * @param cm
+     * @return control mode (int)
+     */
     public static int toInteger(ControlMode cm){
         int x;
         switch (cm){
@@ -44,6 +79,10 @@ public enum ControlMode {
         }
     }
 
+    /**
+     * returns a displayable string of the mode
+     * @return control mode string
+     */
     public synchronized String getString(){
         String s;
         switch (mode) {
@@ -62,12 +101,24 @@ public enum ControlMode {
         return s;
     }
 
+    /**
+     * boolean function if the device is in a specific state
+     * @return isTransceiver
+     */
     public synchronized boolean isTransceiver(){
         return this == ControlMode.TRANSCEIVER;
     }
+    /**
+     * boolean function if the device is in a specific state
+     * @return isRemote
+     */
     public synchronized boolean isRemote(){
         return this == ControlMode.REMOTE;
     }
+    /**
+     * boolean function if the device is in a specific state
+     * @return isDirect
+     */
     public synchronized boolean isDirect(){
         return this == ControlMode.DIRECT;
     }

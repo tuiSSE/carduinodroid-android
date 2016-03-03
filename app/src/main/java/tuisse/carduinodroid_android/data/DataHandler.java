@@ -30,6 +30,7 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     private int screensaver = 60000;
 
     public DataHandler() {
+        // the data handler variables are set on startup in CarduinodroidApplication
     }
 
     public synchronized CarduinoData getData(){

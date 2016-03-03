@@ -2,6 +2,8 @@ package tuisse.carduinodroid_android.data;
 
 import android.util.Log;
 
+import tuisse.carduinodroid_android.Constants;
+
 /**
  * Created by keX on 11.12.2015.
  */
@@ -118,12 +120,14 @@ public class SerialFrameHandler implements SerialFrameIF{
         //update values
         carduinoData.setCurrent(command[NUM_CURRENT] & BYTE_MASK);
         carduinoData.setAbsBattCap(command[NUM_ABSOLUTE_BATTERY_CAPACITY] & BYTE_MASK);
-        carduinoData.setRelBattCap(command[NUM_RELATIVE_BATTERY_CAPACITY]  & BYTE_MASK);
+        carduinoData.setRelBattCap(command[NUM_RELATIVE_BATTERY_CAPACITY] & BYTE_MASK);
         carduinoData.setVoltage(command[NUM_VOLTAGE] & BYTE_MASK);
         carduinoData.setTemperature(command[NUM_TEMPERATURE] & BYTE_MASK);
         carduinoData.setUltrasoundFront(command[NUM_ULTRASOUND_FRONT] & BYTE_MASK);
         carduinoData.setUltrasoundBack(command[NUM_ULTRASOUND_BACK] & BYTE_MASK);
-        //Log.d(TAG, carduinoData.print());
+        if(Constants.LOG.SERIAL_RECEIVER){
+            Log.d(TAG, carduinoData.print());
+        }
         return true;
     }
 

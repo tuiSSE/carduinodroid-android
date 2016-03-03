@@ -3,12 +3,12 @@ package tuisse.carduinodroid_android.data;
 import android.util.Log;
 
 /**
- * @AUTOR Till Max Schwikal
- * @DATE 26.01.2016
+ * @author Till Max Schwikal
+ * @date 26.01.2016
  *
- * @enum Codes the bluetooth handling after establishing a connection.
+ * Enum which codes the bluetooth handling after establishing a connection.
  *
- * @brief The enumeration has static conversion functions fromInteger and toInteger.
+ * The enumeration has static conversion functions fromInteger and toInteger.
  *
  * @see DataHandler
  */

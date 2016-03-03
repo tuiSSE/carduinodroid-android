@@ -12,7 +12,17 @@ import tuisse.carduinodroid_android.R;
 import tuisse.carduinodroid_android.Sound;
 
 /**
- * Created by mate on 02.02.2016.
+ * @author Lars Vogel, Till Max Schwikal
+ * @date 02.02.2016
+ *
+ * Class which holds all data sent and received from the Android Device(s).
+ *
+ * This class has the role of a central data storage for the carduinodroid device. All data needed for the
+ * remote control are stored here. The class provides besides some helper functions getter and setter to
+ * the data.
+ *
+ * @see CarduinoDroidIF
+ * @see DataHandler
  */
 public class CarduinoDroidData implements CarduinoDroidIF{
     private final String TAG = "CarduinoDroidData";

@@ -35,8 +35,9 @@ public class Constants {
 
     public interface LOG{
         boolean IP_SENDER = false;
-        boolean SERIAL = false;
         boolean IP_RECEIVER = false;
+        boolean SERIAL_SENDER = false;
+        boolean SERIAL_RECEIVER = false;
     }
 
     public interface NOTIFICATION_ID{
