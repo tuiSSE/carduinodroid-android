@@ -56,6 +56,7 @@ public class Constants {
     public interface TIMEOUT{
         int SERIAL      = 1300;      //ms
         int IP          = 200;       //ms
+        int WATCHDOG_STOP = 10;     //trys
     }
 
     public interface HEART_BEAT{
