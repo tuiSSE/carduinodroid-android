@@ -30,7 +30,14 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
- * Created by Bird on 18.02.2016.
+ * <h1>Camera Control</h1>
+ * An important part of the CarduinoDroid Application is the background usage of the camera to
+ * create a picture stream (some kind of MJPEG stream) because it has the smallest possible delay.
+ * This class is started by the service and gives access to all the important camera functions.
+ *
+ * @author Lars Vogel
+ * @version 1.0
+ * @since 18.02.2016
  */
 public class CameraControl extends SurfaceView implements Camera.PreviewCallback, Runnable{
 
@@ -60,13 +67,19 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     private int previewFlashLight;
     private int previewCamType;
 
-    private boolean isRunning;
-
+    /**
+     * This method gives access to the Data Handler (central data base)
+     * @return the centralized Data Handler
+     */
     protected DataHandler getDataHandler(){
 
         return cameraService.getCarduino().dataHandler;
     }
 
+    /**
+     * The constructor will create a Broadcast Receiver with its necessary Intent to listen to.
+     * @param s is used as variable for the camera service to get access to certain functions
+     */
     CameraControl(CameraService s){
 
         super(s);
@@ -76,9 +89,12 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         ipDataCameraFilter = new IntentFilter(Constants.EVENT.IP_DATA_CAMERA);
     }
 
+    /**
+     * This method is needed to initialize important camera parameters if a new connection between
+     * transceiver and remote device is set up. It lowers the initial bandwidth especially in regions
+     * with low speed.
+     */
     protected void init(){
-
-        isRunning = false;
 
         surfID = 10;
 
@@ -88,9 +104,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         previewCamType = 1;
     }
 
+    /**
+     * This method is used to establish new camera settings by getting all the saved information
+     * out of the data base.
+     */
     protected void update(){
-
-        isRunning = false;
 
         previewResolutionID = getDData().getCameraResolutionID();
         previewQuality = getDData().getCameraQuality();
@@ -98,6 +116,16 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         previewCamType = getDData().getCameraType();
     }
 
+    /**
+     * This method is called either a new connection is created between transceiver and remote
+     * device or after the camera settings are changed. It checks if a camera is available on the
+     * used mobile phone. Afterwards you need to check the camera object itself and which type is
+     * chosen.
+     * The most important part is described by the dummy SurfaceTexture to emulate a not-existing
+     * activity because a Camera Preview in Android wants to show its pictures.
+     * Then all setting are integrated and the camera Preview is started with a the created
+     * PreviewCallback
+     */
     protected void start() {
 
         packageManager = cameraService.getPackageManager();
@@ -150,9 +178,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * This methods enables the right close of the camera and unregister the BroadcastReceiver for
+     * camera setting changes.
+     */
     protected void close(){
-
-        isRunning = false;
 
         LocalBroadcastManager.getInstance(cameraService).unregisterReceiver(ipDataCameraReceiver);
 
@@ -160,6 +190,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         camera = null;
     }
 
+    /**
+     * This method is part of the closing procedure to release the camera (disable flashlight) and
+     * reset the PreviewCallback to stop taking picture
+     */
     private void releaseCamera(){
 
         if(parameters != null)
@@ -171,6 +205,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * This method set the status of the Flashlight
+     * @param status enables the Flashlight with 1 and disables with 0
+     */
     private void setFlash(int status){
 
         if(status==1)
@@ -180,6 +218,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         previewFlashLight = status;
     }
 
+    /**
+     * This method activates the Flashlight by the Flash_Mode_Torch
+     */
     private void activateFlash(){
 
         parameters = camera.getParameters();
@@ -187,6 +228,9 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         camera.setParameters(parameters);
     }
 
+    /**
+     * This method disables the Flashlight by the Flash_Mode_Off
+     */
     private void disableFlash(){
 
         parameters = camera.getParameters();
@@ -194,6 +238,12 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         camera.setParameters(parameters);
     }
 
+    /**
+     * This method sets the Camera Resolution out of the SupportedPreviewSize-Array by the ID
+     * ( 0 is the highest possible resolution and n the lowest one). If it is starting with the
+     * default parameter (-1) this method will overwrite it with the lowest possible resolution ID.
+     * @param ID is the identifier for the Size-Array (0 highest to n lowest resolution)
+     */
     private void setCameraResolution(int ID){
 
         if((ID <= (supportedPreviewSizes.size()-1)) && (ID >= 0)) {
@@ -211,6 +261,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * An important part for a short delay is the definition of the compress Quality for the
+     * picture stream.
+     * @param quality is a value from 0 (low) to 100 (high)
+     */
     private void setCompressQuality(int quality){
 
         if(quality > 100) previewQuality = 100;
@@ -305,7 +360,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
 
-        isRunning = true;
         new processImages(camera, data).start();
     }
 
@@ -378,7 +432,6 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
             getDData().setCameraPicture(image);
 
             Log.i(TAG, "New picture data Available");
-            isRunning = false;
 
             Intent onCameraData = new Intent(Constants.EVENT.CAMERA_DATA_RECEIVED);
             LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onCameraData);

@@ -1,7 +1,5 @@
 package tuisse.carduinodroid_android.data;
 
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -11,7 +9,16 @@ import org.json.JSONObject;
 import tuisse.carduinodroid_android.Constants;
 
 /**
- * Created by mate on 02.02.2016.
+ * <h1>IP Frame Handler</h1>
+ * This Class is used for the preparation of all the transmission data between remote and
+ * transceiver. One part contains the Creation of a certain transmission protocol based on JSON.
+ * Both sides need to use the same type of JSON and to check this factor a Header is introduced in
+ * all of the packages. The Header contains of version, data mask and the status of the data socket.
+ *
+ * @author Lars Vogel
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 03.02.2016
  */
 public class IpFrameHandler implements IpFrameIF{
     private final String TAG = "CarduinoIpFrame";
@@ -34,14 +41,28 @@ public class IpFrameHandler implements IpFrameIF{
     private boolean isForClient;
     private boolean isForServer;
 
+    /**
+     * The constructor is important to get the access to the data base provided by CarduinoData and
+     * CarduinoDroidData.
+     * @param cd gives the access to the CarduinoData
+     * @param cdd gives the access to the CarduinoDroidData
+     */
     public IpFrameHandler(CarduinoData cd, CarduinoDroidData cdd){
         carduinoDroidData = cdd;
         carduinoData = cd;
         //setClientVersion(0);
     }
 
-    // translate a received JSON object to get all the send information out of it and set it to
-    // their variables
+    /**
+     * This method is the essential part for transmitting data between transceiver and remote side.
+     * It enables the translation of received JSON objects to get all the send information out of it
+     * and set it to their variables.
+     * @param jsonObjectRxData is the receive message as String and it will be transformed to a JSON
+     *                         object
+     * @return either the information if the data socket is already in use or what data mask is used
+     * in a certain package to set the Intent in the IP Connection
+     * @see tuisse.carduinodroid_android.IpConnection
+     */
     public synchronized String parseJson(String jsonObjectRxData) {
         // return isConnectedRunning = true if Data Server is already connected/running or if there
         // are some errors occurring
@@ -180,6 +201,13 @@ public class IpFrameHandler implements IpFrameIF{
         }
     }
 
+    /**
+     * This methods checks a given data mask if it contains predefined keywords and if the given
+     * combination is Logic. Only Client or only Server data should be put together. And it saves
+     * the extracted information for the following parsing process.
+     * @param mask is the given data mask in a certain JSON Object
+     * @return if the data mask is logic
+     */
     private boolean isMaskLogic(String mask){
 
         isCar = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAR);
@@ -198,8 +226,15 @@ public class IpFrameHandler implements IpFrameIF{
         return !(isForClient&&isForServer);
     }
 
-    // Standard Build of the transmitted JSON Object defined by Header, Hardware information,
-    // Car information, vibration and camera resolution out of the available variables
+    /**
+     * This method is an essential part for the data exchange between the transceiver and a remote
+     * device. A Standard Build is defined by a Header and if it is not a Control Message, it
+     * contains some data objects as well depending on the data type mask.
+     * @param dataTypeMask shows this method what parts should be integrated (camera, car, control
+     *                     or other data)
+     * @param dataServerStatus is important if this method is only used for control messages
+     * @return the created JSON object which is send a string over the established socket
+     */
     private synchronized boolean createJsonObject(String dataTypeMask, boolean dataServerStatus) {
 
         isMaskTypeServer = false;
@@ -370,7 +405,14 @@ public class IpFrameHandler implements IpFrameIF{
         return true;
     }
 
-    // Return the last created JSON Object with the current variables
+    /**
+     * This method is the public method to get the created JSON object if it was successful.
+     * Otherwise this methods will give a null object to check this possible error.
+     * @param dataTypeMask shows this method what parts should be integrated (camera, car, control
+     *                     or other data)
+     * @param dataServerStatus is important if this method is only used for control messages
+     * @return the created JSON or null object
+     */
     public synchronized JSONObject getTransmitData(String dataTypeMask, boolean dataServerStatus){
 
         if(createJsonObject(dataTypeMask, dataServerStatus))
@@ -378,6 +420,13 @@ public class IpFrameHandler implements IpFrameIF{
         else return null;
     }
 
+    /**
+     * This method is the central part to check a given data type mask string if it contains
+     * a key word.
+     * @param dataTypeMask contains the full string given in the JSON Object
+     * @param Type is the key word this methods wants to check for
+     * @return if the key word is in the mask (true) or not (false)
+     */
     private synchronized boolean checkDataTypeMask(String dataTypeMask, String Type){
 
         if(dataTypeMask.contains(Type)){
@@ -385,6 +434,11 @@ public class IpFrameHandler implements IpFrameIF{
         }else{ return false;}
     }
 
+    /**
+     * This method transforms the Supported Sizes Array from the camera to a format that can be
+     * send with a JSON Object.
+     * @return a JSON object containing all the possible sizes
+     */
     private synchronized JSONObject setSupportedSizesObject(){
 
         JSONObject JsonObjectCameraSizes = new JSONObject();
@@ -406,6 +460,14 @@ public class IpFrameHandler implements IpFrameIF{
         return JsonObjectCameraSizes;
     }
 
+    /**
+     * This method is the opposite direction as setSupportedSizesObject() to create an Array out of
+     * the given JSON Object to use on the DriveActivity
+     * @param JsonObjectCameraSizes is the JSON Object containing the supported sizes and which
+     *                              shall be transformed here
+     * @param count indicates the number of values in the JSON Object
+     * @return the array of supported camera sizes
+     */
     private synchronized String[] getSupportedSizedValues(JSONObject JsonObjectCameraSizes, int count){
 
         if(count > 0){
