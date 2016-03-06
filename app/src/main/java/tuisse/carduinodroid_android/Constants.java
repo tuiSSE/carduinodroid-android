@@ -3,7 +3,15 @@ package tuisse.carduinodroid_android;
 import android.widget.Toast;
 
 /**
- * Created by mate on 08.02.2016.
+ * <h1>Constants</h1>
+ * This class allows a global definition of certain constants which are used in possibly all the
+ * other classes, methods and functions. It contains of Event description, Log enabling, Delay
+ * definition, timeouts and many more.
+ *
+ * @author Till Max Schwikal
+ * @author Lars Vogel
+ * @version 1.0
+ * @since 12.02.2016
  */
 public class Constants {
     public interface ACTION {
@@ -11,6 +19,9 @@ public class Constants {
         String CONTROL_MODE_CHANGED = "tuisse.carduinodroid_android.action.control_mode_changed";
     }
 
+    /**
+     * Consists of all the BroadcastReceiver Intents
+     */
     public interface EVENT {
         String SERIAL_STATUS_CHANGED ="tuisse.carduinodroid_android.event.serial_status_changed";
         String IP_STATUS_CHANGED ="tuisse.carduinodroid_android.event.ip_status_changed";
@@ -33,6 +44,10 @@ public class Constants {
         String USB = "tuisse.carduinodroid_android.permission.usb";
     }
 
+    /**
+     * Here you can enable or disable the Logging for frequently occurring events like receiving or
+     * sending data over an established ip connection.
+     */
     public interface LOG{
         boolean IP_SENDER = false;
         boolean SERIAL = false;
@@ -43,6 +58,9 @@ public class Constants {
         int WATCHDOG = 1337;
     }
 
+    /**
+     * Contains all the used delays and factors in the field of data transmission
+     */
     public interface DELAY{
         int WATCHDOG    = 3000;     //ms
         int SERIAL      = 50;      //ms
@@ -65,6 +83,9 @@ public class Constants {
         int CAMERA      = 100;  //*DELAY.CAMERA
     }
 
+    /**
+     * Physical conversion factors
+     */
     public interface FACTORS{
         float DATA      = 1024;
         float TIME      = 1000;
@@ -88,6 +109,10 @@ public class Constants {
         int ARDUINO_MEGA_2560_ADK_R3 = 0x44;
     }
 
+    /**
+     * Provides the Port Numbers and all the used Tags to set up a socket based connection. And
+     * it is used for the Shared Preferences to save the last used IP addresses.
+     */
     public interface IP_CONNECTION{
         int DATAPORT = 12020;
         int CTRLPORT = 12021;
@@ -104,6 +129,10 @@ public class Constants {
         String PREF_IP_NAMES[] = {PREF_FIRST_IP,PREF_SECOND_IP,PREF_THIRD_IP,PREF_FOURTH_IP,PREF_FIFTH_IP};
     }
 
+    /**
+     * To create a specified JSON Object it is necessary to define all the possible parts with a
+     * centralized Tag System, that transceiver and remote device create and parse it right.
+     */
     public interface JSON_OBJECT{
         int MY_VERSION = 2;
 
@@ -173,6 +202,11 @@ public class Constants {
         String NUM_SOUND = "#Sound";
     }
 
+    /**
+     * Defines all the orientation settings needed to give the user some defined values. And
+     * integrates default data collected by testing this application on different devices.
+     *
+     */
     public interface CAMERA_VALUES{
         String[] ORIENTATION_DEGREES = {"0","90","180","270"};
         String TAG_PREF_ORIENTATION = "Orientation Camera";

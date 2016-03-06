@@ -26,7 +26,14 @@ import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
- * Created by keX on 04.01.2016.
+ * <h1>IP Connection</h1>
+ * The Central part for the whole data communication and transmission is represented by this Class.
+ * All the Sockets, SocketServer and Connections are build up here. After they are established
+ * Threads will held the Connections and manage the data sending and receiving.
+ *
+ * @author Lars Vogel
+ * @version 1.0
+ * @since 14.02.2016
  */
 public class IpConnection {
 
@@ -73,6 +80,13 @@ public class IpConnection {
 
     private String incomingDataMsg;
 
+    /**
+     * The constructor establishes all the BroadcastReceivers to create the possibility for sending
+     * JSON Objects not only frequently. All the Receivers are divided into certain categories and
+     * will be used for the camera resolution and settings, serial status exchange and releasing
+     * sounds at the transceiver.
+     * @param s
+     */
     IpConnection(IpService s){
 
         ipService = s;
@@ -104,6 +118,9 @@ public class IpConnection {
         reset();
     }
 
+    /**
+     * This methods rests the Sockets and BufferedWriter for the data sending over an Intent.
+     */
     protected void reset(){
 
         ctrlSocketServer = null;
@@ -113,11 +130,18 @@ public class IpConnection {
         intentWriter = null;
     }
 
+    /**
+     * Getting Acces to the data Handler and especially to the data base of CarduinoData and
+     * CarduinoDroidData.
+     * @return the DataHandler Object
+     */
     protected DataHandler getDataHandler(){
         return ipService.getCarduino().dataHandler;
     }
 
-    //Initialization of both ServerSockets if a connection via another mobile phone or pc is wished
+    /**
+     * This method initialize the SocketServer for the Control and Data Port.
+     */
     protected void initServer(){
 
         isClient = false;
@@ -138,7 +162,12 @@ public class IpConnection {
         }
     }
 
-    //Creates a SocketServer depending on the expected Type (Data,Ctrl)
+    /**
+     * This method creates a SocketServer depending on the expected Type (Data,Control)
+     * @param socketType defines if it is a Control or Data Socket
+     * @return if the Creation was successful
+     * @throws IOException by ServerSocket error
+     */
     protected boolean createSocketServer(String socketType) throws IOException {
 
         if(socketType.toLowerCase().equals(Constants.IP_CONNECTION.TAG_DATAPORT.toLowerCase()))
@@ -172,6 +201,11 @@ public class IpConnection {
         return true;
     }
 
+    /**
+     * This method starts the necessary Thread to arrange the Socket connection (Control and Data
+     * SocketServer) repetitively.
+     * @param dataType
+     */
     protected void startServerThread(String dataType){
 
         if(dataType.toLowerCase().equals(Constants.IP_CONNECTION.TAG_CTRLPORT.toLowerCase()))
@@ -191,6 +225,10 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This method represents the counter part to the SocketServer Connection. The Remote side tries
+     * to start the connection as Client to a chosen Transceiver.
+     */
     protected void initClient(){
 
         isClient = true;
@@ -199,11 +237,21 @@ public class IpConnection {
         setIpState(ConnectionEnum.TRYCONNECT);
     }
 
+    /**
+     * This method is part of the Client Connection to start the Thread to build all up
+     */
     protected void startClientThread(){
 
         new ClientConnection().start();
     }
 
+    /**
+     * Closing procedure with the following parts:
+     * - Work around to get out of the accept state for the SocketServer
+     * - If they are not in this state, try to close the Socket and wait a defined time to be
+     *   save
+     * - Unregister all used BroadcastReceiver
+     */
     protected void close(){
 
         Log.i(TAG, "Closing IP Connection Service");
@@ -299,12 +347,22 @@ public class IpConnection {
         }, "StopIpConnection").start();
     }
 
-    // Giving information over the Control Channel if the Data Channel is free
+    /**
+     * This method secures if the data SockerServer is already in use
+     * @return if the Data SocketServer is already in use
+     */
     protected boolean requestDataStatus(){
 
         return (isRunning()||isConnected());
     }
 
+    /**
+     * This method is the main part to transmit data between transceiver and remote device. It uses
+     * the BufferedWriter to send a certain String with a Information Type given by the dataTypeMask
+     * @param outData defines the BufferedWriter as Stream based on the SocketServer
+     * @param dataTypeMask is important to define the right data and get them back again
+     * @throws IOException if the BufferedWriter has an Error
+     */
     private synchronized void sendData(BufferedWriter outData, String dataTypeMask) throws IOException{
 
         JSONObject transmit = getDataHandler().getTransmitData(dataTypeMask, requestDataStatus());
@@ -322,6 +380,13 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This method is the main part to transmit data between transceiver and remote device. It uses
+     * the ParsingJSON Method out of the DataHandler and the DataTypeMask to trigger the right
+     * internal Intent
+     * @param dataPacket contains one package or so called JSON Object in String format
+     * @throws IOException when the Intent creates an Error
+     */
     protected void receiveData(String dataPacket) throws IOException{
 
         String mask = getDataHandler().parseJson(dataPacket);
@@ -364,11 +429,23 @@ public class IpConnection {
         }
     }
 
+    /**
+     * To realize the Connection the Control SocketServer needs to inform an interested Client about
+     * the Data SocketServer Status. It is a short Message only contains of the Header
+     * @param dataPacket contains one package or so called JSON Object in String format
+     * @return if the Data SocketServer is already in use
+     * @throws IOException
+     */
     protected String receiveCtrl(String dataPacket) throws IOException{
 
         return getDataHandler().parseJson(dataPacket);
     }
 
+    /**
+     * This Thread is handling the side of the SocketServer to create the Sending and Receiving
+     * Threads if a Clients wants to connect. If the connection is lost it needs to reset its
+     * states and give another Client to opportunity to connect.
+     */
     protected class IpDataConnectionServerThread extends Thread {
 
         BufferedReader inData;
@@ -441,6 +518,11 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This Thread handles the full Receiving part if a connection has been established. If a Client
+     * disconnects the while-loop will receive a Null and if the Server itself wants to close it,
+     * the dataSocketServerDisconnect will be set.
+     */
     protected class IpDataReceiveThread extends Thread {
 
         BufferedReader inData;
@@ -482,6 +564,10 @@ public class IpConnection {
         }
     }//IpDataReceiveThread
 
+    /**
+     * This Thread handles the frequently data Sending of Picture Stream, Control Data and Car
+     * Information.
+     */
     protected class IpDataSendThread extends Thread {
 
         BufferedWriter outData;
@@ -561,7 +647,11 @@ public class IpConnection {
         }
     }//IpDataSendThread
 
-    // Handling of the Control Message for multiple Requests
+
+    /**
+     * This Thread handles multiple requests to the Control SocketServer that a remote side can
+     * request even if a connection is already there
+     */
     protected class IpCtrlSendServerThread extends Thread {
         public IpCtrlSendServerThread() {
             super("IpConnection-IpCtrlSendServerThread");
@@ -600,6 +690,9 @@ public class IpConnection {
         }
     }//IpSendThread
 
+    /**
+     * This Threads handles the Control Message Sending for each request in the Background
+     */
     public class CtrlMsgEchoThread extends Thread {
 
         protected Socket socket;
@@ -629,6 +722,12 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This Thread handles the full progress of a client connection in the Remote Mode.
+     * - Build up a connection to a defined IP with the request of the Data SocketServer Status
+     * - If the Data SocketServer is free. Build up the connection to it
+     * - Create the Receive and Send Thread for the chosen Socket (Transceiver) IP
+     */
     public class ClientConnection extends Thread{
 
         protected String address;
@@ -726,10 +825,18 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This method saves the Actual BufferedWriter of the chosen Connection to handle all sending
+     * Intents
+     * @param writer defines the Buffered Writer after the creation of a socket
+     */
     private void saveActualBufferedWriter(BufferedWriter writer) {
         intentWriter = writer;
     }
 
+    /**
+     * This BroadcastReceiver enables the Supported Preview Size sending
+     */
     private class CameraSupportedResolutionReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -747,6 +854,9 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This BroadcastReceiver enables the Camera Settings sending
+     */
     private class CameraSettingsChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -764,6 +874,9 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This BroadcastReceiver enables the Sound Setting sending
+     */
     private class SoundSettingChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -781,6 +894,9 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This BroadcastReceiver enables the Serial Status sending
+     */
     private class SerialStatusChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -801,6 +917,9 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This BroadcastReceiver enables the GPS Position sending
+     */
     private class MobilityGPSChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -818,6 +937,9 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This BroadcastReceiver enables the extra Features (battery status, vibration) sending
+     */
     private class FeatureChangedReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -835,22 +957,42 @@ public class IpConnection {
         }
     }
 
-
+    /**
+     * This method sets the Remote IP after a connection has been created
+     * @param ip stands for the remote ip
+     */
     protected void setRemoteIP(String ip){
         getDData().setRemoteIp(ip);
     }
 
+    /**
+     * This method sets the Transceiver IP after a connection has been created
+     * @param ip stands for the transceiver ip
+     */
     protected void setTransceiverIP(String ip){
         getDData().setTransceiverIp(ip);
     }
+
+    /**
+     * This method gets the Transceiver IP
+     * @return the actual transceiver IP
+     */
     protected String getTransceiverIP(){
         return getDData().getTransceiverIp();
     }
 
+    /**
+     * This method sets the own IP in a certain network
+     * @param ip
+     */
     protected void setMyIp(String ip){
         getDData().setMyIp(ip);
     }
 
+    /**
+     * This methods returns the information if a certain IP State is chosen right now
+     * @return true if the IP State is chosen
+     */
 	protected boolean isIdle() { return getDData().getIpState().isIdle();}
 	protected boolean isTryFind() { return getDData().getIpState().isTryFind();}
 	protected boolean isFound() { return getDData().getIpState().isFound();}
@@ -859,15 +1001,31 @@ public class IpConnection {
 	protected boolean isRunning() { return getDData().getIpState().isRunning();}
 	protected boolean isError() { return getDData().getIpState().isError();}
 
-	
+    /**
+     * This method is the Setter for the IP State gets changed by reaching a certain progress or an
+     * error occurs
+     * @param state defines the reached States (Idle, Running, Connected, Error, ...)
+     */
 	protected synchronized void setIpState(ConnectionEnum state){
         setIpState(state, "");
 	}
 
+    /**
+     * This method is the Setter for the IP State gets changed by reaching a certain progress or an
+     * error occurs but it also give the opportunity to integrate an Error ID
+     * @param state defines the reached States (Idle, Running, Connected, Error, ...)
+     * @param error is a chosen ID for an certain Error
+     */
     protected synchronized void setIpState(ConnectionEnum state, int error){
         setIpState(state, ipService.getString(error));
     }
 
+    /**
+     * This method is the Setter for the IP State gets changed by reaching a certain progress or an
+     * error occurs but it also give the opportunity to integrate an Error ID
+     * @param state defines the reached States (Idle, Running, Connected, Error, ...)
+     * @param error tries to create an information about the error (What was the problem?)
+     */
     protected synchronized void setIpState(ConnectionEnum state, String error){
 
         if(getDData().getIpState() != null) {
@@ -895,10 +1053,18 @@ public class IpConnection {
         }
     }
 
+    /**
+     * This method giving access to the CarduinoDroid database through the dataHandler
+     * @return CarduinoDroid object for the Getter and Setter
+     */
     protected synchronized CarduinoDroidData getDData(){
         return ipService.getCarduino().dataHandler.getDData();
     }
 
+    /**
+     * This method giving access to the Carduino database through the dataHandler
+     * @return Carduino object for the Getter and Setter
+     */
     protected synchronized CarduinoData getData(){
         return ipService.getCarduino().dataHandler.getData();
     }

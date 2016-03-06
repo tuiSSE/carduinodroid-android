@@ -45,6 +45,7 @@ import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
  * @author Till Max Schwikal
+ * @author Lars Vogel
  *
  * This activity is the main activity of the carduinodroid application.
  *
@@ -272,6 +273,10 @@ public class StatusActivity extends AppCompatActivity {
             }
         });
 
+        /**
+         * This OnClickListener tries to give a tool to insert an own IP to build up a connection
+         * to the transceiver. The Dialog saves the 5 last used IP and wants to ease it.
+         */
         imageViewSettingsTransceiver.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -508,6 +513,12 @@ public class StatusActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method updates the shown IP on the Status Activity depending on the chosen Control
+     * Mode. As Transceiver the user wants to see its own IP in the network and after an Socket
+     * accepted a connection the IP of the remote side. As Remote device you want to see your own
+     * IP in the defined network and has the possibility to change the target IP.
+     */
     private void updateIp(){
         try{
             switch(getDataHandler().getControlMode()){
@@ -609,6 +620,12 @@ public class StatusActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This method checks a given IP if it is in the right Pattern.
+     * An IP consists of 4 number starting at 0 and ending with 255 each.
+     * @param ip is the validation object
+     * @return true, if the ip has the right pattern
+     */
     private boolean validateIP(String ip){
         Pattern pattern;
         Matcher matcher;
@@ -624,6 +641,11 @@ public class StatusActivity extends AppCompatActivity {
         return matcher.matches();
     }
 
+    /**
+     * This method checks the Shared Preferences how many IP are already saved and get them out
+     * as String Array to fill the ComboBox of the Dialog
+     * @return String Array with all last used IPs
+     */
     private String[] getFillIP(){
 
         int counter = 0;
@@ -642,6 +664,11 @@ public class StatusActivity extends AppCompatActivity {
         return Arrays.copyOfRange(ipValues, 0, counter);
     }
 
+    /**
+     * This method saves new IPs if they aren't already in the Shared Preference. And then shift the
+     * other ones by one position, if this IP wasn't recently used.
+     * @param ip
+     */
     private synchronized void saveIP(String ip){
 
         boolean isAlreadyInList = false;

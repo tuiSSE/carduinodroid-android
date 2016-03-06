@@ -11,6 +11,16 @@ import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
+/**
+ * <h1>IP Service</h1>
+ * This class provides the complete IP Connection Service to Create the Object, handling errors
+ * and keep the devices connected to each other in the background.
+ *
+ * @author Lars Vogel
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 14.01.2016
+ */
 public class IpService extends Service {
 
     static final String TAG = "CarduinoIpService";
@@ -31,7 +41,6 @@ public class IpService extends Service {
 
     /**
      * Helper function to get the CarduinoData
-     *
      * @return CarduinoData Object
      */
     private CarduinoData getData(){
@@ -40,7 +49,6 @@ public class IpService extends Service {
 
     /**
      * Helper function to get the CarduinoDroidData
-     *
      * @return CarduinoDroidData Object
      */
     private CarduinoDroidData getDData(){
@@ -49,7 +57,6 @@ public class IpService extends Service {
 
     /**
      * Helper function to get the DataHandler
-     *
      * @return DataHandler Object
      */
     private DataHandler getDataHandler(){
@@ -58,7 +65,6 @@ public class IpService extends Service {
 
     /**
      * static return function for the isDestroyed status.
-     *
      * @return isDestroyed
      */
     static synchronized boolean getIsDestroyed(){
@@ -70,6 +76,10 @@ public class IpService extends Service {
         return null;
     }
 
+    /**
+     * Standard Methods that is implemented into each service. Here it gives access to the carduino
+     * Application
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -77,6 +87,15 @@ public class IpService extends Service {
         Log.d(TAG, "onCreate");
     }
 
+    /**
+     * This onStartCommand manages to create the IpConnection Object, Handling possible Error which
+     * can occur and restarting the Service. All the methods are based on the IP State and if
+     * any unknown error occurs the state is switched to create a safe state.
+     * @param intent is given by the onStartCommand of a service
+     * @param flags is given by the onStartCommand of a service
+     * @param startId is given by the onStartCommand of a service
+     * @return the kind how this service starts (START_STICKY, ...)
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -138,6 +157,10 @@ public class IpService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * This onDestroy method is triggered when the stopSelf() command is used while starting the
+     * service or it is explicit called. The Stopping sequence is treated in a separate Thread.
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -152,6 +175,11 @@ public class IpService extends Service {
         Log.i(TAG, "onDestroyed");
     }
 
+    /**
+     * The Starting Process is handled in an own Thread to certain Timing problems which can occur
+     * while it is used in the main activity. So the Build up is done in the background to keep the
+     * full functionality of the application
+     */
     public class StartingIpConnection extends Thread {
 
         protected IpService ipService;
@@ -202,6 +230,11 @@ public class IpService extends Service {
         }
     }
 
+    /**
+     * The Stopping Process is handled in an own Thread to certain Timing problems which can occur
+     * while it is used in the main activity. So the Build up is done in the background to keep the
+     * full functionality of the application
+     */
     public class StoppingIpConnection extends Thread {
 
         public StoppingIpConnection() {}
@@ -225,6 +258,12 @@ public class IpService extends Service {
         }
     }
 
+    /**
+     * This method sets a variable which shall prevent the start of a second starting or stopping
+     * process while the IpService is already in another one. The IpService needs to reach a certain
+     * progress to get back into the standard function.
+     * @param IsClosing
+     */
     protected void setIsClosing(Boolean IsClosing){
         this.isClosing = IsClosing;
     }

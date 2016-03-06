@@ -27,7 +27,14 @@ import android.util.Log;
 import tuisse.carduinodroid_android.data.CarduinoDroidData;
 
 /**
- * Created by Bird on 28.02.2016.
+ * <h1>Hardware Information</h1>
+ * This class shall be used as centralized management for Hardware Controlling on a mobile device
+ * and shall work without using any Thread in the background. Each Getter and Setter should set or
+ * give back the information directly.
+ *
+ * @author Lars Vogel
+ * @version 1.0
+ * @since 28.02.2016
  */
 public class HardwareInformation{
 
@@ -52,6 +59,13 @@ public class HardwareInformation{
     private float mAccelLast;
     private float delta;
 
+    /**
+     * The constructor provides all the important access to certain areas of the mobile phone.
+     * The Connectivity Manager is the portal to the Mobile and WLAN Connection. The Location
+     * Manager is needed to receive a GPS Position changes with the mobil device and get the values.
+     * And the Sensor Manager is all about the vibration calculation.
+     * @param s contains the IpService Object to get access to certain Handler functions/database
+     */
     public HardwareInformation(IpService s) {
 
         ipService = s;
@@ -74,6 +88,11 @@ public class HardwareInformation{
         }
     }
 
+    /**
+     * The GPS Location Listener connects the hardware module to this application to observe a
+     * location change in the background. If there is a change over a certain range, then this
+     * listener will override the actual variables for latitude, longitude and altitude.
+     */
     private final class GPSLocationListener implements LocationListener{
 
         @Override
@@ -104,6 +123,10 @@ public class HardwareInformation{
         }
     }
 
+    /**
+     * This Motion Event Listener calculates the vibration based on all directions and the value
+     * is based on the weighted Average over the last measurements
+     */
     private final class MotionEventListener implements SensorEventListener{
 
         @Override
@@ -129,6 +152,11 @@ public class HardwareInformation{
         }
     }
 
+    /**
+     * This method uses a standard Receiver for the Battery Status of the mobile phone and scales it
+     * from 1 to 100 (0 means the device is off)
+     * @return the battery status from 1 (low) to 100 (full)
+     */
     public float getBatteryLevelPhone(){
 
         Intent batteryIntent = ipService.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -143,6 +171,10 @@ public class HardwareInformation{
         return ((float)level / (float)scale) * 100.0f;
     }
 
+    /**
+     * This method is the Getter if the Mobile Status is available
+     * @return true if the device has a mobile connection available and false if not
+     */
     public int getMobileAvailable(){
 
         connectivityManager = (ConnectivityManager) ipService.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -152,6 +184,10 @@ public class HardwareInformation{
         else return 0;
     }
 
+    /**
+     * This method is the Getter if the Mobile Status is active
+     * @return true if the device has a mobile connection active and false if not
+     */
     public int getMobileActive(){
 
         connectivityManager = (ConnectivityManager) ipService.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -161,6 +197,10 @@ public class HardwareInformation{
         else return 0;
     }
 
+    /**
+     * This method is the Getter if the wlan Status is available
+     * @return true if the device has a wlan connection available and false if not
+     */
     public int getWLANAvailable(){
 
         connectivityManager = (ConnectivityManager) ipService.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -170,6 +210,10 @@ public class HardwareInformation{
         else return 0;
     }
 
+    /**
+     * This method is the Getter if the wlan Status is active
+     * @return true if the device has a wlan connection active and false if not
+     */
     public int getWLANActive(){
 
         connectivityManager = (ConnectivityManager) ipService.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -179,6 +223,10 @@ public class HardwareInformation{
         else return 0;
     }
 
+    /**
+     * This method is the Getter for the Local IP Address in a chosen network
+     * @return the Local IP Address as String but already formatted
+     */
     public String getLocalIpAdress(){
 
         WifiManager wifiMgr = (WifiManager) ipService.getSystemService(Context.WIFI_SERVICE);
@@ -189,6 +237,10 @@ public class HardwareInformation{
         return ip;
     }
 
+    /**
+     * Get access to the CarduinoDroid database with the help of the datahandler
+     * @return the CarduinoDroidData object
+     */
     protected synchronized CarduinoDroidData getDData(){
         return ipService.getCarduino().dataHandler.getDData();
     }

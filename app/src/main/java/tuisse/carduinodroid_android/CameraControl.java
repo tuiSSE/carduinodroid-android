@@ -273,6 +273,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         else previewQuality = quality;
     }
 
+    /**
+     * This method transforms the Supported Preview Sizes, divided into height and width, out of
+     * the camera parameters into an String-Array with "width x height"
+     */
     private void getSupportedPreviewSizes(){
 
         supportedPreviewSizes = parameters.getSupportedPreviewSizes();
@@ -292,6 +296,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         LocalBroadcastManager.getInstance(cameraService).sendBroadcast(onSupportedResolutions);
     }
 
+    /**
+     * Depending on the used mobile phone it may happen, that the ID of Back or Front Camera may
+     * differ. With the help of "Camera_Facing_Front" this method extracts the right ID.
+     * @return ID of the Front Facing Camera
+     */
     private int getFrontFacingCameraID() {
 
         int ID=-1;
@@ -310,6 +319,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         return ID;
     }
 
+    /**
+     * Depending on the used mobile phone it may happen, that the ID of Back or Front Camera may
+     * differ. With the help of "Camera_Facing_Back" this method extracts the right ID.
+     * @return ID of the Back Facing Camera
+     */
     private int getBackFacingCameraID(){
 
         int ID=-1;
@@ -328,6 +342,13 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         return ID;
     }
 
+    /**
+     * This methods is called when the BroadcastReceiver gets an Intent that new Camera Settings
+     * were received. First it checks if the variables has been changed and depending on the
+     * variable a certain process is used.
+     * Update Resolution or Camera Type will trigger a restart of the camera object
+     * Update Flashlight or Preview Quality just needs to set the values
+     */
     private void updateCameraData(){
 
         boolean isUpdated = false;
@@ -357,12 +378,23 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * onPreviewFrame is an essential part of the Camera.PreviewCallback to create the picture
+     * stream. It is an inner class and gives a picture as Byte-Array with selected camera settings
+     * back. Each Picture starts an own Thread to handle the CPU and Memory hungry Compression.
+     * @param data contains a full picture in a chosen resolution
+     * @param camera contains all the predefined camera settings for the preview picture
+     */
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
 
         new processImages(camera, data).start();
     }
 
+    /**
+     * The BroadcastReceiver is a tool to transform received data into camera setting changes
+     * depending on the obtained information by calling the updateCameraData()-Method
+     */
     private class IpDataCameraReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -371,6 +403,10 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * This Runnable enables the onPreviewFrame but takes a certain amount of time. It prevents
+     * a stucked application.
+     */
     @Override
     public void run() {
         try {
@@ -392,6 +428,11 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * ProcessImages describes a Thread to provide the compression of all created pictures by the
+     * onPreviewFrame. As it is a performance hungry, the YUV picture with NV21 ImageFormat is used
+     * because it should be part in all the current android versions.
+      */
     public class processImages extends Thread {
 
         protected Camera camera;
@@ -438,11 +479,19 @@ public class CameraControl extends SurfaceView implements Camera.PreviewCallback
         }
     }
 
+    /**
+     * This method giving access to the CarduinoDroid database through the dataHandler
+     * @return CarduinoDroid object for the Getter and Setter
+     */
     protected synchronized CarduinoDroidData getDData(){
 
         return cameraService.getCarduino().dataHandler.getDData();
     }
 
+    /**
+     * This method giving access to the Carduino database through the dataHandler
+     * @return Carduino object for the Getter and Setter
+     */
     protected synchronized CarduinoData getData(){
 
         return cameraService.getCarduino().dataHandler.getData();

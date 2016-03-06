@@ -41,6 +41,18 @@ import tuisse.carduinodroid_android.data.CarduinoDroidData;
 import tuisse.carduinodroid_android.data.CarduinoIF;
 import tuisse.carduinodroid_android.data.DataHandler;
 
+/**
+ * <h1>Crive Activity</h1>
+ * This Activity provides the overlay to maneuver the car in the chosen mode. It is divided into
+ * the presentation of the picture stream and giving the user at the same moment a huge amount of
+ * settings (Enable Flashlight, Activate Signal, etc). But there are a lot of information shown as
+ * well, like ultra sonic back and front ranges, motion values and more.
+ *
+ * @author Till Max Schwikal
+ * @author Lars Vogel
+ * @version 1.0
+ * @since 14.01.2016
+ */
 public class DriveActivity extends AppCompatActivity{
     private static final String TAG = "CarduinoDriveActivity";
 
@@ -284,6 +296,10 @@ public class DriveActivity extends AppCompatActivity{
         }
         viewDebug.setLayoutParams(params);
 
+        /**
+         * This OnClickListener creates the Dialog CarmSettings for the user. It is necessary to set
+         * all values out of the database before the Dialog is opened.
+         */
         buttonCameraSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -639,6 +655,10 @@ public class DriveActivity extends AppCompatActivity{
         reset();
     }
 
+    /**
+     * This BroadcastReceiver is used for the picture Stream and sets the Bitmap into the
+     * ViewImage
+     */
     private class IpDataVideoReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -646,7 +666,10 @@ public class DriveActivity extends AppCompatActivity{
             setImageViewBitmap();
         }
     }
-    /// AUFPASSEN HIER EINTEILEN GLEICH
+
+    /**
+     * This BroadcastReceiver is used to update all the Car Information provided by the Arduino.
+     */
     private class IpDataCarReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -655,6 +678,10 @@ public class DriveActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * This BroadcastReceiver is used to update all the Control data on the side of the Transceiver
+     * while its monitoring data
+     */
     private class IpDataControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -663,6 +690,9 @@ public class DriveActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * This BroadcastReceiver updates the Button showing the status of the Flashlight
+     */
     private class IpDataCameraReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -674,6 +704,9 @@ public class DriveActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * This BroadcastReceiver is used to update all the Car Information provided by the Arduino.
+     */
     private class SerialDataRxReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -688,7 +721,11 @@ public class DriveActivity extends AppCompatActivity{
             setBackgroundColor();
         }
     }
-    //Direct taken by the camera
+
+    /**
+     * This BroadcastReceiver is the essential part to debug all the camera picture on the side
+     * of the transceiver.
+     */
     private class CameraDataReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -934,6 +971,10 @@ public class DriveActivity extends AppCompatActivity{
         viewImage.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
     }
 
+    /**
+     * This method updates all the Control Data like speed and steering value with their Icons on
+     * the overlay.
+     */
     private void setClientValues() {
 
         int speed = getData().getSpeed();
@@ -951,6 +992,10 @@ public class DriveActivity extends AppCompatActivity{
         else buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
     }
 
+    /**
+     * It is the Setter for the Camera Quality out of the Dialog CamSettings
+     * @param quality from 0 (low) to 100 (high)
+     */
     private void setCameraQuality(String quality){
 
         int value = Integer.parseInt(quality);
@@ -960,6 +1005,10 @@ public class DriveActivity extends AppCompatActivity{
         else getDData().setCameraQuality(value);
     }
 
+    /**
+     * It is the Setter for the Camera Type (Front(Back) out of the Dialog CamSettings
+     * @param isChecked is the Variable if the Back Facing Camera is used
+     */
     private void setCameraType(boolean isChecked){
 
         if(isChecked)
@@ -968,6 +1017,12 @@ public class DriveActivity extends AppCompatActivity{
             getDData().setCameraType(0);
     }
 
+    /**
+     * It is the Setter for the Camera Orientation because the camera.orientation isn't working on
+     * all tested devices. So the 4 possible degress are shown to set the preferred one.
+     * @param degree
+     * @param isFrontCamera
+     */
     private void setCameraDegree(String degree, boolean isFrontCamera){
 
         int value = Integer.parseInt(degree);
@@ -980,6 +1035,12 @@ public class DriveActivity extends AppCompatActivity{
         editor.commit();
     }
 
+    /**
+     * This method is the Getter for the Orientation based on the ID out of the possible Degree
+     * Array in Constants. It sets up the ComboBox at the Dialog CamSettings
+     * @param isFrontCamera
+     * @return
+     */
     private int getCameraDegreeID(boolean isFrontCamera){
 
         int actualValue;
@@ -1002,11 +1063,22 @@ public class DriveActivity extends AppCompatActivity{
         return ID;
     }
 
+    /**
+     * This method is the Setter for the Orientation based on the ID out of the Degree Array in
+     * Constants
+     * @param ID is the position of the Orientation out of the Degree Array in Constants
+     */
     private void setCameraResolutionID(int ID){
 
         getDData().setCameraResolutionID(ID);
     }
 
+    /**
+     * This method is the Getter for the Camera Resolution ID saved in a separate Variable
+     * @param itemsNumber describes the number of Camera Resolution in the Array and helps to
+     *                    transform the default Value (-1) into the lowest possible resolution
+     * @return the Camera Resolution ID from 0 to n. (n = itemsNumber-1)
+     */
     private int getCameraResolutionID(int itemsNumber){
 
         int itemsID = getDData().getCameraResolutionID();
@@ -1016,19 +1088,31 @@ public class DriveActivity extends AppCompatActivity{
             return getDData().getCameraResolutionID();
     }
 
+    /**
+     * This Intent triggers the BroadcastReceiver at the IpConnection to sendData to the transceiver
+     * @see IpConnection
+     */
     private void sendCameraSettingChanged(){
 
         Intent onCameraSettingsChanged = new Intent(Constants.EVENT.CAMERA_SETTINGS_CHANGED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(onCameraSettingsChanged);
     }
 
+    /**
+     * This Intent triggers the BroadcastReceiver at the IpConnection to sendData to the transceiver
+     * @see IpConnection
+     */
     private void sendPlaySoundChanged(){
 
         Intent onSoundPlayChanged = new Intent(Constants.EVENT.SOUND_PLAY_CHANGED);
         LocalBroadcastManager.getInstance(this).sendBroadcast(onSoundPlayChanged);
     }
 
-    /**** Test for changing Image on Thread - Problem with setting Data up (only getting first picture) ****/
+    /**
+     * This method is the central part for updating the ViewImage of the DriveActivity and to create
+     * a picture Stream (similar to MJPEG) with the smallest possible delay. Depending the preferred
+     * DriveActivity orientation (Landscape/Portrait).
+     */
     private void setImageViewBitmap(){
 
         if (carduino.dataHandler.getControlMode().isRemote() && getDData().getIpState().isRunning()){
@@ -1086,6 +1170,10 @@ public class DriveActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * On the side of the Remote Control this methods gives back the measurement data for the actual
+     * used bandwidth
+     */
     private void setBandwidthUsage() {
         actualTime = System.currentTimeMillis();
         actualTxData = TrafficStats.getUidTxBytes(applicationUID);
