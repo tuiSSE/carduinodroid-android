@@ -126,7 +126,7 @@ public class DriveActivity extends AppCompatActivity{
     private final Handler mHideHandler = new Handler();
     private ImageView viewImage;
     private View viewStop;
-    private View viewDistance;
+    private RelativeLayout viewHud;
     private View viewDebug;
 
     private CheckBox checkBoxFailsafeStop;
@@ -275,7 +275,7 @@ public class DriveActivity extends AppCompatActivity{
 
         viewDebug = findViewById(R.id.fullscreen_content_debug);
         viewImage = (ImageView) findViewById(R.id.fullscreen_content_video);
-        viewDistance = findViewById(R.id.fullscreen_content_distance);
+        viewHud = (RelativeLayout) findViewById(R.id.viewHud);
         viewStop = findViewById(R.id.fullscreen_content_stop);
 
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewDebug.getLayoutParams();
@@ -685,7 +685,6 @@ public class DriveActivity extends AppCompatActivity{
     private class IpDataControlReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             setClientValues();
         }
     }
@@ -696,11 +695,12 @@ public class DriveActivity extends AppCompatActivity{
     private class IpDataCameraReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-            int flashLight = getDData().getCameraFlashlight();
-
-            if(flashLight == 1) buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
-            else buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
+            if(getDData().getCameraFlashlight() == 1) {
+                buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_status_led_press));
+            }
+            else {
+                buttonFlashLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_status_led));
+            }
         }
     }
 
@@ -968,7 +968,13 @@ public class DriveActivity extends AppCompatActivity{
     }
 
     private void setBackgroundColor(){
-        viewImage.setBackgroundColor(getResources().getColor(getDataHandler().getCommunicationStatusColor()));
+        int color =
+                getResources().getColor(R.color.colorBlackOverlay) + //transparent value
+                getResources().getColor(getDataHandler().getCommunicationStatusColor());//rgb color
+        if(getDataHandler().getCommunicationStatus().isOk()){
+            color = getResources().getColor(R.color.colorTransparent);
+        }
+        viewHud.setBackgroundColor(color);
     }
 
     /**
@@ -979,17 +985,23 @@ public class DriveActivity extends AppCompatActivity{
 
         int speed = getData().getSpeed();
         int steering = getData().getSteer();
-        int horn = getDData().getSoundPlay();
-        int light = getData().getFrontLight();
 
         textViewSpeed.setText(String.format(getString(R.string.driveSpeed), speed));
         seekBarSpeed.setProgress(speed + CarduinoIF.SPEED_MAX);
         textViewSteer.setText(String.format(getString(R.string.driveSteer), steering));
         seekBarSteer.setProgress(steering + CarduinoIF.STEER_MAX);
-        if(horn == 1) buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
-        else buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
-        if(light == 1) buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
-        else buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
+        if(getDData().getSoundPlay() == 1) {
+            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_horn_press));
+        }
+        else {
+            buttonHorn.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_horn));
+        }
+        if(getData().getFrontLight() == 1) {
+            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_front_light_press));
+        }
+        else {
+            buttonFrontLight.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_grey, R.drawable.icon_front_light));
+        }
     }
 
     /**

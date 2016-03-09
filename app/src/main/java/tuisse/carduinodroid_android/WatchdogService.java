@@ -280,9 +280,13 @@ public class WatchdogService extends Service {
         }
         @Override
         public void run() {
+            LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
+            LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
+
+            getData().setSerialState(new ConnectionState(ConnectionEnum.IDLE));
+            getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
             if (!SerialService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, SerialService.class));
-
             }
             if (!IpService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, IpService.class));
@@ -290,32 +294,15 @@ public class WatchdogService extends Service {
             if (!CameraService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, CameraService.class));
             }
-            Thread.yield();
-            if (SerialService.getIsDestroyed() && IpService.getIsDestroyed() && CameraService.getIsDestroyed()) {
-                sendToast("WatchdogThred stopped");
-                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
-                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
-                if(isInForeground) {
-                    stopForeground(false);
-                    isInForeground = false;
-                }
-                if(notificationManager != null) {
-                    notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
-                }
-                isDestroyed = true;
-                return;
+            sendToast("WatchdogThred stopped");
+            if(isInForeground) {
+                stopForeground(false);
+                isInForeground = false;
             }
-            else{
-                try {
-                    sleep(100);
-                }catch (InterruptedException e){
-                    Log.d(TAG, "WatchdogStopThread interrupted");
-                }finally {
-                    stopSelf();
-                }
-
-
+            if(notificationManager != null) {
+                notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
             }
+            isDestroyed = true;
         }
     };
 

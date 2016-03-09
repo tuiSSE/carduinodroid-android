@@ -14,6 +14,9 @@ import tuisse.carduinodroid_android.R;
  * @author Lars Vogel
  * @version 1.0
  * @since 03.02.2016
+  *
+ * @see CarduinoDroidIF
+ * @see DataHandler
  */
 public class CarduinoDroidData implements CarduinoDroidIF{
 

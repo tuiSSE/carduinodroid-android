@@ -6,9 +6,6 @@ import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 
 /**
- * Created by keX on 21.12.2015.
- */
-/**
  * @author Till Max Schwikal
  * @date 21.12.2015
  *
