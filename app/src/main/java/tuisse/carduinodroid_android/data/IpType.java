@@ -1,10 +1,13 @@
 package tuisse.carduinodroid_android.data;
 
 /**
- * @author Till Max Schwikal
- * @date 04.01.2016
+ * <h1>Ip Type enum</h1>
  *
  * Enumeration which abstractly codes the ip connection type.
+ *
+ * @author Till Max Schwikal
+ * @since 04.01.2016
+ * @version 1.0
  */
 public enum IpType {
     /// TODO: 12.01.2016 support mobile internet?!

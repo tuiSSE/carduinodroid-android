@@ -6,12 +6,15 @@ import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 
 /**
- * @author Till Max Schwikal
- * @date 21.12.2015
+ * <h1>Connection State enum</h1>
  *
  * Class which abstractly codes the status of a connection service (ip or serial).
  *
- * @see ConnectionEnum
+ * @author Till Max Schwikal
+ * @since 21.12.2015
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.data.ConnectionEnum
  */
 
 public class ConnectionState {

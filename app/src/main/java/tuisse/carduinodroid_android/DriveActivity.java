@@ -910,7 +910,6 @@ public class DriveActivity extends AppCompatActivity{
         setSpeed();
         setSteering();
         setBandwidthUsage();
-
     }
 
     private float scale(float val, float bound){

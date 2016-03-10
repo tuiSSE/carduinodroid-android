@@ -14,6 +14,9 @@ import android.widget.Toast;
  * @since 12.02.2016
  */
 public class Constants {
+    /**
+     * Consitsts of all the Actions
+     */
     public interface ACTION {
         String EXIT = "tuisse.carduinodroid_android.action.exit";
         String CONTROL_MODE_CHANGED = "tuisse.carduinodroid_android.action.control_mode_changed";

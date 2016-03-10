@@ -3,14 +3,15 @@ package tuisse.carduinodroid_android.data;
 import android.util.Log;
 
 /**
- * @author Till Max Schwikal
- * @date 26.01.2016
- *
+ * <h1>BluetoothHandling enum</h1>
  * Enum which codes the bluetooth handling after establishing a connection.
- *
  * The enumeration has static conversion functions fromInteger and toInteger.
  *
- * @see DataHandler
+ * @author Till Max Schwikal
+ * @since 26.01.2016
+ * @version 1.0
+ * 
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 public enum BluetoothHandling {
 

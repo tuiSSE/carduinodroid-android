@@ -5,7 +5,16 @@ import android.util.Log;
 import tuisse.carduinodroid_android.Constants;
 
 /**
- * Created by keX on 11.12.2015.
+ * <h1>Serial frame handler class</h1>
+ * class which assembles and disassembles serial frames. lots of constants describe how a frame is assembled and at which position a particular byte is located
+ *
+ * @author Till Max Schwikal
+ * @since 11.12.2015
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.data.SerialFrameIF
+ * @see tuisse.carduinodroid_android.data.CarduinoData
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 public class SerialFrameHandler implements SerialFrameIF{
     private final String TAG = "CarduinoSerialFrame";
@@ -54,14 +63,22 @@ public class SerialFrameHandler implements SerialFrameIF{
     private final int NUM_VERSION_LENGTH = 1;///< position of the version & length byte in every frame
     private final int BYTE_MASK = 0xff;///< mask for a byte
 
-    private CarduinoData carduinoData;///<
-    private byte[] rxBuffer = new byte[BUFFER_LENGTH_RX +1];
-    private int    rxBufferLength = 0;
+    private CarduinoData carduinoData;///< local connection to the carduino database
+    private byte[] rxBuffer = new byte[BUFFER_LENGTH_RX +1];///< rx buffer
+    private int    rxBufferLength = 0;///< current serial buffer length (incremented if a valid byte is appended)
 
+    /**
+     * constructor of the serial frame handler
+     * @param cd carduino database
+     */
     public SerialFrameHandler(CarduinoData cd){
         carduinoData = cd;
     }
 
+    /**
+     * function to create a serial frame for tx direction
+     * @return byte array to be sent
+     */
     public synchronized byte[] serialFrameAssembleTx() {
         byte[] command = new byte[BUFFER_LENGTH_TX];
         command[NUM_START] = START_BYTE;
@@ -73,6 +90,11 @@ public class SerialFrameHandler implements SerialFrameIF{
         return command;
     }
 
+    /**
+     * function to append a read byte inChar to the serial read buffer
+     * @param inChar new byte which should be appended
+     * @return true if after the last appended byte a valid serial frame was received
+     */
     public synchronized boolean serialFrameAppendRx(byte inChar){
         if(inChar == START_BYTE){
             rxBufferLength = 0;
@@ -97,12 +119,17 @@ public class SerialFrameHandler implements SerialFrameIF{
             }
             //update values
             rxBufferLength = 0;
-            return set(rxBuffer);
+            return serialFrameCheck(rxBuffer);
         }
         return false;
     }
 
-    private synchronized boolean set(byte[] command) {
+    /**
+     * checks a serial frame on validity
+     * @param command byte array of the current received serial command
+     * @return true if the command is a valid command
+     */
+    private synchronized boolean serialFrameCheck(byte[] command) {
         if (command.length < BUFFER_LENGTH_RX) {
             Log.e(TAG, "BUFFER_LENGTH out of bounds" + command.length);
             return false;
@@ -131,14 +158,24 @@ public class SerialFrameHandler implements SerialFrameIF{
         return true;
     }
 
+
+    /**
+     * function which assembles the status byte from several bits
+     * @return status byte
+     */
     private synchronized byte getStatusByte(){
-        return (byte) (0x00
-                | ((carduinoData.getStatusLed() << STATUS_LED_SHF) & STATUS_LED_MSK)
-                | ((carduinoData.getFrontLight() << FRONT_LIGHT_SHF) & FRONT_LIGHT_MSK)
+        return (byte) (
+                  ((carduinoData.getStatusLed()    << STATUS_LED_SHF) & STATUS_LED_MSK)
+                | ((carduinoData.getFrontLight()   << FRONT_LIGHT_SHF) & FRONT_LIGHT_MSK)
                 | ((carduinoData.getFailSafeStop() << FAILSAFE_STOP_SHF) & FAILSAFE_STOP_MSK)
-                | ((carduinoData.getResetAccCur() << RESET_ACCUMULATED_CURRENT_SHF) & RESET_ACCUMULATED_CURRENT_MSK));
+                | ((carduinoData.getResetAccCur()  << RESET_ACCUMULATED_CURRENT_SHF) & RESET_ACCUMULATED_CURRENT_MSK));
     }
 
+    /**
+     * function which assembles the version length byte
+     * @param dataLength length of the current serial frame
+     * @return version and length byte
+     */
     private synchronized byte getVersionLength(int dataLength){
         if(VERSION >= VERSION_FORBIDDEN) {
             //this check just verifies if the version number is allowed.
@@ -149,6 +186,12 @@ public class SerialFrameHandler implements SerialFrameIF{
         return  (byte) (0x00 | ((dataLength) & LENGTH_MSK) | ((VERSION << VERSION_SHF) & VERSION_MSK));
     }
 
+    /**
+     * function which calculates the check byte
+     * @param cmd byte array command without check byte but enough space for it
+     * @param numCheck position of the check byte within the command
+     * @return calculated check byte dependent on the command
+     */
     private synchronized byte getCheck(byte[] cmd, int numCheck){
         if(numCheck+1 > cmd.length){
             Log.e(TAG, "get Check buffer length to small " + cmd.length + " it should at least be " + (numCheck+1));

@@ -3,12 +3,14 @@ package tuisse.carduinodroid_android.data;
 import android.graphics.drawable.LayerDrawable;
 
 /**
- * @author Till Max Schwikal
- * @date 01.02.2016
- *
+ * <h1>CarduinoData Interface</h1>
  * This interface holds all constants and functions needed for the CarduinoData class.
  *
- * @see CarduinoData
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 01.02.2016
+ *
+ * @see tuisse.carduinodroid_android.data.CarduinoData
  */
 public interface CarduinoIF {
 

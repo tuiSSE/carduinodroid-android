@@ -9,56 +9,113 @@ import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 
 /**
- * Created by keX on 10.12.2015.
+ * <h1>Data Handler</h1>
+ * The data handler is a guard to all data. It holds the CarduinoData and CarduinoDroidData.
+ * Also here are general app settings stored.
+ *
+ * @author Till Max Schwikal
+ * @since 10.12.2015
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.CarduinodroidApplication
  */
-public class DataHandler implements SerialFrameIF,IpFrameIF{
+public class DataHandler implements SerialFrameIF, IpFrameIF{
     private final String TAG = "CarduinoDataHandler";
 
-    protected CarduinoData cd;
-    protected CarduinoDroidData ccd;
-    protected SerialFrameHandler serialFrameHandler;
-    protected IpFrameHandler ipFrameHandler;
+    /**
+     * the following variables are instantiated in the CarduinodroidApplication
+     */
+    protected CarduinoData cd;///<instance of the Carduino Database
+    protected CarduinoDroidData ccd;///< instance of the Carduinodroid Database
+    protected SerialFrameHandler serialFrameHandler;///< instance of the serial frame handler
+    protected IpFrameHandler ipFrameHandler;///< instance of the ip frame handler
 
-    private ControlMode controlMode = null;
-    private SerialType serialPref = SerialType.NONE;
-    private String bluetoothDeviceName = "";
-    private BluetoothHandling bluetoothHandling = BluetoothHandling.AUTO;
-    private boolean failSafeStopPref = true;
-    private boolean debugView = false;
-    private boolean bluetoothEnabled = false;
-    private CommunicationStatus communicationStatus = CommunicationStatus.IDLE;
-    private int screensaver = 60000;
+    private ControlMode controlMode = null;///< global control mode instance
+    private SerialType serialPref = SerialType.NONE;///< preference of the serial connection type
+    private String bluetoothDeviceName = "";///< preference filter of bluetooth device name
+    private BluetoothHandling bluetoothHandling = BluetoothHandling.AUTO;///< bluetooth handling instance
+    private boolean failSafeStopPref = true;///< preference of the failsafe stop variable
+    private boolean debugView = false;///< preference of the debug view variable
+    private boolean bluetoothEnabled = false;///< bluetooth enabled variable
+    private CommunicationStatus communicationStatus = CommunicationStatus.IDLE;///< communication status variable
+    private int screensaver = 60000;///< preference of the screensaver timeout
 
+
+    /**
+     * public constructor
+     *
+     * empty because the data handler variables are set on startup in CarduinodroidApplication
+     */
     public DataHandler() {
-        // the data handler variables are set on startup in CarduinodroidApplication
     }
 
+    /**
+     * global getter of the carduino database
+     * @return cd carduino database
+     */
     public synchronized CarduinoData getData(){
         return cd;
     }
 
+
+    /**
+     * global getter of the carduinodroid database
+     * @return cd carduinodroid database
+     */
     public synchronized CarduinoDroidData getDData(){
         return ccd;
     }
 
+
+    /**
+     * setter for the screensaver value
+     * @param ss screensavervalue in ms 0 for inactivity of the screensaver
+     */
     public synchronized void setScreensaver(int ss){
         screensaver = ss;
     }
+
+    /**
+     * getter of the screensaver value
+     * @return screensaver timeout in ms
+     */
     public synchronized int getScreensaver(){
         return screensaver;
     }
 
+    /**
+     * setter for the bluetooth enabled variable
+     * @param bte if set, the bluetooth module was enabled before starting a bluetooth connection
+     */
     public synchronized void setBluetoothEnabled(boolean bte){
         bluetoothEnabled = bte;
     }
+
+    /**
+     * getter for the bluetooth enabled variable
+     * @return bluetoothEnabled if set, the bluetooth module was enabled before starting a bluetooth connection
+     */
     public synchronized boolean getBluetoothEnabled(){
         return bluetoothEnabled;
     }
 
+    /**
+     * getter of the communication status
+     * @return communicationStatus
+     * @see CommunicationStatus
+     */
     public synchronized CommunicationStatus getCommunicationStatus() {
         return communicationStatus;
     }
 
+    /**
+     * calculates the communication status based on the control mode, ipStatus and serialStatus
+     * @see CommunicationStatus
+     * @see ControlMode
+     * @see CarduinoData
+     * @see CarduinoDroidData
+     * @see ConnectionState
+     */
     public synchronized void calcCommunicationStatus(){
         switch (controlMode){
             case REMOTE:
@@ -150,6 +207,10 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
+    /**
+     * based on the communication status the app displays the status in different colors
+     * @return resource id of the color of the actual communication status
+     */
     public synchronized int getCommunicationStatusColor(){
         int color = R.color.colorCommunicationStatusOk;
         if(getCommunicationStatus().isIdleError()){
@@ -161,6 +222,10 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return color;
     }
 
+    /**
+     * based on the communication status a string is displayed
+     * @return displayable communication status string
+     */
     public synchronized String getCommunicationStatusString(){
         String s = "";
         switch (communicationStatus){
@@ -189,6 +254,12 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return s;
     }
 
+    /**
+     * setter of the control mode, if the control mode is changed, the global behavior of the whole
+     * needs to be changed
+     * the function instanziated new CarduinoData and/or CarduinoDroidData objects
+     * @param cm new control mode which should be set
+     */
     public synchronized void setControlMode(ControlMode cm){
         try {
             if (controlMode == null || cd == null) {
@@ -279,10 +350,18 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
+    /**
+     * getter of the actual control mode
+     * @return control mode
+     */
     public synchronized ControlMode getControlMode(){
         return controlMode;
     }
 
+    /**
+     * switch function to set the "next" control mode
+     * @return integer of the control mode for preference
+     */
     public synchronized int setControlModeNext(){
         switch (controlMode){
             case TRANSCEIVER:
@@ -301,6 +380,11 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
         return ControlMode.toInteger(controlMode);
     }
+
+    /**
+     * switch function to set the "previous" control mode
+     * @return integer of the control mode for preference
+     */
     public synchronized int setControlModePrev(){
         int cm;
         try {
@@ -327,13 +411,26 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return cm;
     }
 
+    /**
+     * setter of the failsafe stop preference
+     * @param fss true if failsafe stop is set, false otherwise
+     */
     public synchronized void setFailSafeStopPref(boolean fss){
         failSafeStopPref = fss;
     }
 
+    /**
+     * getter of the failsafe stop preference
+     * @return true if failsafe stop is set, false otherwise
+     */
     public synchronized final boolean getFailSafeStopPref(){
         return failSafeStopPref;
     }
+
+    /**
+     * toggles the failsafe stop value
+     * @return integer of the failsafe stop value for preference
+     */
     public synchronized int toggleFailSafeStopPref(){
         failSafeStopPref = !failSafeStopPref;
         if(failSafeStopPref){
@@ -341,12 +438,27 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
         return 0;
     }
+
+    /**
+     * setter of the debug view variable
+     * @param dv true if debug view should be visible, false otherwise
+     */
     public synchronized void setDebugView(boolean dv){
         debugView = dv;
     }
+
+    /**
+     * getter of the debug view variable
+     * @return true if debug view should be visible, false otherwise
+     */
     public synchronized final boolean getDebugView(){
         return debugView;
     }
+
+    /**
+     * toggles the debug view variable
+     * @return integer of the debug view value for preferences
+     */
     public synchronized int toggleDebugView(){
         debugView = !debugView;
         if(debugView){
@@ -355,42 +467,66 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return 0;
     }
 
+    /**
+     * getter of the bluetooth handling
+     * @return bluetooth handling which can be AUTO, ON or OFF
+     * @see BluetoothHandling
+     */
     public synchronized final BluetoothHandling getBluetoothHandling(){
         return bluetoothHandling;
     }
+
+    /**
+     * /**
+     * setter of the bluetooth handling
+     * @param bth bluetooth handling which can be AUTO, ON or OFF
+     * @see BluetoothHandling
+     */
     public synchronized void setBluetoothHandling(BluetoothHandling bth){
         bluetoothHandling = bth;
     }
 
+    /**
+     * setter of the serial type
+     * @return serial type which can be USB or BLUETOOTH
+     * @see SerialType
+     */
     public synchronized final SerialType getSerialPref(){
         return serialPref;
     }
+    /**
+     * getter of the serial type
+     * @param t serial type which can be USB or BLUETOOTH
+     * @see SerialType
+     */
     public synchronized void setSerialPref(SerialType t){
         serialPref = t;
     }
 
+    /**
+     * sets the bluetooth device name which is a filter for the different bluetooth connections
+     * @param name String which needs to be inside the bluetooth's device name. It should
+     *             differentiate all other peered bluetooth devices.
+     */
     public synchronized void setBluetoothDeviceName(String name){
         bluetoothDeviceName = name;
     }
 
+    /**
+     * getter of the bluetooth device name
+     * @return String which needs to be inside the bluetooth's device name. It should
+     *             differentiate all other peered bluetooth devices.
+     */
     public synchronized final String getBluetoothDeviceName(){
         return bluetoothDeviceName;
     }
 
-    public synchronized int toggleSerialType(ConnectionState serialState){
-        if(controlMode.isTransceiver()) {
-            if (serialState.isIdleError()) {
-                if (serialPref.isBluetooth()) {
-                    setSerialPref(SerialType.USB);
-
-                } else {
-                    setSerialPref(SerialType.BLUETOOTH);
-                }
-            }
-        }
-        return SerialType.toInteger(serialPref);
-    }
-
+    /**
+     * interfaced serial frame assemble function in tx direction based on the control mode
+     * @return byte[] which is an assembled serial frame; in ControlMode.REMOTE an empty byte
+     * @see SerialFrameIF
+     * @see ControlMode
+     */
     public synchronized byte[] serialFrameAssembleTx() {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAssembleTx: " + controlMode.toString());
@@ -401,6 +537,13 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
+    /**
+     * interfaced serial frame byte append function in rx direction based on the control mode
+     * @return true if a valid serial frame was received on the last byte input
+     * @param inChar next read char on the serial buffer
+     * @see SerialFrameIF
+     * @see ControlMode
+     */
     public synchronized boolean serialFrameAppendRx(byte inChar) {
         if(controlMode.isRemote()){
             Log.e(TAG, "serialFrameAppendRx: " + controlMode.toString());
@@ -411,6 +554,14 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         }
     }
 
+    /**
+     * interfaced parse JSON function based on the control mode
+     * parses a received JSON string
+     * @return types of detected string modules in a string
+     * @param jsonObjectRxData incoming string which should be parsed
+     * @see IpFrameIF
+     * @see ControlMode
+     */
     public synchronized String parseJson(String jsonObjectRxData) {
         if(controlMode.isDirect()){
             return "false";
@@ -418,8 +569,15 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
         return ipFrameHandler.parseJson(jsonObjectRxData);
     }
 
+    /**
+     * interfaced get data to transmit function based on control mode
+     * @param dataTypeMask mask of the JSÒN data type, information which parts the needed frame
+     *                     should consist of
+     * @param dataServerStatus is important if this method is only used for control messages
+     * @return the created JSON or null object
+     */
     @Override
-    public JSONObject getTransmitData(String dataTypeMask, boolean dataServerStatus) {
+    public synchronized JSONObject getTransmitData(String dataTypeMask, boolean dataServerStatus) {
         if(controlMode.isDirect()){
             return null;
         }

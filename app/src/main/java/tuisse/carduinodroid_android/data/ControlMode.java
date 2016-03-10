@@ -3,12 +3,14 @@ package tuisse.carduinodroid_android.data;
 import tuisse.carduinodroid_android.CarduinodroidApplication;
 import tuisse.carduinodroid_android.R;
 /**
- * @author Till Max Schwikal
- * @date 11.01.2016
- *
+ * <h1>Control Mode enum</h1>
  * Enum which codes the control mode of the android device
  *
- * @see DataHandler
+ * @author Till Max Schwikal
+ * @since 11.01.2016
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 public enum ControlMode {
     /**

@@ -19,9 +19,13 @@ import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.SerialType;
 
 import static tuisse.carduinodroid_android.data.Utils.byteArrayToHexString;
-
 /**
- * Created by keX on 04.01.2016.
+ * <h1>Serial USB</h1>
+ * This class holds the implementation of the serial usb connection
+ *
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 04.01.2016
  */
 public class SerialUsb extends SerialConnection {
     private final String TAG = "CarduinoSerialUsb";
@@ -42,6 +46,10 @@ public class SerialUsb extends SerialConnection {
         }
     }
 
+    /**
+     * find checks if the right usb device partner (an arduino) is connected
+     * @return true if the connected device is a known arduino, else otherwise
+     */
     @Override
     protected boolean find() {
         if (isIdle()) {
@@ -119,6 +127,11 @@ public class SerialUsb extends SerialConnection {
     }
 
 
+    /**
+     * helper function to generate the proper usb line encoding
+     * @param baudRate is the selected baud rate
+     * @return proper line encoding byte array
+     */
     private byte[] getLineEncoding(int baudRate) {
         final byte[] lineEncoding = { (byte) 0x80, 0x25, 0x00, 0x00, 0x00, 0x00, 0x08 };
         //Get the least significant byte of baudRate,
@@ -133,6 +146,11 @@ public class SerialUsb extends SerialConnection {
         return lineEncoding;
     }
 
+    /**
+     * connects with the usb device, checks the permission and opens the usb device and
+     * setups the usb endpoints
+     * @return true on a successful connect
+     */
     @Override
     protected boolean connect() {
         if (!isError()) {
@@ -194,6 +212,11 @@ public class SerialUsb extends SerialConnection {
         return isConnected();
     }
 
+    /**
+     * closees the usb connection normally to free the resources and get to a suitable state
+     * @note some android usb drivers are unable to close the connection
+     * @return true if succesfully closed
+     */
     @Override
     protected boolean close() {
         //getSerialData().setSerialName(serialService.getString(R.string.serialDeviceNone));
@@ -227,7 +250,10 @@ public class SerialUsb extends SerialConnection {
         return isIdle();
     }
 
-
+    /**
+     * sends a serial frame over usb
+     * @throws IOException
+     */
     @Override
     protected void send() throws IOException {
         byte[] buffer = null;
@@ -237,7 +263,9 @@ public class SerialUsb extends SerialConnection {
         if(buffer != null) {
             if((buffer.length > 0) && (usbConnection != null) && (usbEndpointTx != null)) {
                 int len = usbConnection.bulkTransfer(usbEndpointTx, buffer, buffer.length, 0);
-                //Log.d(TAG,"usb send: " + len);
+                if(Constants.LOG.SERIAL_SENDER) {
+                    Log.d(TAG,"usb send" + len + ": " + byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
+                }
             }
             else{
                 setSerialState(ConnectionEnum.ERROR, R.string.serialErrorNoDataPointer);
@@ -245,6 +273,11 @@ public class SerialUsb extends SerialConnection {
         }
     }
 
+    /**
+     * receives incoming bytes over usb
+     * @return true if a valid frame was received
+     * @throws IOException
+     */
     @Override
     protected int receive() throws IOException {
 
@@ -260,7 +293,9 @@ public class SerialUsb extends SerialConnection {
                         acceptedFrame++;
                     }
                 }
-                //Log.d(TAG, byteArrayToHexString(buffer));
+                if(Constants.LOG.SERIAL_RECEIVER){
+                    Log.d(TAG, byteArrayToHexString(buffer));
+                }
             }
         }
         else{

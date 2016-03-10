@@ -12,7 +12,16 @@ import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
- * Created by keX on 09.12.2015.
+ * <h1>Serial Connection abstract class</h1>
+ * This abstract class defines the basic functions and implements serial send and receive threads.
+ *
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 09.12.2015
+ *
+ * @see SerialBluetooth
+ * @see SerialUsb
+ * @see SerialService
  */
 abstract public class SerialConnection {
     private final String            TAG = "CarduinoSerialConn";
@@ -28,17 +37,49 @@ abstract public class SerialConnection {
         serialReceiveThread   = new SerialReceiveThread();
     }
 
+    /**
+     * function to find a proper carduino arduino
+     * is called in serial service
+     * @return true if found was successful
+     */
     abstract protected boolean find();
+
+    /**
+     * function to connect to a proper carduino arduino
+     * is called in serial service
+     * @return true if connect was successful
+     */
     abstract protected boolean connect();
+
+    /**
+     * function to close a serial connection
+     * is called in serial service
+     * @return true on proper closing
+     */
     abstract protected boolean close();
+
+    /**
+     * function to send a serial frame
+     * @throws IOException
+     */
     abstract protected void send() throws IOException;
+
+    /**
+     * function to receive a serial frame
+     * @return number of received bytes
+     * @throws IOException
+     */
     abstract protected int receive() throws IOException;
 
     protected DataHandler getDataHandler(){
         return serialService.getCarduino().dataHandler;
     }
 
-    protected boolean reset() {
+    /**
+     * resets the serial connection state
+     * is called in serial service
+     */
+    protected void reset() {
         setSerialState(ConnectionEnum.IDLE);
         if(serialSendThread.isAlive()){
             serialSendThread.interrupt();
@@ -46,24 +87,42 @@ abstract public class SerialConnection {
         if(serialReceiveThread.isAlive()) {
             serialReceiveThread.interrupt();
         }
-        return true;
     }
 
+    /**
+     * starts the serial send and receive threads
+     * is called in serial service
+     */
     protected void start() {
-        if(isConnected())
-        setSerialState(ConnectionEnum.RUNNING);
-        serialSendThread.start();
-        serialReceiveThread.start();
+        if(isConnected()) {
+            setSerialState(ConnectionEnum.RUNNING);
+            serialSendThread.start();
+            serialReceiveThread.start();
+        }
     }
 
+    /**
+     * overloaded function to set a serial state
+     * @param state connection enum of the state
+     */
     protected synchronized void setSerialState(ConnectionEnum state){
         setSerialState(state, "");
     }
 
+    /**
+     * overloaded function to set a serial state
+     * @param state connection enum of the state
+     * @param errorId error/description id string resource
+     */
     protected synchronized void setSerialState(ConnectionEnum state, int errorId){
         setSerialState(state,serialService.getString(errorId));
     }
 
+    /**
+     * overloaded function to set a serial state
+     * @param state connection enum of the state
+     * @param error error/description string
+     */
     protected synchronized void setSerialState(ConnectionEnum state, String error){
         if(getData().getSerialState() != null) {
 
@@ -88,6 +147,11 @@ abstract public class SerialConnection {
         }
     }
 
+    /**
+     * serial receive thread
+     * runs while serial state is RUNNING
+     * receives serial messages and calls receive()
+     */
     protected class SerialReceiveThread extends Thread {
         public SerialReceiveThread() {
             super("SerialConnection-SerialReceiveThread");
@@ -133,6 +197,11 @@ abstract public class SerialConnection {
         }
     }//SerialReceiveThread
 
+    /**
+     * serial send thread
+     * runs while serial connection state is RUNNING
+     * sends serial messages and calls send()
+     */
     protected class SerialSendThread extends Thread {
         public SerialSendThread() {
             super("SerialConnection-SerialSendThread");

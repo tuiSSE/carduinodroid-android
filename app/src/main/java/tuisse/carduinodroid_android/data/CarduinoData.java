@@ -8,17 +8,18 @@ import tuisse.carduinodroid_android.R;
 import tuisse.carduinodroid_android.Utils;
 
 /**
- * @author Till Max Schwikal
- * @date 04.01.2016
- *
+ * <h1>Carduino Database</h1>
  * Class which holds all data sent and received from the Arduino Device.
- *
  * This class has the role of a central data storage for the carduinodroid. All data needed for the
  * Arduino are stored here. The class provides besides some helper functions getter and setter to
  * the data.
  *
- * @see CarduinoIF
- * @see DataHandler
+ * @author Till Max Schwikal
+ * @since 04.01.2016
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.data.CarduinoIF
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 
 public class CarduinoData implements CarduinoIF{

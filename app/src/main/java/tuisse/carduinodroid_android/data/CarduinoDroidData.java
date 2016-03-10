@@ -6,7 +6,7 @@ import tuisse.carduinodroid_android.R;
 
 /**
  * <h1>CarduinoDroidData Database</h1>
- * The CarDuinoDroidData Class implements a full database for all the values transmitted between
+ * The CarduinoDroidData Class implements a full database for all the values transmitted between
  * transceiver and remote side. It is divived in camera and sound settings, mobile and WLAN
  * information, battery status, vibration for a possible gamepad.
  *
@@ -15,8 +15,8 @@ import tuisse.carduinodroid_android.R;
  * @version 1.0
  * @since 03.02.2016
   *
- * @see CarduinoDroidIF
- * @see DataHandler
+ * @see tuisse.carduinodroid_android.data.CarduinoDroidIF
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 public class CarduinoDroidData implements CarduinoDroidIF{
 
@@ -25,23 +25,23 @@ public class CarduinoDroidData implements CarduinoDroidIF{
     private ConnectionState ipState;
     private IpType ipType;
 
-    private String[] cameraSupportedSizes; // All Resolutions/Sizes supported by the Transceiver
-    private int cameraType; // Front=0 - Back=1
-    private int cameraResolutionID; // Defines resolution ID in the array (from 0 high to n low)
-    private int cameraFlashlight; // On=1 - Off=0;
-    private int cameraQuality; // Value between 0(low) to 100 (high)
+    private String[] cameraSupportedSizes; ///< All Resolutions/Sizes supported by the Transceiver
+    private int cameraType; ///< Front=0 - Back=1
+    private int cameraResolutionID; ///< Defines resolution ID in the array (from 0 high to n low)
+    private int cameraFlashlight; ///< On=1 - Off=0;
+    private int cameraQuality; ///< Value between 0(low) to 100 (high)
 
-    private int soundPlay; // Play a horn sound=1 - No horn sound=0;
-    private int soundRecord; // Start Recording=1 - Stop Recording=0;
+    private int soundPlay; ///< Play a horn sound=1 - No horn sound=0;
+    private int soundRecord; ///< Start Recording=1 - Stop Recording=0;
 
-    private float vibration; // a certain vibration value given by the motion hardware
-    private float batteryPhone; // actual battery status of the transceiver
+    private float vibration; ///< a certain vibration value given by the motion hardware
+    private float batteryPhone; ///< actual battery status of the transceiver
 
-    private String gpsData; // GPS data written in CSV to get long., lat. and altitude
-    private int mobileAvail; // Mobile Available: Yes 1 - No 0
-    private int mobileActive; // Mobile Active: Yes 1 - No 0
-    private int wlanAvail; // WLAN Available: Yes 1 - No 0
-    private int wlanActive; // WLAN Active: Yes 1 - No 0
+    private String gpsData; ///< GPS data written in CSV to get long., lat. and altitude
+    private int mobileAvail; ///< Mobile Available: Yes 1 - No 0
+    private int mobileActive; ///< Mobile Active: Yes 1 - No 0
+    private int wlanAvail; ///< WLAN Available: Yes 1 - No 0
+    private int wlanActive; ///< WLAN Active: Yes 1 - No 0
 
     private String remoteIp;
     private String transceiverIp;
