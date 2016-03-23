@@ -391,10 +391,10 @@ public class DriveActivity extends AppCompatActivity{
                             // accelerometer sensors
                             sensorManager.registerListener(accelerometerListener,
                                     accelerationSensor,
-                                    SensorManager.SENSOR_DELAY_GAME);
+                                    SensorManager.SENSOR_DELAY_NORMAL);
                             sensorManager.registerListener(magnetometerListener,
                                     magnetSensor,
-                                    SensorManager.SENSOR_DELAY_GAME);
+                                    SensorManager.SENSOR_DELAY_NORMAL);
                             buttonDrive.setBackground(Utils.assembleDrawables(R.drawable.buttonshape_primary_light, R.drawable.icon_drive_press));
 
                             txDataApp = TrafficStats.getUidTxBytes(applicationUID);

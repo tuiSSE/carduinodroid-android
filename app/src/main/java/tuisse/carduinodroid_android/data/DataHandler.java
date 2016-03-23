@@ -32,11 +32,11 @@ public class DataHandler implements SerialFrameIF,IpFrameIF{
     public DataHandler() {
     }
 
-    public synchronized CarduinoData getData(){
+    public CarduinoData getData(){
         return cd;
     }
 
-    public synchronized CarduinoDroidData getDData(){
+    public CarduinoDroidData getDData(){
         return ccd;
     }
 
