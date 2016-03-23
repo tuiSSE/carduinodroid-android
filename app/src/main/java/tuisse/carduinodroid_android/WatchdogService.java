@@ -28,7 +28,19 @@ import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
 /**
+ * <h1>Watchdog Service</h1>
  * Service which watches the communication status of the carduinodroid system.
+ * The service is started by the status activity.
+ * The service starts and stops all other services (serial, ip, camera)
+ *
+ * @author Till Max Schwikal
+ * @since 07.12.2015
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.StatusActivity
+ * @see tuisse.carduinodroid_android.SerialService
+ * @see tuisse.carduinodroid_android.IpService
+ * @see tuisse.carduinodroid_android.CameraService
  */
 public class WatchdogService extends Service {
 
@@ -280,9 +292,13 @@ public class WatchdogService extends Service {
         }
         @Override
         public void run() {
+            LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
+            LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
+
+            getData().setSerialState(new ConnectionState(ConnectionEnum.IDLE));
+            getDData().setIpState(new ConnectionState(ConnectionEnum.IDLE));
             if (!SerialService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, SerialService.class));
-
             }
             if (!IpService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, IpService.class));
@@ -290,32 +306,15 @@ public class WatchdogService extends Service {
             if (!CameraService.getIsDestroyed()) {
                 stopService(new Intent(WatchdogService.this, CameraService.class));
             }
-            Thread.yield();
-            if (SerialService.getIsDestroyed() && IpService.getIsDestroyed() && CameraService.getIsDestroyed()) {
-                sendToast("WatchdogThred stopped");
-                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(serialStatusChangeReceiver);
-                LocalBroadcastManager.getInstance(WatchdogService.this).unregisterReceiver(ipStatusChangeReceiver);
-                if(isInForeground) {
-                    stopForeground(false);
-                    isInForeground = false;
-                }
-                if(notificationManager != null) {
-                    notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
-                }
-                isDestroyed = true;
-                return;
+            sendToast("WatchdogThred stopped");
+            if(isInForeground) {
+                stopForeground(false);
+                isInForeground = false;
             }
-            else{
-                try {
-                    sleep(100);
-                }catch (InterruptedException e){
-                    Log.d(TAG, "WatchdogStopThread interrupted");
-                }finally {
-                    stopSelf();
-                }
-
-
+            if(notificationManager != null) {
+                notificationManager.cancel(Constants.NOTIFICATION_ID.WATCHDOG);
             }
+            isDestroyed = true;
         }
     };
 

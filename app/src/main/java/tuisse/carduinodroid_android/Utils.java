@@ -13,7 +13,13 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 /**
- * Created by keX on 12.01.2016.
+ * <h1>Utils static class</h1>
+ * utility class has static functions and no variables. every function is not dependent on this
+ * class. It is available to the packet carduinodroid_android.
+ *
+ * @author Till Max Schwikal
+ * @since 12.01.2016
+ * @version 1.0
  */
 public class Utils {
     private static final String TAG = "CarduinoUtils";

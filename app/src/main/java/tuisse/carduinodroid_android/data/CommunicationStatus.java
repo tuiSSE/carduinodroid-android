@@ -1,14 +1,16 @@
 package tuisse.carduinodroid_android.data;
 
 /**
- * @author Till Max Schwikal
- * @date 04.01.2016
- *
+ * <h1>Communication Status</h1>
  * Enumeration which codes the communication status of the application.
  *
- * @see ConnectionState
- * @see ControlMode
- * @see DataHandler
+ * @author Till Max Schwikal
+ * @since 04.01.2016
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.data.ConnectionState
+ * @see tuisse.carduinodroid_android.data.ControlMode
+ * @see tuisse.carduinodroid_android.data.DataHandler
  */
 
 public enum CommunicationStatus {

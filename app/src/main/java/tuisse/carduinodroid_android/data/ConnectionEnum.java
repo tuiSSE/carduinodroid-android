@@ -3,10 +3,12 @@ package tuisse.carduinodroid_android.data;
 import android.util.Log;
 
 /**
- * @author Till Max Schwikal
- * @date 12.01.2016
- *
+ * <h1>Connection Enum</h1>
  * Enumeration which abstractly codes the status of a connection service.
+ *
+ * @author Till Max Schwikal
+ * @since 12.01.2016
+ * @version 1.0
  */
 public enum ConnectionEnum {
 

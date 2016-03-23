@@ -12,9 +12,16 @@ import tuisse.carduinodroid_android.data.ControlMode;
 import tuisse.carduinodroid_android.data.SerialType;
 
 /**
- * Created by keX on 04.12.2015.
+ * <h1>Carduinodroid Application</h1>
+ * This class is derived from a application class and holds all parts of the application.
+ * By separating global data classes and android classed like activities and services the
+ * application is clearly devided.
+ *
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 04.12.2015
  */
-public class CarduinodroidApplication extends Application /* implements SharedPreferences.OnSharedPreferenceChangeListener */{
+public class CarduinodroidApplication extends Application{
     private static final String TAG = "CarduinoApplication";
 
     private SharedPreferences sharedPrefs;
@@ -38,11 +45,15 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
     @Override
     public void onTerminate() {
         super.onTerminate();
-        dataHandler = null;
-        appContext = null;
         Log.i(TAG, "onTerminated");
     }
 
+    /**
+     * function to update changes from the preferences.
+     * specified changes are made in the data classes
+     * @param sharedPreferences shared preferences reference
+     * @param key shared preference key
+     */
     public synchronized void updateSharedPreferences(SharedPreferences sharedPreferences, String key) {
         if(dataHandler == null){
             Log.e(TAG, "no dataHandler initialized");
@@ -116,6 +127,9 @@ public class CarduinodroidApplication extends Application /* implements SharedPr
         }
     }
 
+    /**
+     * static function to get the application context
+     */
     public static Context getAppContext(){
         if(appContext == null){
             //should never happen

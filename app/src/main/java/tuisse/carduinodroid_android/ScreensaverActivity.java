@@ -17,7 +17,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import tuisse.carduinodroid_android.data.DataHandler;
-
+/**
+ * <h1>Screensaver Activity</h1>
+ * This class is a simple activity. It displays the connection status by color and a carduinodroid logo.
+ * with a Touch event the activity is exited.
+ *
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 10.02.2016
+ */
 public class ScreensaverActivity extends AppCompatActivity {
     private static final String TAG = "CarduinoStatusActivity";
 

@@ -8,7 +8,7 @@ import android.media.SoundPool;
  * Provides methods to load Soundfiles into RAM and play then.
  *
  * @author Paul Thorwirth & Felix Lewandowski
- * @version 1.0
+ * @version 1.1
  * @see SoundPool
  * @see AudioManager
  */

@@ -13,6 +13,8 @@ import android.graphics.drawable.LayerDrawable;
  * @author Lars Vogel
  * @version 1.0
  * @since 03.02.2016
+ *
+ * @see tuisse.carduinodroid_android.data.CarduinoDroidData
  */
 public interface CarduinoDroidIF{
 

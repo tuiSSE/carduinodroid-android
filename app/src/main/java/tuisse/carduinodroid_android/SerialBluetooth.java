@@ -17,7 +17,12 @@ import tuisse.carduinodroid_android.data.SerialType;
 import static tuisse.carduinodroid_android.data.Utils.byteArrayToHexString;
 
 /**
- * Created by keX on 08.12.2015.
+ * <h1>Serial Bluetooth</h1>
+ * This class holds the implementation of the serial bluetooth connection
+ *
+ * @author Till Max Schwikal
+ * @version 1.0
+ * @since 08.12.2015
  */
 public class SerialBluetooth extends SerialConnection {
     private final String TAG = "CarduinoSerialBluetooth";
@@ -37,6 +42,11 @@ public class SerialBluetooth extends SerialConnection {
         }
     }
 
+    /**
+     * find enables the bluetooth module, selects the right peering partner which can be selected
+     * by a bluetooth device string.
+     * @return if one, and only one proper device is found, the function returns true, else otherwise
+     */
     @Override
     public boolean find() {
         if (isIdle()) {
@@ -128,6 +138,12 @@ public class SerialBluetooth extends SerialConnection {
         return isFound();
     }
 
+    /**
+     * connect() connects to the before found device. it checks if a device was found, before it can
+     * connect to it. it establishes the android sockets for reading and sending byte arrays to the
+     * bluetooth module
+     * @return true if a connect was successful, otherwise false
+     */
     @Override
     public boolean connect() {
         if (!isError()) {
@@ -139,17 +155,17 @@ public class SerialBluetooth extends SerialConnection {
             setSerialState(ConnectionEnum.TRYCONNECTERROR, R.string.serialErrorNoBluetoothDevicePaired);
         }
 
-        final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+        final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //standard SerialPortService ID
         if (isTryConnect()) {
-            // Socket erstellen
+            // establish socket
             try {
                 mmSocket = mmDevice.createInsecureRfcommSocketToServiceRecord(uuid);
             } catch (Exception e) {
-                setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(serialService.getString(R.string.serialErrorSocketCreation),e.toString()));
-                Log.e(TAG, String.format(serialService.getString(R.string.serialErrorSocketCreation),e.toString()));
+                setSerialState(ConnectionEnum.TRYCONNECTERROR, String.format(serialService.getString(R.string.serialErrorSocketCreation), e.toString()));
+                Log.e(TAG, String.format(serialService.getString(R.string.serialErrorSocketCreation), e.toString()));
             }
             mBluetoothAdapter.cancelDiscovery();
-            // Socket verbinden
+            // connect socket
             try {
                 mmSocket.connect();
             } catch (IOException e) {
@@ -158,7 +174,7 @@ public class SerialBluetooth extends SerialConnection {
             }
         }
 
-        // Socket beenden, falls nicht verbunden werden konnte
+        // close socket, if connection was unsuccessful
         if (isError()) {
             try {
                 mmSocket.close();
@@ -167,7 +183,7 @@ public class SerialBluetooth extends SerialConnection {
                 Log.e(TAG, String.format(serialService.getString(R.string.serialErrorSocketClose),e.toString()));
             }
         } else {
-            // Outputstream erstellen:
+            // establish outputstream
             try {
                 mmOutputStream = mmSocket.getOutputStream();
             } catch (IOException e) {
@@ -175,7 +191,7 @@ public class SerialBluetooth extends SerialConnection {
                 setSerialState(ConnectionEnum.STREAMERROR, String.format(serialService.getString(R.string.serialErrorOutputStream),e.toString()));
             }
 
-            // Inputstream erstellen
+            // establish inputstream
             if(!isError()) {
                 try {
                     mmInputStream = mmSocket.getInputStream();
@@ -195,6 +211,10 @@ public class SerialBluetooth extends SerialConnection {
         return isConnected();
     }
 
+    /**
+     * closees the bluetooth connection normally to free the resources and get to a suitable state
+     * @return true if succesfully closed
+     */
     @Override
     public boolean close() {
         try {
@@ -252,12 +272,24 @@ public class SerialBluetooth extends SerialConnection {
         return isIdle();
     }
 
+
+    /**
+     * sends a serial frame over bluetooth
+     * @throws IOException
+     */
     @Override
     protected void send() throws IOException {
-        //Log.d(TAG, byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
         mmOutputStream.write(getDataHandler().serialFrameAssembleTx());
+        if(Constants.LOG.SERIAL_SENDER){
+            Log.d(TAG, byteArrayToHexString(getDataHandler().serialFrameAssembleTx()));
+        }
     }
 
+    /**
+     * receives incoming bytes over bluetooth
+     * @return true if a valid frame was received
+     * @throws IOException
+     */
     @Override
     protected int receive() throws IOException {
         final int BUFFER_LENGTH = RECEIVE_BUFFER_LENGTH;
@@ -270,7 +302,9 @@ public class SerialBluetooth extends SerialConnection {
                     acceptedFrame++;
                 }
             }
-            //Log.d(TAG, byteArrayToHexString(buffer));
+            if(Constants.LOG.SERIAL_RECEIVER){
+                Log.d(TAG, byteArrayToHexString(buffer));
+            }
         }
         return acceptedFrame;
     }

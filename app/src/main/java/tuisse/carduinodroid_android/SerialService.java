@@ -18,6 +18,16 @@ import tuisse.carduinodroid_android.data.ConnectionEnum;
 import tuisse.carduinodroid_android.data.ConnectionState;
 import tuisse.carduinodroid_android.data.DataHandler;
 
+/**
+ * <h1>Serial Service</h1>
+ * establishes a serial connection, sends and receives serial frames
+ *
+ * @author Till Max Schwikal
+ * @since 08.12.215
+ * @version 1.0
+ *
+ * @see tuisse.carduinodroid_android.SerialConnection
+ */
 public class SerialService extends Service {
     static final String TAG = "CarduinoSerialService";
     static private boolean isDestroyed = true;

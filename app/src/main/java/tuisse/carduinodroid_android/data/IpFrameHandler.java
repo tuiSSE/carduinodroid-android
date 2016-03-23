@@ -208,8 +208,7 @@ public class IpFrameHandler implements IpFrameIF{
      * @param mask is the given data mask in a certain JSON Object
      * @return if the data mask is logic
      */
-    private boolean isMaskLogic(String mask){
-
+    private synchronized boolean isMaskLogic(String mask){
         isCar = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_CAR);
         isMobility = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_MOBILITY);
         isFeature = checkDataTypeMask(mask,Constants.JSON_OBJECT.NUM_FEATURES);
