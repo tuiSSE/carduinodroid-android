@@ -67,7 +67,7 @@ public class Constants {
      */
     public interface DELAY{
         int WATCHDOG    = 3000;     //ms
-        int SERIAL      = 50;      //ms
+        int SERIAL      = 100;      //ms
         int IP          = 50;       //ms
         int CONNECTIONTRY = 3000;   //ms
         int FACTOR_CONTROL = 2;     //2 * IP Delay
@@ -144,7 +144,7 @@ public class Constants {
         String TAG_HEADER_VERSION = "Version";
         String TAG_HEADER_INFORMATION_TYPE = "Information Type";
         String TAG_HEADER_DATA_SERVER_STATUS = "Data Server Status";
-        String TAG_HEADER = "Header";
+        String TAG_HEADER = "#Header";
 
         String TAG_CAR_CURRENT = "Current";
         String TAG_CAR_BATTERY_ABSOLUTE = "Battery Absolute";

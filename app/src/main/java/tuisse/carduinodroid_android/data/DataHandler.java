@@ -53,7 +53,7 @@ public class DataHandler implements SerialFrameIF, IpFrameIF{
      * global getter of the carduino database
      * @return cd carduino database
      */
-    public synchronized CarduinoData getData(){
+    public CarduinoData getData(){
         return cd;
     }
 
@@ -62,7 +62,7 @@ public class DataHandler implements SerialFrameIF, IpFrameIF{
      * global getter of the carduinodroid database
      * @return cd carduinodroid database
      */
-    public synchronized CarduinoDroidData getDData(){
+    public CarduinoDroidData getDData(){
         return ccd;
     }
 
